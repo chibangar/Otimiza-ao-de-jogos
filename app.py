@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.8.1"
+APP_VERSION = "1.8.2"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -870,10 +870,16 @@ class Api:
             latest = rel.get("tag_name", "")
             notes = rel.get("body", "") or ""
             dl = ""
+            fallback = ""
             for a in rel.get("assets", []):
-                if a.get("name", "").lower().endswith(".exe"):
+                nm = a.get("name", "")
+                if nm == "MidnightOptimizer.exe":
                     dl = a.get("browser_download_url", "")
                     break
+                if not fallback and nm.lower().endswith(".exe") and "setup" not in nm.lower():
+                    fallback = a.get("browser_download_url", "")
+            if not dl:
+                dl = fallback
             available = bool(latest) and _ver_tuple(latest) > _ver_tuple(APP_VERSION)
             if available:
                 _UPDATE.update({"version": latest, "notes": notes})
@@ -902,6 +908,11 @@ class Api:
         def _dl():
             try:
                 dest = os.path.join(tempfile.gettempdir(), "MidnightOptimizer_novo.exe")
+                try:
+                    if os.path.isfile(dest):
+                        os.remove(dest)
+                except Exception:
+                    pass
                 req = urllib.request.Request(url, headers={"User-Agent": "MidnightOptimizer"})
                 with urllib.request.urlopen(req, timeout=60) as r, open(dest, "wb") as f:
                     total = int(r.headers.get("Content-Length") or 0)
@@ -914,6 +925,11 @@ class Api:
                         got += len(chunk)
                         if total:
                             _UPDATE["pct"] = min(99, int(got * 100 / total))
+                final = os.path.getsize(dest) if os.path.isfile(dest) else 0
+                if total and final != total:
+                    raise IOError(f"download incompleto ({final}/{total} bytes)")
+                if final < 5 * 1024 * 1024:
+                    raise IOError(f"ficheiro suspeito ({final} bytes)")
                 _UPDATE.update({"status": "ready", "pct": 100, "path": dest})
             except Exception as e:
                 _UPDATE.update({"status": "error", "error": str(e)})
