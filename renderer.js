@@ -30,6 +30,8 @@ async function getBackend(){
       wowCompetitive: ()=>a.wow_competitive(),
       wowBalanced: ()=>a.wow_balanced(),
       wowRestore: ()=>a.wow_restore(),
+      listPros: ()=>a.list_pros(),
+      applyPro: (id)=>a.apply_pro(id),
     };
     return window.midnightAPI;
   }
@@ -161,8 +163,29 @@ document.getElementById('file-game').addEventListener('change',(e)=>{
   games.push({name:p.split(/[\\/]/).pop().replace('.exe','').replace('.lnk',''), path:p});
   saveGames(); renderGames(); toast('Jogo adicionado!');
 });
-(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); })();
+(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); })();
 document.getElementById('status-pill').className='status-pill normal';
+
+// ---------- GALERIA PROS ----------
+async function renderPros(){
+  const grid = document.getElementById('pros-grid'); if(!grid) return;
+  if(!window.midnightAPI || !window.midnightAPI.listPros){ grid.innerHTML='<div class="card">Backend sem pros.</div>'; return; }
+  try{
+    const list = await window.midnightAPI.listPros();
+    grid.innerHTML='';
+    list.forEach(p=>{
+      const d=document.createElement('div'); d.className='pro-card';
+      d.innerHTML=`<img src="${p.photo}" alt="${p.name}" onerror="this.style.display='none'"><h4>${p.name}</h4><div class="team">${p.team} • ${p.role}</div><div class="specs">${p.dpi} DPI × ${p.sens} sens = <b>${p.edpi} eDPI</b><br>${p.res} ${p.aspect}</div><button class="btn gold small">⚔ Usar config</button>`;
+      d.querySelector('button').addEventListener('click', async ()=>{
+        toast(`⚔ A aplicar config de ${p.name}… (fecha o CS2 primeiro)`);
+        const r = await window.midnightAPI.applyPro(p.id);
+        ilog((r.success?'✔ ':'✘ ')+`[${p.name}] `+(r.output||''));
+        toast(r.success ? `Config de ${p.name} aplicada!` : r.output);
+      });
+      grid.appendChild(d);
+    });
+  }catch(e){ grid.innerHTML='<div class="card">Erro a carregar pros.</div>'; }
+}
 
 // ---------- IN-GAME CS2 & WOW ----------
 function ilog(msg){ const el=document.getElementById('log-ingame'); if(!el) return; el.textContent += '\n'+msg; el.scrollTop=el.scrollHeight; }

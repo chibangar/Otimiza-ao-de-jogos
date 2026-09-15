@@ -129,6 +129,15 @@ nav{display:flex;flex-direction:column;gap:8px}
 .sys-rows{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
 .sys-rows label{font-size:11px;color:var(--gold-soft);text-transform:uppercase;letter-spacing:1px}
 .sys-rows p{margin:2px 0 0;font-size:14px}
+/* Pros */
+.pros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
+.pro-card{background:linear-gradient(180deg,#1a204f,#0a0d28);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;transition:.2s}
+.pro-card:hover{transform:translateY(-2px);box-shadow:var(--glow);border-color:var(--gold)}
+.pro-card img{width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#05061a}
+.pro-card h4{margin:8px 0 2px;font-size:16px}
+.pro-card .team{color:var(--gold-soft);font-size:12px;font-weight:700}
+.pro-card .specs{color:var(--muted);font-size:11.5px;margin:8px 0;line-height:1.6}
+.pro-card .btn{width:100%;margin-top:4px}
 .toast{position:fixed;bottom:24px;right:24px;z-index:10;background:#12163a;border:1px solid var(--gold);color:#fff;
   padding:12px 16px;border-radius:12px;box-shadow:var(--glow);opacity:0;pointer-events:none;transition:.3s;max-width:360px}
 .toast.show{opacity:1;transform:translateY(-4px)}

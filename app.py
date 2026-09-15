@@ -11,6 +11,7 @@ import platform
 import shutil
 import webview
 import game_tweaks
+import pros
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -222,6 +223,13 @@ class Api:
 
     def wow_restore(self):
         return game_tweaks.restore_wow()
+
+    # ---------- PROS CS2 ----------
+    def list_pros(self):
+        return pros.list_pros()
+
+    def apply_pro(self, pro_id):
+        return pros.apply_pro(pro_id)
 
 
 def main():
