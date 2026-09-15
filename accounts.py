@@ -80,6 +80,42 @@ def user_dir(name):
     return p
 
 
+def _session_file():
+    return os.path.join(data_root(), "session.json")
+
+
+def save_session(name):
+    try:
+        with open(_session_file(), "w", encoding="utf-8") as f:
+            json.dump({"user": name, "token": secrets.token_hex(16)}, f)
+    except Exception:
+        pass
+
+
+def load_session():
+    try:
+        with open(_session_file(), encoding="utf-8") as f:
+            d = json.load(f)
+        u = (d or {}).get("user", "")
+        if not u:
+            return None
+        if u == GUEST:
+            return u
+        if u in _load_users():
+            return u
+        return None
+    except Exception:
+        return None
+
+
+def clear_session():
+    try:
+        if os.path.isfile(_session_file()):
+            os.remove(_session_file())
+    except Exception:
+        pass
+
+
 def custom_sounds(name):
     out = []
     sdir = os.path.join(user_dir(name), "sounds")

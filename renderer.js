@@ -54,6 +54,13 @@ async function getBackend(){
       accountRegister: (u,p)=>a.account_register(u,p),
       accountLogin: (u,p)=>a.account_login(u,p),
       accountLogout: ()=>a.account_logout(),
+      whoami: ()=>a.whoami(),
+      sessionResume: ()=>a.session_resume(),
+      sessionForget: ()=>a.session_forget(),
+      openReleasesPage: ()=>a.open_releases_page(),
+      oauthStatus: ()=>a.oauth_status(),
+      oauthGoogle: ()=>a.oauth_google(),
+      oauthDiscord: ()=>a.oauth_discord(),
       hotkeySet: (m)=>a.hotkey_set(m),
       hotkeyClear: ()=>a.hotkey_clear(),
       logError: (m)=>a.log_error(m),
@@ -198,6 +205,18 @@ document.getElementById('file-game').addEventListener('change',(e)=>{
   const step=async(n,f)=>{ try{ await f(); }catch(e){ try{ await window.midnightAPI.logError(n+': '+(e&&e.stack||e)); }catch{} } };
   await step('getBackend', getBackend);
   await step('initLogin', initLogin);
+  await step('sessionResume', async ()=>{
+    try{
+      const r=await window.midnightAPI.sessionResume();
+      if(r && r.success && r.user){
+        currentUser=r.user;
+        document.getElementById('user-name').textContent=r.user;
+        document.getElementById('login-overlay').style.display='none';
+        try{ await window._setAvatar(); }catch{}
+        await boot();
+      }
+    }catch{}
+  });
 })();
 window.addEventListener('error',(ev)=>{
   try{ const m='JSERR '+(ev.message||'')+' @'+(ev.lineno||''); if(window.midnightAPI&&window.midnightAPI.logError) window.midnightAPI.logError(m); }catch{}
@@ -241,9 +260,19 @@ async function initVoice(){
       mic.innerHTML=''; out.innerHTML=''; mon.innerHTML='';
       dv.inputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; mic.appendChild(o); });
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); const m=document.createElement('option'); m.value=d.index; m.textContent=d.name; mon.appendChild(m); });
+      const cableEl=document.getElementById('voice-cable');
+      if(cableEl) cableEl.textContent = dv.cable ? '✔ Micro virtual pronto.' : '⚠ Sem micro virtual — corre o Setup.';
+      // Sem escolha guardada: usa o CABLE Output sozinho, como no Voicemod
+      try{
+        const s0=vmLoad();
+        if(!s0.out){
+          const c=[...out.options].find(o=>/CABLE Output/i.test(o.text));
+          if(c){ out.value=c.value; vmSave(); }
+        }
+      }catch{}
     } else vlog(dv.output);
   }catch(e){ vlog('Erro devices: '+e); }
-  // Sempre ligado como no Voicemod: restaura e arranca sozinho
+  // Privacidade: NUNCA liga o micro sozinho. Restaura tudo, mas o ⏻ começa desligado.
   try{
     const s=vmLoad();
     if(s.gain){ document.getElementById('voice-gain').value=s.gain; document.getElementById('voice-gain-val').textContent=s.gain; }
@@ -252,9 +281,9 @@ async function initVoice(){
     if(s.out && [...out.options].some(o=>o.value==s.out)) out.value=s.out;
     if(s.mon && [...mon.options].some(o=>o.value==s.mon)) mon.value=s.mon;
     if(s.fx && voiceAll.some(f=>f.id===s.fx)){ const f=voiceAll.find(x=>x.id===s.fx); voiceFx=f.id; voiceFxLive=f.live; renderVoiceGrid(); }
-    if(voiceFxLive){ await startLive(); vlog('⏻ Voz sempre ligada (estilo Voicemod).'); }
-    else document.getElementById('voice-status').textContent='Efeito de gravar ativo — prime ⏻ para ouvir em direto.';
-  }catch(e){ vlog('Auto-start: '+e); }
+    document.getElementById('voice-status').textContent='Micro desligado. Prime ⏻ para ativar a voz.';
+    vlog('🔇 Arranque silencioso: micro desligado por privacidade.');
+  }catch(e){ vlog('Restore: '+e); }
 }
 function renderVoiceGrid(){
   const grid=document.getElementById('voice-grid'); if(!grid) return; grid.innerHTML='';
@@ -300,22 +329,37 @@ async function initLogin(){
       const r=await window.midnightAPI.usersList();
       const box=$('login-users'); box.innerHTML='';
       (r.users||[]).forEach(u=>{
-        const b=document.createElement('button'); b.textContent='👤 '+u;
-        b.addEventListener('click',()=>{ $('login-name').value=u; $('login-pass').focus(); });
+        const name=(u&&u.name)||u;
+        const b=document.createElement('button');
+        b.innerHTML=(u&&u.avatar?`<img src="${u.avatar}" style="width:20px;height:20px;border-radius:50%;vertical-align:middle"> `:'👤 ')+name;
+        b.addEventListener('click',()=>{ $('login-name').value=name; $('login-pass').focus(); });
         box.appendChild(b);
       });
     }catch{}
   }
+  async function setAvatar(){
+    try{
+      const w=await window.midnightAPI.whoami?.();
+      const img=document.getElementById('user-avatar');
+      if(w && w.avatar){ img.src=w.avatar; img.style.display=''; }
+      else img.style.display='none';
+    }catch{}
+  }
+  window._setAvatar=setAvatar;
   async function enter(name){
     currentUser=name; $('user-name').textContent=name;
     $('login-overlay').style.display='none';
     voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false;
+    await setAvatar();
     await boot();
   }
   async function doLogin(){
     const u=$('login-name').value.trim(), p=$('login-pass').value;
     const r=await window.midnightAPI.accountLogin(u,p);
-    if(r.success) enter(u||'convidado');
+    if(r.success){
+      if(!$('login-keep').checked){ try{ await window.midnightAPI.sessionForget(); }catch{} }
+      enter(u||'convidado');
+    }
     else { const e=$('login-err'); e.textContent=r.output; e.style.color=''; }
   }
   $('btn-login').addEventListener('click', doLogin);
@@ -333,6 +377,14 @@ async function initLogin(){
   $('btn-guest').addEventListener('click', async ()=>{
     await window.midnightAPI.accountLogin('convidado',''); enter('convidado');
   });
+  async function doOauth(kind){
+    const e=$('login-err'); e.style.color=''; e.textContent='A abrir o browser… confirma lá e volta aqui.';
+    const r = kind==='google' ? await window.midnightAPI.oauthGoogle() : await window.midnightAPI.oauthDiscord();
+    if(r.success){ e.textContent=''; enter(r.user); refreshUsers(); }
+    else e.textContent=r.output;
+  }
+  $('btn-google').addEventListener('click', ()=>doOauth('google'));
+  $('btn-discord').addEventListener('click', ()=>doOauth('discord'));
   $('btn-logout').addEventListener('click', async ()=>{
     try{ await window.midnightAPI.voiceStop(); await window.midnightAPI.monitorStop(); await window.midnightAPI.hotkeyClear(); await window.midnightAPI.accountLogout(); }catch{}
     voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false; currentUser='';
@@ -343,6 +395,14 @@ async function initLogin(){
     refreshUsers();
   });
   await refreshUsers();
+  try{
+    const st=await window.midnightAPI.oauthStatus();
+    if(st && (st.google || st.discord)){
+      $('login-social').style.display='flex';
+      if(!st.google) $('btn-google').style.display='none';
+      if(!st.discord) $('btn-discord').style.display='none';
+    }
+  }catch{}
 }
 
 // ---------- HOTKEYS ----------
@@ -486,16 +546,24 @@ document.getElementById('vm-ear')?.addEventListener('click', async ()=>{
 });
 
 // ---------- AUTO-UPDATE ----------
-async function checkForUpdate(){
+async function checkForUpdate(silent){
   try{
     if(!window.midnightAPI || !window.midnightAPI.checkUpdate) return;
     const r = await window.midnightAPI.checkUpdate();
     if(r && r.success && r.available){
-      document.getElementById('update-banner').style.display='flex';
+      const banner=document.getElementById('update-banner');
+      const wasHidden=banner.style.display==='none';
+      banner.style.display='flex';
       document.getElementById('update-text').textContent=`Nova versão ${r.latest} disponível — atualiza sem sair da app!`;
+      if(wasHidden) toast(`✦ Nova versão ${r.latest} disponível!`);
     }
   }catch{}
 }
+setInterval(()=>{ const b=document.getElementById('update-banner'); if(b && b.style.display==='none') checkForUpdate(true); }, 30*60*1000);
+document.getElementById('btn-update-manual')?.addEventListener('click', async ()=>{
+  toast('A abrir a página de Releases…');
+  await window.midnightAPI.openReleasesPage();
+});
 document.getElementById('btn-update-later')?.addEventListener('click',()=>{
   document.getElementById('update-banner').style.display='none';
 });

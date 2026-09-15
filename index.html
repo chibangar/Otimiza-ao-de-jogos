@@ -18,11 +18,16 @@
     <div class="login-users" id="login-users"></div>
     <input id="login-name" placeholder="Nome de utilizador" maxlength="16" autocomplete="username">
     <input id="login-pass" type="password" placeholder="Palavra-passe" autocomplete="current-password">
+    <label class="login-keep"><input type="checkbox" id="login-keep" checked> Manter sessão iniciada</label>
     <div class="login-btns">
       <button class="btn gold" id="btn-login">Entrar</button>
       <button class="btn ghost" id="btn-register">Criar conta</button>
     </div>
     <button class="btn outline small" id="btn-guest">Entrar como convidado</button>
+    <div class="login-social" id="login-social" style="display:none">
+      <button class="btn social google" id="btn-google"><b>G</b> Continuar com Google</button>
+      <button class="btn social discord" id="btn-discord">℈ Entrar com Discord</button>
+    </div>
     <p class="login-err" id="login-err"></p>
   </div>
 </div>
@@ -53,7 +58,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="status-pill" id="user-pill" title="Sessão"><span>👤</span><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
+      <div class="status-pill" id="user-pill" title="Sessão"><img id="user-avatar" style="display:none;width:22px;height:22px;border-radius:50%"><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
       <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
       <p class="hint">Executa como <b>Administrador</b> para poder total.</p>
     </div>
@@ -75,6 +80,7 @@
       <span id="update-text">Nova versão disponível!</span>
       <div class="update-bar"><div id="update-fill"></div></div>
       <button class="btn small gold" id="btn-update-now">Atualizar</button>
+      <button class="btn small ghost" id="btn-update-manual">📥 Manual</button>
       <button class="btn small ghost" id="btn-update-later">Depois</button>
       <button class="btn small gold" id="btn-update-restart" style="display:none">Reiniciar agora</button>
     </div>
@@ -227,7 +233,7 @@
           <button class="btn small gold" id="btn-voice-rec">⏺ Gravar e transformar</button>
         </div>
         <p class="muted small" id="voice-status">Escolhe uma voz em cima.</p>
-        <p class="muted small">Para Discord/CS2: instala um cabo virtual (VB-CABLE), escolhe-o como <b>Saída</b> e usa-o como microfone no Discord.</p>
+        <p class="muted small">O nosso Setup instala o micro virtual sozinho. No CS2/Discord escolhe <b>"CABLE Output"</b> como microfone. <span id="voice-cable"></span></p>
         <p class="muted small" style="opacity:.7">Avatares: OpenMoji (CC BY-SA 4.0) • Sons: myinstants</p>
       </div>
       <div class="console"><div class="console-head">🎙️ Registo de Voz</div><pre id="log-voice">Pronto.</pre></div>

@@ -18,6 +18,7 @@ import game_tweaks
 import pros
 import voicefx
 import accounts
+import oauth_login
 
 try:
     import sounddevice as sd
@@ -49,7 +50,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.4.0"
+APP_VERSION = "1.5.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -298,9 +299,18 @@ class Api:
         return game_tweaks.restore_wow()
 
     # ---------- CONTAS ----------
+    def _avatar_url(self, path):
+        if path and os.path.isfile(path):
+            import urllib.request
+            return "file:///" + urllib.request.pathname2url(path).lstrip("/")
+        return ""
+
     def users_list(self):
         try:
-            return {"success": True, "users": accounts.list_users()}
+            users = accounts._load_users()
+            return {"success": True, "users": [
+                {"name": n, "avatar": self._avatar_url(u.get("avatar", ""))}
+                for n, u in sorted(users.items())]}
         except Exception as e:
             return {"success": False, "output": str(e)}
 
@@ -311,18 +321,68 @@ class Api:
         r = accounts.check((name or "").strip(), pw or "")
         if r.get("success"):
             _SESSION["user"] = (name or "").strip() or accounts.GUEST
+            accounts.save_session(_SESSION["user"])
         return r
 
     def account_logout(self):
         _SESSION["user"] = None
+        accounts.clear_session()
         try:
             self.voice_stop()
         except Exception:
             pass
         return {"success": True, "output": "Sessao terminada."}
 
+    def session_resume(self):
+        u = accounts.load_session()
+        if not u:
+            return {"success": False, "output": "Sem sessao."}
+        _SESSION["user"] = u
+        return {"success": True, "user": u}
+
+    def session_forget(self):
+        accounts.clear_session()
+        return {"success": True}
+
+    def open_url(self, url):
+        try:
+            import webbrowser
+            webbrowser.open(url)
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def open_releases_page(self):
+        return self.open_url(f"https://github.com/{REPO}/releases/latest")
+
     def whoami(self):
-        return {"user": _SESSION.get("user")}
+        u = _SESSION.get("user")
+        av = ""
+        try:
+            av = self._avatar_url(accounts._load_users().get(u, {}).get("avatar", ""))
+        except Exception:
+            pass
+        return {"user": u, "avatar": av}
+
+    def oauth_status(self):
+        try:
+            return {"success": True, **oauth_login.status()}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def oauth_google(self):
+        r = oauth_login.login_google()
+        if r.get("success"):
+            _SESSION["user"] = r["user"]
+            accounts.save_session(r["user"])
+        return r
+
+    def oauth_discord(self):
+        r = oauth_login.login_discord()
+        if r.get("success"):
+            _SESSION["user"] = r["user"]
+            accounts.save_session(r["user"])
+        return r
 
     def _me(self):
         return _SESSION.get("user") or accounts.GUEST
@@ -358,7 +418,8 @@ class Api:
                 if d["max_output_channels"] > 0:
                     outs.append({"index": i, "name": d["name"]})
             return {"success": True, "inputs": ins, "outputs": outs,
-                    "default_in": sd.default.device[0], "default_out": sd.default.device[1]}
+                    "default_in": sd.default.device[0], "default_out": sd.default.device[1],
+                    "cable": any("cable output" in (o["name"] or "").lower() for o in outs)}
         except Exception as e:
             return {"success": False, "output": str(e)}
 
