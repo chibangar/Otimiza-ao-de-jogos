@@ -5,15 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Midnight Optimizer — Forja Competitiva</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="login-overlay" id="login-overlay">
   <div class="login-card">
-    <div class="logo-rune">◈</div>
-    <h1>MIDNIGHT</h1>
-    <span>OPTIMIZER</span>
+    <img class="login-logo" src="assets/logo.png" alt="Midnight Optimizer">
     <p class="muted small">Cada pessoa tem a sua conta: vozes, teclas, jogos e sons.</p>
     <div class="login-users" id="login-users"></div>
     <input id="login-name" placeholder="Nome de utilizador" maxlength="16" autocomplete="username">
@@ -38,11 +36,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
-      <div class="logo-rune">◈</div>
-      <div>
-        <h1>MIDNIGHT</h1>
-        <span>OPTIMIZER</span>
-      </div>
+      <img class="logo-img" src="assets/logo.png" alt="Midnight Optimizer">
     </div>
     <p class="sidebar-sub">Forja do Vazio • v1.0</p>
 
@@ -59,7 +53,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="status-pill" id="user-pill" title="Sessão"><img id="user-avatar" style="display:none;width:22px;height:22px;border-radius:50%"><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
+      <div class="theme-switch">Tema: <button data-theme="wow" id="th-wow">☾ WoW</button><button data-theme="cs2" id="th-cs2">◉ CS2</button></div>      <div class="status-pill" id="user-pill" title="Sessão"><img id="user-avatar" style="display:none;width:22px;height:22px;border-radius:50%"><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
       <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
       <p class="hint">Executa como <b>Administrador</b> para poder total.</p>
     </div>
@@ -300,6 +294,10 @@
           <div><label>RAM Total</label><p id="sys-ram">…</p></div>
           <div><label>Plano de energia</label><p id="sys-power">…</p></div>
           <div><label>PC</label><p id="sys-host">…</p></div>
+          <div><label>Administrador</label><p id="sys-admin">…</p></div>
+        </div>
+        <div class="comp-btns" style="margin-top:12px">
+          <button class="btn gold" id="btn-admin">🛡️ Reiniciar como Administrador</button>
         </div>
         <p class="muted small">Dica: corre a app como Administrador (botão direito → Executar como administrador) para as otimizações de registo e energia funcionarem a 100%.</p>
       </div>
@@ -309,6 +307,16 @@
 
 <div class="toast" id="toast"></div>
 <div class="hk-capture" id="hk-capture" style="display:none"><div><h3 id="hk-cap-title">Tecla de atalho</h3><p>Prime as teclas que queres usar… (ESC cancela)<br><span class="muted small">Vale tudo: F1-F12, Insert, Numpad, letras com Ctrl/Alt/Shift.</span></p></div></div>
+<div class="theme-overlay" id="theme-overlay" style="display:none">
+  <div class="theme-card">
+    <h2>Escolhe a tua interface</h2>
+    <p class="muted">Podes mudar quando quiseres na barra lateral.</p>
+    <div class="theme-opts">
+      <button class="theme-opt wow" data-theme="wow"><span class="theme-preview"></span><b>☾ WoW Midnight</b><small>Roxo e dourado do Vazio</small></button>
+      <button class="theme-opt cs2" data-theme="cs2"><span class="theme-preview"></span><b>◉ CS2 Tático</b><small>Laranja tático</small></button>
+    </div>
+  </div>
+</div>
 <script src="renderer.js"></script>
 </body>
 </html>

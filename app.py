@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.6.0"
+APP_VERSION = "1.7.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -365,6 +365,29 @@ class Api:
 
     def open_releases_page(self):
         return self.open_url(f"https://github.com/{REPO}/releases/latest")
+
+    # ---------- ADMIN OPCIONAL ----------
+    def is_admin(self):
+        try:
+            import ctypes
+            return {"admin": bool(ctypes.windll.shell32.IsUserAnAdmin())}
+        except Exception:
+            return {"admin": False}
+
+    def restart_as_admin(self):
+        try:
+            import ctypes
+            if ctypes.windll.shell32.IsUserAnAdmin():
+                return {"success": False, "output": "Ja estas como administrador."}
+            if getattr(sys, "frozen", False):
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, None, None, 1)
+            else:
+                ctypes.windll.shell32.ShellExecuteW(
+                    None, "runas", sys.executable, f'"{os.path.abspath(__file__)}"', None, 1)
+            threading.Timer(1.0, lambda: os._exit(0)).start()
+            return {"success": True, "output": "A reiniciar como administrador…"}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
 
     def whoami(self):
         u = _SESSION.get("user")

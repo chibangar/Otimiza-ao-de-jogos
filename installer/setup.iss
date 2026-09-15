@@ -1,5 +1,5 @@
 ; Midnight Optimizer — instalador Windows (Inno Setup 6)
-#define AppVersion "1.6.0"
+#define AppVersion "1.7.0"
 
 [Setup]
 AppName=Midnight Optimizer
@@ -15,6 +15,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\MidnightOptimizer.exe
+SetupIconFile=..\assets\icon.ico
 WizardStyle=modern
 DisableProgramGroupPage=yes
 

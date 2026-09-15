@@ -25,6 +25,8 @@ body{
 .sidebar{width:264px;min-width:264px;background:linear-gradient(180deg, rgba(13,16,38,.95), rgba(6,7,20,.98));
   border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column}
 .logo{display:flex;gap:12px;align-items:center}
+.logo-img{width:170px;border-radius:14px}
+.login-card .login-logo{width:210px;border-radius:16px}
 .logo-rune{width:46px;height:46px;display:grid;place-items:center;font-size:26px;color:var(--gold);
   border:1px solid var(--gold);border-radius:12px;background:radial-gradient(circle at 50% 30%, #2a2358, #0a0c22);
   box-shadow:var(--glow)}
@@ -181,6 +183,37 @@ nav{display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-bottom:8p
 .toast{position:fixed;bottom:24px;right:24px;z-index:10;background:#12163a;border:1px solid var(--gold);color:#fff;
   padding:12px 16px;border-radius:12px;box-shadow:var(--glow);opacity:0;pointer-events:none;transition:.3s;max-width:360px}
 .toast.show{opacity:1;transform:translateY(-4px)}
+/* Tema CS2 */
+body[data-theme="cs2"]{
+  --void:#14161a; --panel:#1b1e23; --panel2:#24282f;
+  --gold:#f0a832; --gold-soft:#e8b64c; --gold-dim:#8a6420;
+  --arcane:#5b9bd5; --arcane2:#7fd4ff; --violet:#6a7bd5;
+  --text:#f0ede4; --muted:#a8a49a; --border:rgba(240,168,50,.25);
+  --glow:0 0 24px rgba(240,168,50,.25), 0 0 64px rgba(240,168,50,.12);
+  background:radial-gradient(1200px 700px at 70% -10%, #3a2c10 0%, transparent 60%),
+             radial-gradient(900px 600px at 0% 100%, #2a2013 0%, transparent 55%),
+             var(--void);
+}
+body[data-theme="cs2"] .nebula{background:
+    radial-gradient(600px 300px at 80% 20%, rgba(240,168,50,.14), transparent 70%),
+    radial-gradient(500px 400px at 15% 85%, rgba(91,155,213,.10), transparent 70%)}
+body[data-theme="cs2"] h1,body[data-theme="cs2"] h2,body[data-theme="cs2"] h3,body[data-theme="cs2"] h4{font-family:'Chakra Petch','Cinzel',serif;letter-spacing:1px}
+/* Escolha de interface */
+.theme-overlay{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:rgba(4,5,16,.9)}
+.theme-card{text-align:center;background:linear-gradient(180deg,#141947,#080a22);border:1px solid var(--gold);border-radius:20px;padding:32px 36px;box-shadow:var(--glow)}
+.theme-card h2{font-family:'Cinzel',serif;margin:0 0 4px}
+.theme-opts{display:flex;gap:16px;margin-top:20px}
+.theme-opt{width:190px;background:#0a0d24;border:2px solid var(--border);border-radius:16px;padding:18px 14px;color:var(--text);cursor:pointer}
+.theme-opt:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+.theme-opt.wow.sel{border-color:#9d4edd}
+.theme-opt.cs2.sel{border-color:#f0a832}
+.theme-preview{display:block;width:72px;height:72px;border-radius:50%;margin:0 auto 10px}
+.theme-opt.wow .theme-preview{background:radial-gradient(circle at 50% 35%, #9d4edd, #1b1447 70%);border:2px solid #d4af37}
+.theme-opt.cs2 .theme-preview{background:radial-gradient(circle at 50% 35%, #f0a832, #3a2c10 70%);border:2px solid #5b9bd5}
+.theme-opt b{display:block;font-size:16px}.theme-opt small{color:var(--muted)}
+.theme-switch{display:flex;gap:6px;align-items:center;margin-bottom:8px;font-size:12px;color:var(--muted)}
+.theme-switch button{background:#1a1e45;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:4px 10px;cursor:pointer}
+.theme-switch button.sel{border-color:var(--gold);box-shadow:var(--glow)}
 /* Servidores */
 .srv-card h4{font-size:14px}
 .srv-meta{color:var(--muted);font-size:12px;margin:6px 0}

@@ -60,6 +60,8 @@ async function getBackend(){
       sessionResume: ()=>a.session_resume(),
       sessionForget: ()=>a.session_forget(),
       openReleasesPage: ()=>a.open_releases_page(),
+      isAdmin: ()=>a.is_admin(),
+      restartAsAdmin: ()=>a.restart_as_admin(),
       serversList: ()=>a.servers_list(),
       serversRefresh: ()=>a.servers_refresh(),
       serversHistory: ()=>a.servers_history(),
@@ -121,7 +123,16 @@ async function refreshSystem(){
   document.getElementById('sys-gpu').textContent=info.gpu; document.getElementById('sys-ram').textContent=info.ramTotal+' GB';
   document.getElementById('sys-power').textContent=info.power.slice(0,120); document.getElementById('sys-host').textContent=info.hostname;
   }catch(e){ try{ await window.midnightAPI.logError('refreshSystem: '+(e&&e.stack||e)); }catch{} }
+  try{
+    const adm=await window.midnightAPI.isAdmin();
+    const el=document.getElementById('sys-admin');
+    if(el){ el.textContent=adm.admin?'Sim ✔':'Não — prime o botão para poder total'; el.style.color=adm.admin?'#7ef0c1':'#ffd479'; }
+  }catch{}
 }
+document.getElementById('btn-admin')?.addEventListener('click', async ()=>{
+  toast('A reiniciar como administrador… aceita o pedido.');
+  await window.midnightAPI.restartAsAdmin();
+});
 document.getElementById('btn-refresh').addEventListener('click', refreshSystem);
 
 // Competitivo
@@ -312,6 +323,22 @@ async function selectVoice(id){
 }
 function vmSelectFromHotkey(id){ selectVoice(id); }
 
+// ---------- TEMAS ----------
+function applyTheme(t){
+  t = (t==='cs2') ? 'cs2' : 'wow';
+  if(t==='cs2') document.body.dataset.theme='cs2';
+  else document.body.removeAttribute('data-theme');
+  try{ localStorage.setItem(LS('theme'), t); }catch{}
+  document.querySelectorAll('.theme-switch button').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
+  document.querySelectorAll('.theme-opt').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
+}
+function themeSaved(){ try{ return localStorage.getItem(LS('theme'))||''; }catch{ return ''; } }
+document.querySelectorAll('.theme-switch button').forEach(b=>b.addEventListener('click',()=>{ applyTheme(b.dataset.theme); toast(b.dataset.theme==='cs2'?'Interface CS2 Tático ativa.':'Interface WoW Midnight ativa.'); }));
+document.querySelectorAll('.theme-opt').forEach(b=>b.addEventListener('click',()=>{
+  applyTheme(b.dataset.theme);
+  document.getElementById('theme-overlay').style.display='none';
+}));
+
 // ---------- CONTAS ----------
 let currentUser='';
 function LS(k){ return 'mno_'+(currentUser||'nouser')+'_'+k; }
@@ -319,6 +346,8 @@ async function boot(){
   const step=async(n,f)=>{ try{ await f(); }catch(e){ try{ await window.midnightAPI.logError(n+': '+(e&&e.stack||e)); }catch{} } };
   try{ hkLoad(); }catch(e){}
   loadGames();
+  if(!themeSaved()) document.getElementById('theme-overlay').style.display='flex';
+  else applyTheme(themeSaved());
   await step('renderGames', async()=>renderGames());
   await step('refreshSystem', refreshSystem);
   await step('detectGames', detectGames);
