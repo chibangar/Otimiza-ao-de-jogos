@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midnight Optimizer — Forja Competitiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="nebula"></div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-rune">◈</div>
+      <div>
+        <h1>MIDNIGHT</h1>
+        <span>OPTIMIZER</span>
+      </div>
+    </div>
+    <p class="sidebar-sub">Forja do Vazio • v1.0</p>
+
+    <nav>
+      <button class="nav-btn active" data-page="dashboard"><i>◉</i> Dashboard</button>
+      <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
+      <button class="nav-btn" data-page="ingame"><i>🎯</i> In-Game CS2 & WoW</button>
+      <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
+      <button class="nav-btn" data-page="jogos"><i>♞</i> Meus Jogos</button>
+      <button class="nav-btn" data-page="sistema"><i>☾</i> Sistema</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
+      <p class="hint">Executa como <b>Administrador</b> para poder total.</p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h2 id="page-title">Dashboard</h2>
+        <p id="page-desc">Visão geral da tua máquina de batalha.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost" id="btn-refresh">↻ Atualizar</button>
+        <button class="btn gold" id="btn-quick-boost">⚔ Boost Rápido</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">A HORA DA MEIA-NOITE APROXIMA-SE</p>
+          <h3>Prepara-te para a <em>arena</em>.</h3>
+          <p>Corta o peso do Windows, estabiliza o ping e espreme cada frame. Um clique para entrar em modo de guerra.</p>
+          <div class="hero-btns">
+            <button class="btn gold big" id="btn-hero-competitive">Ativar Modo Competitivo</button>
+            <button class="btn outline" data-goto="otimizacoes">Ver otimizações</button>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120" class="ring">
+              <circle cx="60" cy="60" r="52" class="ring-bg"/>
+              <circle cx="60" cy="60" r="52" class="ring-fg" id="ram-ring"/>
+            </svg>
+            <div class="ring-center"><b id="ram-pct">--%</b><span>RAM em uso</span></div>
+          </div>
+          <div class="hero-specs">
+            <div><label>CPU</label><p id="spec-cpu">…</p></div>
+            <div><label>GPU</label><p id="spec-gpu">…</p></div>
+            <div class="row2">
+              <div><label>RAM Livre</label><p id="spec-ram">…</p></div>
+              <div><label>Disco C: livre</label><p id="spec-disk">…</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="card"><h4>⚡ FPS & Fluidez</h4><p>Plano Ultimate Performance + prioridade GPU + efeitos leves.</p></div>
+        <div class="card"><h4>◈ Ping Estável</h4><p>Flush DNS + anti-throttling de rede do Windows.</p></div>
+        <div class="card"><h4>☾ Foco Total</h4><p>Mata browsers e apps em 2º plano antes da ranked.</p></div>
+      </div>
+    </section>
+
+    <!-- COMPETITIVO -->
+    <section class="page" id="page-competitivo">
+      <div class="comp-panel">
+        <div class="comp-left">
+          <p class="eyebrow">MODO DE GUERRA</p>
+          <h3>Modo Competitivo</h3>
+          <p class="muted">Aplica de uma vez: energia máxima, Modo Jogo, sem DVR, rede otimizada, limpeza temp e foco total. Ideal antes de Ranked, Faceit, Valorant, LoL, CS2, Fortnite, Warzone.</p>
+          <ul class="comp-list" id="comp-log">
+            <li>Ainda não ativado nesta sessão.</li>
+          </ul>
+          <div class="comp-btns">
+            <button class="btn gold big" id="btn-comp-on">⚔ ATIVAR COMPETITIVO</button>
+            <button class="btn ghost" id="btn-comp-off">Restaurar Normal</button>
+          </div>
+        </div>
+        <div class="comp-right">
+          <button class="big-toggle" id="big-toggle" aria-label="toggle competitivo">
+            <span class="big-toggle-ring"></span>
+            <span class="big-toggle-core">⚔</span>
+          </button>
+          <p id="comp-state-label">DESATIVADO</p>
+          <div class="checklist">
+            <div>✔ Plano Ultimate Performance</div>
+            <div>✔ Modo Jogo Windows</div>
+            <div>✔ DVR / Game Bar OFF</div>
+            <div>✔ Rede + DNS otimizados</div>
+            <div>✔ Efeitos em desempenho</div>
+            <div>✔ Background limpo</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IN-GAME CS2 & WOW -->
+    <section class="page" id="page-ingame">
+      <div class="games-head">
+        <div><h3>🎯 Otimização Dentro do Jogo</h3><p class="muted">Mexe nos ficheiros do próprio jogo (autoexec, video, Config.wtf). Com backup automático.</p></div>
+        <div><button class="btn ghost" id="btn-detect-games">↻ Detetar jogos</button></div>
+      </div>
+      <div class="grid2">
+        <div class="card wide">
+          <h4>🔫 Counter-Strike 2 — Competitivo</h4>
+          <p class="muted small" id="cs2-status">A detetar…</p>
+          <p class="muted small" id="cs2-path"></p>
+          <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
+            <button class="btn gold" id="btn-cs2-apply">⚔ Aplicar FPS Máximo</button>
+            <button class="btn ghost" id="btn-cs2-launch">📋 Copiar Launch Options</button>
+            <button class="btn ghost" id="btn-cs2-restore">↩ Restaurar backup</button>
+          </div>
+          <pre class="muted small" id="cs2-launch-preview" style="white-space:pre-wrap;margin-top:10px"></pre>
+          <ul class="comp-list" style="margin-top:10px">
+            <li>autoexec.cfg: rates 128-tick, interp 0/1, sem ragdoll/sangue, fps_max 0</li>
+            <li>cs2_video.txt: tudo Low, sem MSAA</li>
+            <li>Guia: Steam → CS2 → Propriedades → colar Launch Options</li>
+          </ul>
+        </div>
+        <div class="card wide">
+          <h4>🌌 World of Warcraft Midnight — Raid / M+</h4>
+          <p class="muted small" id="wow-status">A detetar…</p>
+          <p class="muted small" id="wow-path"></p>
+          <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
+            <button class="btn gold" id="btn-wow-apply">⚔ Aplicar Raid FPS</button>
+            <button class="btn ghost" id="btn-wow-balanced">✦ Modo Bonito</button>
+            <button class="btn ghost" id="btn-wow-restore">↩ Restaurar backup</button>
+          </div>
+          <ul class="comp-list" style="margin-top:10px">
+            <li>Config.wtf: sombras OFF, SSAO OFF, partículas 10, render D3D12</li>
+            <li>maxFPS 200 / background 60, LOD baixo</li>
+            <li>Fecha o jogo antes de aplicar. Backup em Config.wtf.midnight_backup</li>
+          </ul>
+        </div>
+      </div>
+      <div class="console"><div class="console-head">🎯 Registo In-Game</div><pre id="log-ingame">Pronto. Deteta os jogos primeiro.</pre></div>
+    </section>
+
+    <!-- OTIMIZAÇÕES -->
+    <section class="page" id="page-otimizacoes">
+      <div class="grid2" id="opt-grid">
+        <div class="card opt" data-opt="power"><div><h4>⚡ Plano de Energia</h4><p>Alterna entre Ultimate Performance e Equilibrado.</p></div><button class="switch" data-action="power"></button></div>
+        <div class="card opt" data-opt="gamemode"><div><h4>◉ Modo Jogo do Windows</h4><p>Prioriza o jogo no CPU/GPU. Recomendado: ON.</p></div><button class="switch" data-action="gamemode"></button></div>
+        <div class="card opt" data-opt="gamebar"><div><h4>✖ Game Bar & DVR</h4><p>Desativa captura em 2º plano que rouba FPS.</p></div><button class="switch on" data-action="gamebar"></button></div>
+        <div class="card opt" data-opt="visual"><div><h4>☾ Efeitos Visuais Leves</h4><p>Desliga animações para menos latência.</p></div><button class="switch" data-action="visual"></button></div>
+        <div class="card opt" data-opt="gpu"><div><h4>⬢ Prioridade GPU / HAGS</h4><p>Agendamento GPU acelerado. Pode pedir reinício.</p></div><button class="switch" data-action="gpu"></button></div>
+        <div class="card opt" data-opt="kill"><div><h4>⚔ Encerrar 2º Plano</h4><p>Mata browsers, launchers parados e apps pesadas.</p></div><button class="btn small gold" data-action="kill">Executar</button></div>
+        <div class="card opt" data-opt="temp"><div><h4>🧹 Limpar Temporários</h4><p>Limpa TEMP + flush DNS. Rápido e seguro.</p></div><button class="btn small gold" data-action="temp">Limpar</button></div>
+        <div class="card opt" data-opt="net"><div><h4>◈ Otimizar Rede</h4><p>Anti-throttling + SystemResponsiveness 0.</p></div><button class="btn small gold" data-action="net">Otimizar</button></div>
+      </div>
+      <div class="console"><div class="console-head">✦ Registo Arcano</div><pre id="log">Pronto. Escolhe uma otimização…</pre></div>
+    </section>
+
+    <!-- JOGOS -->
+    <section class="page" id="page-jogos">
+      <div class="games-head">
+        <div><h3>Biblioteca de Batalha</h3><p class="muted">Adiciona os teus .exe e lança com prioridade ALTA + boost automático.</p></div>
+        <div><button class="btn gold" id="btn-add-game">＋ Adicionar jogo</button><input type="file" id="file-game" accept=".exe,.lnk" style="display:none"></div>
+      </div>
+      <div class="games-grid" id="games-grid"></div>
+    </section>
+
+    <!-- SISTEMA -->
+    <section class="page" id="page-sistema">
+      <div class="card wide">
+        <h4>☾ Ficha da Máquina</h4>
+        <div class="sys-rows">
+          <div><label>Sistema</label><p id="sys-os">…</p></div>
+          <div><label>CPU</label><p id="sys-cpu">…</p></div>
+          <div><label>GPU</label><p id="sys-gpu">…</p></div>
+          <div><label>RAM Total</label><p id="sys-ram">…</p></div>
+          <div><label>Plano de energia</label><p id="sys-power">…</p></div>
+          <div><label>PC</label><p id="sys-host">…</p></div>
+        </div>
+        <p class="muted small">Dica: corre a app como Administrador (botão direito → Executar como administrador) para as otimizações de registo e energia funcionarem a 100%.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="renderer.js"></script>
+</body>
+</html>

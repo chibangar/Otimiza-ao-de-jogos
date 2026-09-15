@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+
+# PyInstaller
+build/
+dist/
+*.spec
+*.exe
+
+# Node / Electron (ficheiros pesados locais)
+node_modules/
+out/
+
+# Backups da app
+*.midnight_backup
+
+# Sistema
+.DS_Store
+Thumbs.db
