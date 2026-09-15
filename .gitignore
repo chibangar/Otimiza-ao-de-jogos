@@ -21,3 +21,6 @@ out/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Segredos OAuth (nunca commitar)
+oauth_config.json
