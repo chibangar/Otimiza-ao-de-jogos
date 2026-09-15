@@ -165,10 +165,14 @@ def apply_pro(pro_id):
     p = BY_ID.get(pro_id)
     if not p:
         return {"success": False, "output": "Pro desconhecido."}
-    info = game_tweaks.find_cs2()
-    if not info:
+    running, _ = game_tweaks.cs2_running()
+    if running:
         return {"success": False,
-                "output": "CS2 nao detetado. Abre o jogo uma vez no Steam e volta aqui."}
+                "output": "⛔ Fecha o CS2 primeiro! O jogo apaga mudancas feitas com ele aberto."}
+    info = game_tweaks.find_cs2()
+    if not info or not info.get("cfg_dir"):
+        return {"success": False,
+                "output": "CS2 nao detetado. Prime 'Escolher pasta do CS2' e aponta para o jogo."}
     logs = []
     cfg_dir = info["cfg_dir"]
 

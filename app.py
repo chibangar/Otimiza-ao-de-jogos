@@ -19,6 +19,7 @@ import pros
 import voicefx
 import accounts
 import oauth_login
+import servers
 
 try:
     import sounddevice as sd
@@ -50,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.5.0"
+APP_VERSION = "1.6.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -270,15 +271,25 @@ class Api:
 
     # ---------- IN-GAME: CS2 & WOW ----------
     def detect_games(self):
-        cs = game_tweaks.find_cs2()
+        cs = game_tweaks.find_cs2() or {}
+        running, proc = game_tweaks.cs2_running()
         wow = game_tweaks.find_wow()
         return {
-            "cs2": {"found": bool(cs), "base": cs.get("base", ""), "cfg": cs.get("cfg_dir", ""),
-                    "autoexec": cs.get("autoexec", ""), "videos": cs.get("video_candidates", [])},
+            "cs2": {"found": bool(cs.get("cfg_dir")), "base": cs.get("base", ""),
+                    "cfg": cs.get("cfg_dir", ""), "source": cs.get("source", ""),
+                    "running": running, "process_path": proc or cs.get("process_path", ""),
+                    "autoexec": cs.get("autoexec", ""),
+                    "videos": cs.get("video_candidates", [])},
             "wow": {"found": bool(wow and wow.get("config") and os.path.isfile(wow.get("config"))),
                     "base": (wow or {}).get("base", ""), "config": (wow or {}).get("config", ""),
                     "flavor": (wow or {}).get("flavor", "")},
         }
+
+    def pick_cs2_folder(self):
+        return game_tweaks.pick_cs2_folder()
+
+    def kill_cs2(self):
+        return game_tweaks.kill_cs2()
 
     def cs2_competitive(self):
         return game_tweaks.apply_cs2_competitive()
@@ -387,6 +398,38 @@ class Api:
     def _me(self):
         return _SESSION.get("user") or accounts.GUEST
 
+    # ---------- SERVIDORES ----------
+    def servers_list(self):
+        try:
+            return {"success": True, "servers": servers.load(), "modes": servers.MODES}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def servers_refresh(self):
+        try:
+            return {"success": True, "servers": servers.refresh()}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def servers_history(self):
+        try:
+            return {"success": True, "history": servers.history(self._me())}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def server_connect(self, ip, port):
+        try:
+            port = int(port)
+        except Exception:
+            return {"success": False, "output": "Porta invalida."}
+        name, mode = "", ""
+        for s in servers.load():
+            if s.get("ip") == ip and int(s.get("port", 0)) == port:
+                name, mode = s.get("sample_name", ""), s.get("mode", "")
+                break
+        servers.add_history(self._me(), {"ip": ip, "port": port, "name": name, "mode": mode})
+        return servers.connect(ip, port)
+
     # ---------- PROS CS2 ----------
     def list_pros(self):
         try:
@@ -419,7 +462,7 @@ class Api:
                     outs.append({"index": i, "name": d["name"]})
             return {"success": True, "inputs": ins, "outputs": outs,
                     "default_in": sd.default.device[0], "default_out": sd.default.device[1],
-                    "cable": any("cable output" in (o["name"] or "").lower() for o in outs)}
+                    "cable": any("cable" in (o["name"] or "").lower() for o in outs)}
         except Exception as e:
             return {"success": False, "output": str(e)}
 

@@ -50,6 +50,7 @@
       <button class="nav-btn active" data-page="dashboard"><i>◉</i> Dashboard</button>
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
       <button class="nav-btn" data-page="ingame"><i>🎯</i> In-Game CS2 & WoW</button>
+      <button class="nav-btn" data-page="servers"><i>🌐</i> Servidores</button>
       <button class="nav-btn" data-page="voz"><i>🎙️</i> Estúdio de Voz</button>
       <button class="nav-btn" data-page="sound"><i>🔊</i> Soundboard</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
@@ -171,9 +172,12 @@
         <div class="card wide">
           <h4>🔫 Counter-Strike 2 — Competitivo</h4>
           <p class="muted small" id="cs2-status">A detetar…</p>
+          <p class="muted small" id="cs2-run"></p>
           <p class="muted small" id="cs2-path"></p>
           <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
             <button class="btn gold" id="btn-cs2-apply">⚔ Aplicar FPS Máximo</button>
+            <button class="btn ghost" id="btn-cs2-kill" style="display:none">🔪 Fechar CS2 à força</button>
+            <button class="btn ghost" id="btn-cs2-folder">📁 Escolher pasta do CS2</button>
             <button class="btn ghost" id="btn-cs2-launch">📋 Copiar Launch Options</button>
             <button class="btn ghost" id="btn-cs2-restore">↩ Restaurar backup</button>
           </div>
@@ -218,6 +222,20 @@
       <div class="console"><div class="console-head">✦ Registo Arcano</div><pre id="log">Pronto. Escolhe uma otimização…</pre></div>
     </section>
 
+    <!-- SERVIDORES -->
+    <section class="page" id="page-servers">
+      <div class="games-head">
+        <div><h3>🌐 Servidores Públicos</h3><p class="muted">1 clique para entrar. Prime Atualizar para ver quem está online agora.</p></div>
+        <div><button class="btn gold" id="btn-servers-refresh">↻ Atualizar estado</button></div>
+      </div>
+      <div class="vm-tabs" id="srv-tabs"></div>
+      <div class="grid2" id="servers-grid"><div class="card">A carregar servidores…</div></div>
+      <div class="card wide" style="margin-top:14px">
+        <h4>🕘 Histórico — os teus últimos servidores</h4>
+        <div class="sys-rows" id="servers-history"><p class="muted">Ainda não entraste em nenhum.</p></div>
+      </div>
+    </section>
+
     <!-- ESTÚDIO DE VOZ -->
     <section class="page" id="page-voz">
       <div class="vm-tabs" id="vm-tabs"></div>
@@ -247,10 +265,16 @@
     <!-- SOUNDBOARD -->
     <section class="page" id="page-sound">
       <div class="games-head">
-        <div><h3>🔊 Soundboard — memes do myinstants</h3><p class="muted">Clica para tocar na saída escolhida. Mete ⌨ em cada som ou voz para tecla de atalho global.</p></div>
-        <div><button class="btn gold" id="btn-add-sound">＋ Adicionar meu som</button>
-        <button class="btn ghost" id="btn-hk-toggle">⌨ Atalhos: ON</button>
-        <button class="btn ghost" id="btn-sound-stop">⏹ Parar som</button></div>
+        <div><h3>🔊 Soundboard — memes do myinstants</h3><p class="muted">Para sair <b>no CS2</b>: saída em baixo = <b>CABLE Input</b> e no CS2 microfone = <b>CABLE Output</b>. <span id="sound-cable"></span></p></div>
+        <div><button class="btn gold" id="btn-cable-out">🎯 Usar CABLE p/ CS2</button>
+        <button class="btn gold" id="btn-add-sound">＋ Adicionar meu som</button></div>
+      </div>
+      <div class="card wide" style="margin-bottom:14px">
+        <div class="voice-row" style="grid-template-columns:1fr auto">
+          <div><label>Saída dos sons</label><select id="sound-out"></select></div>
+          <div style="align-self:end"><button class="btn ghost" id="btn-hk-toggle">⌨ Atalhos: ON</button>
+          <button class="btn ghost" id="btn-sound-stop">⏹ Parar som</button></div>
+        </div>
       </div>
       <div class="vm-grid" id="sound-grid"><div class="card">A carregar sons…</div></div>
       <div class="console"><div class="console-head">🔊 Registo</div><pre id="log-sound">Pronto.</pre></div>

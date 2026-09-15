@@ -27,6 +27,8 @@ async function getBackend(){
       cs2Competitive: ()=>a.cs2_competitive(),
       cs2Restore: ()=>a.cs2_restore(),
       cs2Launch: ()=>a.cs2_launch_options(),
+      pickCs2Folder: ()=>a.pick_cs2_folder(),
+      killCs2: ()=>a.kill_cs2(),
       wowCompetitive: ()=>a.wow_competitive(),
       wowBalanced: ()=>a.wow_balanced(),
       wowRestore: ()=>a.wow_restore(),
@@ -58,6 +60,10 @@ async function getBackend(){
       sessionResume: ()=>a.session_resume(),
       sessionForget: ()=>a.session_forget(),
       openReleasesPage: ()=>a.open_releases_page(),
+      serversList: ()=>a.servers_list(),
+      serversRefresh: ()=>a.servers_refresh(),
+      serversHistory: ()=>a.servers_history(),
+      serverConnect: (ip,port)=>a.server_connect(ip,port),
       oauthStatus: ()=>a.oauth_status(),
       oauthGoogle: ()=>a.oauth_google(),
       oauthDiscord: ()=>a.oauth_discord(),
@@ -85,7 +91,7 @@ for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*in
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -262,11 +268,11 @@ async function initVoice(){
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); const m=document.createElement('option'); m.value=d.index; m.textContent=d.name; mon.appendChild(m); });
       const cableEl=document.getElementById('voice-cable');
       if(cableEl) cableEl.textContent = dv.cable ? '✔ Micro virtual pronto.' : '⚠ Sem micro virtual — corre o Setup.';
-      // Sem escolha guardada: usa o CABLE Output sozinho, como no Voicemod
+      // Sem escolha guardada: usa o CABLE sozinho, como no Voicemod
       try{
         const s0=vmLoad();
         if(!s0.out){
-          const c=[...out.options].find(o=>/CABLE Output/i.test(o.text));
+          const c=[...out.options].find(o=>/CABLE/i.test(o.text));
           if(c){ out.value=c.value; vmSave(); }
         }
       }catch{}
@@ -320,6 +326,7 @@ async function boot(){
   await step('checkForUpdate', checkForUpdate);
   await step('initVoice', initVoice);
   await step('initSound', initSound);
+  await step('initServers', initServers);
   await step('hkRegister', hkRegister);
 }
 async function initLogin(){
@@ -405,6 +412,77 @@ async function initLogin(){
   }catch{}
 }
 
+// ---------- SERVIDORES ----------
+let srvAll=[], srvModes=["Todos"], srvCat="Todos";
+async function initServers(){
+  if(!window.midnightAPI || !window.midnightAPI.serversList) return;
+  try{
+    const r=await window.midnightAPI.serversList();
+    srvAll=r.servers||[];
+    srvModes=r.modes||["Todos"];
+    const tabs=document.getElementById('srv-tabs'); tabs.innerHTML='';
+    srvModes.forEach(m=>{
+      const b=document.createElement('button'); b.className='vm-tab'+(m==='Todos'?' active':''); b.textContent=m;
+      b.addEventListener('click',()=>{ srvCat=m; tabs.querySelectorAll('.vm-tab').forEach(t=>t.classList.remove('active')); b.classList.add('active'); renderServers(); });
+      tabs.appendChild(b);
+    });
+    renderServers();
+    renderSrvHistory();
+    serversRefreshNow(true);
+  }catch(e){ document.getElementById('servers-grid').innerHTML='<div class="card">Erro: '+e+'</div>'; }
+}
+async function serversRefreshNow(auto){
+  if(!auto) toast('A sondar servidores…');
+  try{
+    const r=await window.midnightAPI.serversRefresh();
+    if(r.success){ srvAll=r.servers; renderServers(); if(!auto) toast('Estado atualizado!'); }
+    else if(!auto) toast(r.output);
+  }catch(e){ if(!auto) toast('Falha: '+e); }
+}
+function renderServers(){
+  const grid=document.getElementById('servers-grid'); if(!grid) return; grid.innerHTML='';
+  const list=srvAll.filter(s=>srvCat==='Todos'||s.mode===srvCat);
+  if(!list.length){ grid.innerHTML='<div class="card">Nada aqui. Tenta outra categoria.</div>'; return; }
+  list.forEach(s=>{
+    const pct=s.max?Math.min(100,Math.round(s.players/s.max*100)):0;
+    const d=document.createElement('div'); d.className='card srv-card';
+    d.innerHTML=`<span class="srv-mode">${s.mode||''}</span><h4>${s.online===false?'🔴':'🟢'} ${s.name||s.sample_name||s.ip}</h4>
+      <div class="srv-meta">${s.ip}:${s.port} • mapa <b>${s.map||s.sample_map||'?'}</b></div>
+      <div class="srv-players"><div style="width:${pct}%"></div></div>
+      <div class="srv-meta">${s.players??'?'}/${s.max??'?'} jogadores</div>
+      <p class="srv-desc">${s.desc||''}</p>
+      <div class="srv-actions"><button class="btn gold small">▶ Ligar</button><button class="btn ghost small">📋 IP</button></div>`;
+    d.querySelector('.btn.gold').addEventListener('click', async ()=>{
+      toast(`A ligar a ${s.ip}… (abre o CS2 se preciso)`);
+      const r=await window.midnightAPI.serverConnect(s.ip,s.port);
+      toast(r.output); renderSrvHistory();
+    });
+    d.querySelector('.btn.ghost').addEventListener('click', async ()=>{
+      try{ await navigator.clipboard.writeText(`connect ${s.ip}:${s.port}`); toast('IP copiado! Cola na consola do CS2.'); }
+      catch{ toast(`${s.ip}:${s.port}`); }
+    });
+    grid.appendChild(d);
+  });
+}
+async function renderSrvHistory(){
+  const box=document.getElementById('servers-history'); if(!box) return;
+  try{
+    const r=await window.midnightAPI.serversHistory();
+    const h=r.history||[];
+    if(!h.length){ box.innerHTML='<p class="muted">Ainda não entraste em nenhum.</p>'; return; }
+    box.innerHTML='';
+    h.forEach(e=>{
+      const d=document.createElement('div');
+      d.innerHTML=`<label>${e.when||''} • ${e.mode||''}</label><p>${e.name||e.ip}:${e.port} <button class="btn small gold" style="margin-left:8px">▶</button></p>`;
+      d.querySelector('button').addEventListener('click', async ()=>{
+        const rr=await window.midnightAPI.serverConnect(e.ip,e.port); toast(rr.output);
+      });
+      box.appendChild(d);
+    });
+  }catch{}
+}
+document.getElementById('btn-servers-refresh')?.addEventListener('click', ()=>serversRefreshNow(false));
+
 // ---------- HOTKEYS ----------
 let hkMap={}, hkOn=true;
 function hkLoad(){ try{ hkMap=JSON.parse(localStorage.getItem(LS('vm_hotkeys'))||'{}'); hkOn=localStorage.getItem(LS('vm_hkon'))!=='0'; }catch{ hkMap={}; } }
@@ -459,12 +537,32 @@ document.getElementById('btn-hk-toggle')?.addEventListener('click', async ()=>{
 // ---------- SOUNDBOARD ----------
 let soundAll=[];
 function slog(m){ const el=document.getElementById('log-sound'); if(!el)return; el.textContent+='\n'+m; el.scrollTop=el.scrollHeight; }
-function soundOut(){ const o=document.getElementById('voice-out'); return parseInt((o&&o.value)||'-1'); }
+function soundOut(){ const o=document.getElementById('sound-out'); if(o && o.value!==undefined && o.value!=='') return parseInt(o.value); const v=document.getElementById('voice-out'); return parseInt((v&&v.value)||'-1'); }
 async function initSound(){
   if(!window.midnightAPI || !window.midnightAPI.soundboardList) return;
   try{ soundAll=await window.midnightAPI.soundboardList(); }catch{ soundAll=[]; }
   renderSoundGrid();
+  try{
+    const dv=await window.midnightAPI.voiceDevices();
+    const sel=document.getElementById('sound-out');
+    if(dv.success && sel){
+      const saved=localStorage.getItem(LS('sound_out'))||'';
+      sel.innerHTML='';
+      dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; sel.appendChild(o); });
+      if(saved && [...sel.options].some(o=>o.value==saved)) sel.value=saved;
+      else { const c=[...sel.options].find(o=>/CABLE/i.test(o.text)); if(c) sel.value=c.value; }
+      sel.addEventListener('change',()=>{ try{ localStorage.setItem(LS('sound_out'),sel.value); }catch{} });
+      const sc=document.getElementById('sound-cable');
+      if(sc) sc.textContent = dv.cable ? '✔ Micro virtual pronto.' : '⚠ Sem micro virtual — corre o Setup e reinicia o PC.';
+    }
+  }catch{}
 }
+document.getElementById('btn-cable-out')?.addEventListener('click', ()=>{
+  const sel=document.getElementById('sound-out');
+  const c=[...sel.options].find(o=>/CABLE/i.test(o.text));
+  if(c){ sel.value=c.value; try{ localStorage.setItem(LS('sound_out'),c.value); }catch{} toast('✔ Sons agora saem no CABLE → CS2. No CS2 escolhe "CABLE Output" como microfone.'); }
+  else toast('⚠ Sem micro virtual. Corre o Setup (instala sozinho) e reinicia o PC.');
+});
 function renderSoundGrid(){
   const grid=document.getElementById('sound-grid'); if(!grid) return; grid.innerHTML='';
   if(!soundAll.length){ grid.innerHTML='<div class="card">Sem sons.</div>'; return; }
@@ -613,8 +711,19 @@ async function detectGames(){
     const d = await withTimeout(window.midnightAPI.detectGames(), 30000, 'detectGames');
     const cs = d.cs2, wow = d.wow;
     const csS = document.getElementById('cs2-status'), csP = document.getElementById('cs2-path');
-    if(csS){ csS.textContent = cs.found ? '✔ CS2 detetado' : '✘ CS2 não detetado (abre no Steam uma vez)'; csS.style.color = cs.found ? '#7ef0c1' : '#ff9d9d'; }
+    const csR = document.getElementById('cs2-run');
+    if(csS){ csS.textContent = cs.found ? `✔ CS2 detetado (via ${cs.source||'steam'})` : '✘ CS2 não detetado — prime "📁 Escolher pasta do CS2"'; csS.style.color = cs.found ? '#7ef0c1' : '#ff9d9d'; }
     if(csP){ csP.textContent = cs.base || cs.cfg || ''; }
+    if(csR){
+      const killBtn=document.getElementById('btn-cs2-kill');
+      if(cs.running){
+        csR.textContent='🟢 CS2 A CORRER — fecha o jogo para aplicar. Se já fechaste, o processo ficou preso: prime "🔪 Fechar CS2 à força".';
+        csR.style.color='#ffd479';
+        if(killBtn) killBtn.style.display='';
+      }
+      else if(cs.found){ csR.textContent='⚪ CS2 fechado — pronto para aplicar.'; csR.style.color='#9a94b8'; if(killBtn) killBtn.style.display='none'; }
+      else { csR.textContent=''; if(killBtn) killBtn.style.display='none'; }
+    }
     const wowS = document.getElementById('wow-status'), wowP = document.getElementById('wow-path');
     if(wowS){ wowS.textContent = wow.found ? '✔ WoW detetado ('+(wow.flavor||'retail')+')' : (wow.base ? '⚠ WoW encontrado mas abre o jogo uma vez p/ gerar Config.wtf' : '✘ WoW não detetado'); wowS.style.color = wow.found ? '#7ef0c1' : '#ffd479'; }
     if(wowP){ wowP.textContent = wow.config || wow.base || ''; }
@@ -622,6 +731,18 @@ async function detectGames(){
   }catch(e){ ilog('Erro deteção: '+e); }
 }
 document.getElementById('btn-detect-games')?.addEventListener('click', detectGames);
+document.getElementById('btn-cs2-folder')?.addEventListener('click', async ()=>{
+  toast('Escolhe a pasta do CS2…');
+  const r = await window.midnightAPI.pickCs2Folder();
+  ilog((r.success?'✔ ':'✘ ')+r.output); toast(r.output);
+  if(r.success) detectGames();
+});
+document.getElementById('btn-cs2-kill')?.addEventListener('click', async ()=>{
+  toast('A fechar CS2 à força…');
+  const r = await window.midnightAPI.killCs2();
+  ilog((r.success?'✔ ':'✘ ')+r.output); toast(r.output);
+  detectGames();
+});
 document.getElementById('btn-cs2-apply')?.addEventListener('click', async ()=>{
   toast('⚔ A aplicar CS2 competitivo…'); const r = await window.midnightAPI.cs2Competitive();
   ilog((r.success?'✔ ':'✘ ')+(r.output||'')); if(r.launch){ document.getElementById('cs2-launch-preview').textContent = 'Launch Options:\n'+r.launch; }
