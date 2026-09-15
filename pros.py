@@ -89,6 +89,20 @@ PROS = [
         "fps": 999, "radar": 0.65, "launch": "",
         "video": {"w": 1920, "h": 1080, "aspect": 1, "msaa": "2", "aniso": "0"},
     },
+    {
+        "id": "fallen", "name": "FalleN", "real": "Gabriel Toledo",
+        "team": "FURIA", "country": "BR", "role": "AWPer",
+        "photo": "assets/pros/fallen.png",
+        "dpi": 400, "sens": 2.0, "zoom": 1.0, "hz": 1000,
+        "res": "1280x960", "aspect": "4:3 Stretched",
+        "cross": {"length": 2, "thick": 1, "gap": -6, "dot": 0,
+                  "color": 2, "r": 255, "g": 255, "b": 0, "alpha": 255},
+        "vm": {"fov": 60, "x": 1, "y": 1, "z": -1, "preset": 1},
+        "bob": {"lower": 5, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
+        "fps": 0, "radar": 0.45,
+        "launch": "-refresh 360 -novid",
+        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "4", "aniso": "1"},
+    },
 ]
 
 BY_ID = {p["id"]: p for p in PROS}
