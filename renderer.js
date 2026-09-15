@@ -32,6 +32,10 @@ async function getBackend(){
       wowRestore: ()=>a.wow_restore(),
       listPros: ()=>a.list_pros(),
       applyPro: (id)=>a.apply_pro(id),
+      checkUpdate: ()=>a.check_update(),
+      startUpdate: ()=>a.start_update(),
+      updateProgress: ()=>a.update_progress(),
+      applyUpdate: ()=>a.apply_update_and_restart(),
     };
     return window.midnightAPI;
   }
@@ -163,8 +167,39 @@ document.getElementById('file-game').addEventListener('change',(e)=>{
   games.push({name:p.split(/[\\/]/).pop().replace('.exe','').replace('.lnk',''), path:p});
   saveGames(); renderGames(); toast('Jogo adicionado!');
 });
-(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); })();
+(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); checkForUpdate(); })();
 document.getElementById('status-pill').className='status-pill normal';
+
+// ---------- AUTO-UPDATE ----------
+async function checkForUpdate(){
+  try{
+    if(!window.midnightAPI || !window.midnightAPI.checkUpdate) return;
+    const r = await window.midnightAPI.checkUpdate();
+    if(r && r.success && r.available){
+      document.getElementById('update-banner').style.display='flex';
+      document.getElementById('update-text').textContent=`Nova versão ${r.latest} disponível — atualiza sem sair da app!`;
+    }
+  }catch{}
+}
+document.getElementById('btn-update-later')?.addEventListener('click',()=>{
+  document.getElementById('update-banner').style.display='none';
+});
+document.getElementById('btn-update-now')?.addEventListener('click', async ()=>{
+  document.getElementById('btn-update-now').style.display='none';
+  document.getElementById('btn-update-later').style.display='none';
+  await window.midnightAPI.startUpdate();
+  const fill=document.getElementById('update-fill'), txt=document.getElementById('update-text');
+  const h=setInterval(async ()=>{
+    const p=await window.midnightAPI.updateProgress();
+    fill.style.width=(p.pct||0)+'%';
+    txt.textContent=`A descarregar atualização… ${p.pct||0}%`;
+    if(p.status==='ready'){ clearInterval(h); txt.textContent=`Versão ${p.version} pronta!`; document.getElementById('btn-update-restart').style.display=''; }
+    if(p.status==='error'){ clearInterval(h); txt.textContent='Falha: '+p.error; }
+  },500);
+});
+document.getElementById('btn-update-restart')?.addEventListener('click', async ()=>{
+  await window.midnightAPI.applyUpdate();
+});
 
 // ---------- GALERIA PROS ----------
 async function renderPros(){

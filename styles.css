@@ -129,6 +129,10 @@ nav{display:flex;flex-direction:column;gap:8px}
 .sys-rows{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
 .sys-rows label{font-size:11px;color:var(--gold-soft);text-transform:uppercase;letter-spacing:1px}
 .sys-rows p{margin:2px 0 0;font-size:14px}
+/* Update banner */
+.update-banner{display:flex;gap:10px;align-items:center;background:linear-gradient(90deg, rgba(212,175,55,.15), rgba(124,108,240,.15));border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px}
+.update-bar{flex:1;height:8px;background:#0a0d24;border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.update-bar div{height:100%;width:0%;background:linear-gradient(90deg,#b78d1f,#f0d47a);transition:width .3s}
 /* Pros */
 .pros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
 .pro-card{background:linear-gradient(180deg,#1a204f,#0a0d28);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;transition:.2s}
