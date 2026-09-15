@@ -133,8 +133,32 @@ nav{display:flex;flex-direction:column;gap:8px}
 .update-banner{display:flex;gap:10px;align-items:center;background:linear-gradient(90deg, rgba(212,175,55,.15), rgba(124,108,240,.15));border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px}
 .update-bar{flex:1;height:8px;background:#0a0d24;border-radius:99px;overflow:hidden;border:1px solid var(--border)}
 .update-bar div{height:100%;width:0%;background:linear-gradient(90deg,#b78d1f,#f0d47a);transition:width .3s}
+/* Voz estilo Voicemod */
+.vm-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:12px}
+.vm-tab{flex-shrink:0;border:1px solid transparent;background:rgba(255,255,255,.06);color:var(--muted);padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13px}
+.vm-tab.active{background:#22d3ee;color:#04222a;border-color:#22d3ee}
+.vm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px}
+.vm-item{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;color:var(--text)}
+.vm-avatar{position:relative;width:104px;height:104px}
+.vm-avatar img{width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.14);background:#0a0d24;transition:.2s}
+.vm-item.selected .vm-avatar img{border-color:#22d3ee;box-shadow:0 0 22px rgba(34,211,238,.8)}
+.vm-name{font-size:13px;font-weight:600;text-align:center}
+.vm-badge{position:absolute;top:-8px;right:-6px;font-size:10px;font-weight:800;border-radius:6px;padding:2px 7px;letter-spacing:.5px}
+.vm-badge.HOT{background:#ff5a2e;color:#fff}
+.vm-badge.NOVO{background:#ffb02e;color:#1a1200}
+.vm-live{position:absolute;bottom:0;right:0;font-size:10px;font-weight:800;background:#2effa3;color:#04120a;border-radius:8px;padding:2px 6px}
+.vm-rec{position:absolute;bottom:0;right:0;font-size:10px;font-weight:800;background:#ffb02e;color:#1a1200;border-radius:8px;padding:2px 6px}
+.vm-bar{position:sticky;bottom:12px;margin:14px auto 0;display:flex;gap:14px;align-items:center;justify-content:center;background:rgba(10,13,36,.92);border:1px solid var(--border);border-radius:22px;padding:10px 18px;width:max-content;box-shadow:var(--glow);z-index:5}
+.vm-btn{width:52px;height:52px;border-radius:50%;border:1px solid var(--border);background:#1a1e45;color:#fff;font-size:22px;cursor:pointer}
+.vm-btn.on{background:#2effa3;color:#04120a;border-color:#2effa3}
+.vm-mic{width:76px;height:76px;border-radius:50%;border:3px solid #22d3ee;background:radial-gradient(circle at 50% 30%, #134a5e, #060714);font-size:34px;cursor:pointer;box-shadow:0 0 26px rgba(34,211,238,.7)}
+.vm-mic.rec{background:radial-gradient(circle at 50% 30%, #ff5a2e, #3d0d00);border-color:#ff5a2e;box-shadow:0 0 26px rgba(255,90,46,.8)}
+.vm-mic.on{border-color:#2effa3;box-shadow:0 0 26px rgba(46,255,163,.8)}
+.vm-key{position:absolute;top:-6px;left:-6px;width:28px;height:28px;border-radius:50%;border:1px solid var(--gold);background:#0a0d24;color:var(--gold-soft);font-size:13px;cursor:pointer;z-index:2}
+.vm-key.bound{background:var(--gold);color:#1a1200}
+.vm-hk{font-size:10.5px;color:var(--gold-soft);font-weight:700;min-height:14px}
 /* Voz */
-.voice-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+.voice-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:12px}
 .voice-row label{font-size:11px;color:var(--gold-soft);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
 .voice-row select{width:100%;background:#0a0d24;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px}
 .voice-row input[type=range]{width:100%}
@@ -151,7 +175,26 @@ nav{display:flex;flex-direction:column;gap:8px}
 .pro-card .team{color:var(--gold-soft);font-size:12px;font-weight:700}
 .pro-card .specs{color:var(--muted);font-size:11.5px;margin:8px 0;line-height:1.6}
 .pro-card .btn{width:100%;margin-top:4px}
+.hk-capture{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(4,5,16,.85);text-align:center}
+.hk-capture h3{font-family:'Cinzel',serif;color:var(--gold);font-size:24px}
+.hk-capture p{color:var(--text)}
 .toast{position:fixed;bottom:24px;right:24px;z-index:10;background:#12163a;border:1px solid var(--gold);color:#fff;
   padding:12px 16px;border-radius:12px;box-shadow:var(--glow);opacity:0;pointer-events:none;transition:.3s;max-width:360px}
 .toast.show{opacity:1;transform:translateY(-4px)}
+/* Login */
+.login-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:radial-gradient(900px 600px at 50% 20%, #1b1447, #060714)}
+.login-card{width:340px;text-align:center;background:linear-gradient(180deg,#141947,#080a22);border:1px solid var(--gold);border-radius:20px;padding:32px 28px;box-shadow:var(--glow)}
+.login-card h1{margin:10px 0 0;font-family:'Cinzel',serif;letter-spacing:3px}
+.login-card>span{font-size:11px;letter-spacing:5px;color:var(--gold-soft)}
+.login-card input{width:100%;margin-top:10px;background:#0a0d24;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px}
+.login-btns{display:flex;gap:8px;margin-top:12px}.login-btns .btn{flex:1}
+.login-card .btn.small{margin-top:10px}
+.login-users{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0 4px}
+.login-users button{background:#1a1e45;color:var(--text);border:1px solid var(--border);border-radius:999px;padding:6px 14px;cursor:pointer}
+.login-users button:hover{border-color:var(--gold)}
+.login-err{color:#ff9d9d;font-size:12px;min-height:16px}
+#user-pill{justify-content:flex-start;margin-bottom:8px}
+#user-pill button{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px}
+#user-pill button:hover{color:#ff9d9d}
+.vm-del{position:absolute;bottom:0;left:0;font-size:10px;font-weight:800;background:#ff5a2e;color:#fff;border-radius:8px;padding:2px 6px;border:none;cursor:pointer}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#2a2f6b;border-radius:8px}::-webkit-scrollbar-track{background:transparent}

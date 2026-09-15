@@ -3,3 +3,5 @@ pyinstaller>=6.0
 sounddevice>=0.4
 numpy>=1.26
 pillow>=10.0
+miniaudio>=1.6
+keyboard>=0.13

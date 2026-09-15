@@ -9,6 +9,23 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card">
+    <div class="logo-rune">◈</div>
+    <h1>MIDNIGHT</h1>
+    <span>OPTIMIZER</span>
+    <p class="muted small">Cada pessoa tem a sua conta: vozes, teclas, jogos e sons.</p>
+    <div class="login-users" id="login-users"></div>
+    <input id="login-name" placeholder="Nome de utilizador" maxlength="16" autocomplete="username">
+    <input id="login-pass" type="password" placeholder="Palavra-passe" autocomplete="current-password">
+    <div class="login-btns">
+      <button class="btn gold" id="btn-login">Entrar</button>
+      <button class="btn ghost" id="btn-register">Criar conta</button>
+    </div>
+    <button class="btn outline small" id="btn-guest">Entrar como convidado</button>
+    <p class="login-err" id="login-err"></p>
+  </div>
+</div>
 <canvas id="stars"></canvas>
 <div class="nebula"></div>
 
@@ -29,12 +46,14 @@
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
       <button class="nav-btn" data-page="ingame"><i>🎯</i> In-Game CS2 & WoW</button>
       <button class="nav-btn" data-page="voz"><i>🎙️</i> Estúdio de Voz</button>
+      <button class="nav-btn" data-page="sound"><i>🔊</i> Soundboard</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
       <button class="nav-btn" data-page="jogos"><i>♞</i> Meus Jogos</button>
       <button class="nav-btn" data-page="sistema"><i>☾</i> Sistema</button>
     </nav>
 
     <div class="sidebar-footer">
+      <div class="status-pill" id="user-pill" title="Sessão"><span>👤</span><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
       <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
       <p class="hint">Executa como <b>Administrador</b> para poder total.</p>
     </div>
@@ -195,24 +214,40 @@
 
     <!-- ESTÚDIO DE VOZ -->
     <section class="page" id="page-voz">
-      <div class="card wide" style="margin-bottom:14px">
-        <h4>🎙️ Estúdio de Voz — tipo Voicemod</h4>
-        <p class="muted small">AO VIVO: efeitos com selo <b>LIVE</b> (Robot, Rádio, Caverna, Abismo) saem direto na saída. Para Discord/CS2, instala um cabo virtual (ex: VB-CABLE) e escolhe-o como <b>Saída</b>, depois usa-o como microfone no Discord. GRAVAR: funciona com todos, grava → transforma → toca.</p>
+      <div class="vm-tabs" id="vm-tabs"></div>
+      <div class="vm-grid" id="voice-grid"><div class="card">A carregar efeitos…</div></div>
+      <div class="card wide" style="margin-top:14px">
         <div class="voice-row">
           <div><label>Microfone</label><select id="voice-mic"></select></div>
-          <div><label>Saída</label><select id="voice-out"></select></div>
+          <div><label>Saída (Discord)</label><select id="voice-out"></select></div>
+          <div><label>Monitor (ouvir-me)</label><select id="voice-mon"></select></div>
           <div><label>Ganho <span id="voice-gain-val">1.5</span></label><input type="range" id="voice-gain" min="0.5" max="3" step="0.1" value="1.5"></div>
         </div>
-        <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
-          <button class="btn gold" id="btn-voice-live">▶ Ativar voz ao vivo</button>
-          <button class="btn ghost" id="btn-voice-stop">⏹ Parar tudo</button>
-          <button class="btn gold" id="btn-voice-rec">⏺ Gravar (segurar efeito)</button>
-          <button class="btn ghost" id="btn-voice-replay">↻ Repetir última</button>
+        <div class="comp-btns" style="margin-top:12px">
+          <button class="btn small gold" id="btn-voice-rec">⏺ Gravar e transformar</button>
         </div>
-        <p class="muted small" id="voice-status">Escolhe um efeito em baixo e prime Ativar.</p>
+        <p class="muted small" id="voice-status">Escolhe uma voz em cima.</p>
+        <p class="muted small">Para Discord/CS2: instala um cabo virtual (VB-CABLE), escolhe-o como <b>Saída</b> e usa-o como microfone no Discord.</p>
+        <p class="muted small" style="opacity:.7">Avatares: OpenMoji (CC BY-SA 4.0) • Sons: myinstants</p>
       </div>
-      <div class="pros-grid" id="voice-grid"><div class="card">A carregar efeitos…</div></div>
       <div class="console"><div class="console-head">🎙️ Registo de Voz</div><pre id="log-voice">Pronto.</pre></div>
+      <div class="vm-bar">
+        <button class="vm-btn" id="vm-power" title="Ligar/Desligar">⏻</button>
+        <button class="vm-mic" id="vm-micbtn" title="Ouvir-me com efeito"><span>🎙️</span></button>
+        <button class="vm-btn" id="vm-ear" title="Ouvir última">👂</button>
+      </div>
+    </section>
+
+    <!-- SOUNDBOARD -->
+    <section class="page" id="page-sound">
+      <div class="games-head">
+        <div><h3>🔊 Soundboard — memes do myinstants</h3><p class="muted">Clica para tocar na saída escolhida. Mete ⌨ em cada som ou voz para tecla de atalho global.</p></div>
+        <div><button class="btn gold" id="btn-add-sound">＋ Adicionar meu som</button>
+        <button class="btn ghost" id="btn-hk-toggle">⌨ Atalhos: ON</button>
+        <button class="btn ghost" id="btn-sound-stop">⏹ Parar som</button></div>
+      </div>
+      <div class="vm-grid" id="sound-grid"><div class="card">A carregar sons…</div></div>
+      <div class="console"><div class="console-head">🔊 Registo</div><pre id="log-sound">Pronto.</pre></div>
     </section>
 
     <!-- JOGOS -->
@@ -243,6 +278,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="hk-capture" id="hk-capture" style="display:none"><div><h3 id="hk-cap-title">Tecla de atalho</h3><p>Prime as teclas que queres usar… (ESC cancela)<br><span class="muted small">Vale tudo: F1-F12, Insert, Numpad, letras com Ctrl/Alt/Shift.</span></p></div></div>
 <script src="renderer.js"></script>
 </body>
 </html>

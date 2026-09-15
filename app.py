@@ -6,6 +6,7 @@ Backend Python + WebView2 (Edge) — gera .exe único
 import os
 import sys
 import json
+import re
 import subprocess
 import platform
 import shutil
@@ -16,6 +17,7 @@ import webview
 import game_tweaks
 import pros
 import voicefx
+import accounts
 
 try:
     import sounddevice as sd
@@ -24,10 +26,30 @@ except Exception:
     sd = None
     _SD_OK = False
 
-_VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
-       "rec": None, "recording": False, "last_wav": ""}
+try:
+    import miniaudio
+    _MA_OK = True
+except Exception:
+    miniaudio = None
+    _MA_OK = False
 
-APP_VERSION = "1.3.0"
+try:
+    import keyboard as _kb
+    _KB_OK = True
+except Exception:
+    _kb = None
+    _KB_OK = False
+
+_LAST_IN, _LAST_OUT, _LAST_GAIN = None, None, 1.5
+_HK = []
+_SB_CACHE = {}
+_SESSION = {"user": None}
+
+_VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
+       "rec": None, "recording": False, "last_wav": "",
+       "mon": None, "mon_state": None}
+
+APP_VERSION = "1.4.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,6 +97,16 @@ def _ver_tuple(v):
 
 _UPDATE = {"status": "idle", "pct": 0, "error": "", "path": "", "version": "", "notes": ""}
 _WINDOW = None
+
+def log_error(msg):
+    try:
+        p = os.path.join(tempfile.gettempdir(), "midnight_debug.log")
+        with open(p, "a", encoding="utf-8") as f:
+            import datetime
+            f.write(f"[{datetime.datetime.now():%H:%M:%S}] {msg}\n")
+    except Exception:
+        pass
+    return {"success": True}
 
 
 class Api:
@@ -265,9 +297,43 @@ class Api:
     def wow_restore(self):
         return game_tweaks.restore_wow()
 
+    # ---------- CONTAS ----------
+    def users_list(self):
+        try:
+            return {"success": True, "users": accounts.list_users()}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def account_register(self, name, pw):
+        return accounts.register(name, pw)
+
+    def account_login(self, name, pw):
+        r = accounts.check((name or "").strip(), pw or "")
+        if r.get("success"):
+            _SESSION["user"] = (name or "").strip() or accounts.GUEST
+        return r
+
+    def account_logout(self):
+        _SESSION["user"] = None
+        try:
+            self.voice_stop()
+        except Exception:
+            pass
+        return {"success": True, "output": "Sessao terminada."}
+
+    def whoami(self):
+        return {"user": _SESSION.get("user")}
+
+    def _me(self):
+        return _SESSION.get("user") or accounts.GUEST
+
     # ---------- PROS CS2 ----------
     def list_pros(self):
-        return pros.list_pros()
+        try:
+            return pros.list_pros()
+        except Exception as e:
+            log_error("list_pros: " + str(e))
+            return []
 
     def apply_pro(self, pro_id):
         return pros.apply_pro(pro_id)
@@ -276,7 +342,8 @@ class Api:
     def voice_effects(self):
         out = []
         for e in voicefx.EFFECTS:
-            out.append({**e, "photo": f"assets/voice/{e['id']}.png"})
+            out.append({**e, "photo": f"assets/voice/{e['id']}.png",
+                        "live": voicefx.is_live(e)})
         return out
 
     def voice_devices(self):
@@ -321,10 +388,12 @@ class Api:
         return None, 0, str(last_err)
 
     def voice_start(self, effect_id="robot", in_idx=-1, out_idx=-1, gain=1.5):
+        global _LAST_IN, _LAST_OUT, _LAST_GAIN
         if not _SD_OK:
             return {"success": False, "output": "Falta: pip install sounddevice numpy"}
         self.voice_stop()
         import numpy as np
+        _LAST_IN, _LAST_OUT, _LAST_GAIN = in_idx, self._dev(out_idx, 1), float(gain)
         st = voicefx.new_state(effect_id)
         holder = {}
 
@@ -347,6 +416,7 @@ class Api:
         return {"success": True, "output": f"AO VIVO: {effect_id} (canais {ch})"}
 
     def voice_stop(self):
+        """Para a cadeia de ENVIO (efeito ativo). Nao mexe no monitor nem nos sons."""
         try:
             if _VS.get("stream") is not None:
                 _VS["stream"].stop()
@@ -354,18 +424,56 @@ class Api:
         except Exception:
             pass
         _VS["stream"] = None
+        return {"success": True, "output": "Efeito desativado."}
+
+    def monitor_stop(self):
+        """Para a monitorizacao (ouvir-me)."""
+        try:
+            if _VS.get("mon") is not None:
+                _VS["mon"].stop()
+                _VS["mon"].close()
+        except Exception:
+            pass
+        _VS["mon"] = None
+        return {"success": True, "output": "Monitor desligado."}
+
+    def monitor_start(self, effect_id="radio", in_idx=-1, mon_idx=-1, gain=1.5):
+        """Ouve-te a ti proprio COM o efeito (auscultadores). Independente do envio."""
+        if not _SD_OK:
+            return {"success": False, "output": "Falta: pip install sounddevice numpy"}
+        self.monitor_stop()
+        import numpy as np
+        st = voicefx.new_state(effect_id)
+
+        def cb(indata, outdata, frames, time_info, status):
+            x = np.asarray(indata, dtype=np.float32)
+            x = x.mean(axis=1, dtype=np.float32) if x.shape[1] > 1 else x[:, 0]
+            y = voicefx.process_block(x, effect_id, st, voicefx.SR, float(gain))
+            outdata[:, 0] = y[:frames]
+            if outdata.shape[1] > 1:
+                outdata[:, 1] = y[:frames]
+
+        s, ch, err = self._open_stream(self._dev(in_idx, 0), self._dev(mon_idx, 1), cb)
+        if s is None:
+            return {"success": False,
+                    "output": f"Monitor falhou (micro ocupado?): {err}"}
+        _VS.update({"mon": s, "mon_state": st})
+        return {"success": True, "output": f"🎙️ A ouvires-te com {effect_id}."}
+
+    def _stop_all_audio(self):
+        self.voice_stop()
+        self.monitor_stop()
         try:
             if sd is not None:
                 sd.stop()
         except Exception:
             pass
-        return {"success": True, "output": "Voz parada."}
 
     def voice_record_start(self, in_idx=-1):
         if not _SD_OK:
             return {"success": False, "output": "Falta: pip install sounddevice numpy"}
         import numpy as np
-        self.voice_stop()
+        self._stop_all_audio()
         buf = []
 
         def cb(indata, frames, time_info, status):
@@ -439,9 +547,191 @@ class Api:
         except Exception as e:
             return {"success": False, "output": str(e)}
 
+    # ---------- SOUNDBOARD (myinstants + pessoais) ----------
+    def soundboard_list(self):
+        try:
+            with open(os.path.join(BASE_DIR, "assets", "sounds", "manifest.json"),
+                      encoding="utf-8") as f:
+                builtin = json.load(f)
+        except Exception as e:
+            builtin = []
+        try:
+            customs = accounts.custom_sounds(self._me())
+            for c in customs:
+                if c.get("photo"):
+                    import urllib.request
+                    c["photo"] = "file:///" + urllib.request.pathname2url(c["photo"]).lstrip("/")
+            return builtin + customs
+        except Exception:
+            return builtin
+
+    def soundboard_add(self):
+        """Adiciona um som pessoal (mp3/wav/ogg) a conta atual."""
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+            root = tk.Tk()
+            root.withdraw()
+            root.attributes("-topmost", True)
+            path = filedialog.askopenfilename(
+                title="Escolhe um som (mp3/wav/ogg)",
+                filetypes=[("Audio", "*.mp3 *.wav *.ogg"), ("Todos", "*.*")]
+            )
+            root.destroy()
+            if not path:
+                return {"success": False, "output": "Cancelado."}
+            base = re.sub(r"[^a-z0-9]+", "-", os.path.splitext(os.path.basename(path))[0].lower()).strip("-")[:40] or "som"
+            sdir = os.path.join(accounts.user_dir(self._me()), "sounds")
+            dest = os.path.join(sdir, base + os.path.splitext(path)[1].lower())
+            i = 1
+            while os.path.exists(dest):
+                dest = os.path.join(sdir, f"{base}-{i}{os.path.splitext(path)[1].lower()}")
+                i += 1
+            shutil.copy2(path, dest)
+            # valida decode
+            try:
+                if miniaudio is None:
+                    raise RuntimeError("sem decoder")
+                miniaudio.decode_file(dest)
+            except Exception:
+                try:
+                    os.remove(dest)
+                except Exception:
+                    pass
+                return {"success": False, "output": "Ficheiro nao e audio valido."}
+            # icon
+            try:
+                from PIL import Image, ImageDraw, ImageFont
+                img = Image.new("RGB", (256, 256), "#060714")
+                d = ImageDraw.Draw(img)
+                try:
+                    font = ImageFont.truetype("arial.ttf", 110)
+                except Exception:
+                    font = ImageFont.load_default()
+                letter = (base.strip() or "?")[0].upper()
+                bb = d.textbbox((0, 0), letter, font=font)
+                w, h = bb[2] - bb[0], bb[3] - bb[1]
+                d.ellipse([28, 28, 228, 228], outline=(212, 175, 55), width=5)
+                d.text(((256 - w) / 2 - bb[0], (256 - h) / 2 - bb[1] - 8), letter,
+                       font=font, fill=(212, 175, 55))
+                img.save(os.path.join(sdir, os.path.splitext(os.path.basename(dest))[0] + ".png"))
+            except Exception:
+                pass
+            _SB_CACHE.pop("u_" + os.path.splitext(os.path.basename(dest))[0], None)
+            return {"success": True, "output": f"Som '{base}' adicionado aos teus sons!"}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def soundboard_remove(self, sound_id):
+        if not (sound_id or "").startswith("u_"):
+            return {"success": False, "output": "So sons pessoais."}
+        try:
+            sdir = os.path.join(accounts.user_dir(self._me()), "sounds")
+            stem = sound_id[2:]
+            for fn in os.listdir(sdir):
+                if os.path.splitext(fn)[0] == stem:
+                    os.remove(os.path.join(sdir, fn))
+            _SB_CACHE.pop(sound_id, None)
+            return {"success": True, "output": "Som removido."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def _sb_samples(self, sound_id):
+        import numpy as np
+        if sound_id in _SB_CACHE:
+            return _SB_CACHE[sound_id]
+        path = os.path.join(BASE_DIR, "assets", "sounds", sound_id + ".mp3")
+        if not os.path.isfile(path):
+            for s in self.soundboard_list():
+                if s.get("id") == sound_id and s.get("file"):
+                    cand = s["file"]
+                    if not os.path.isabs(cand):
+                        cand = os.path.join(BASE_DIR, cand)
+                    if os.path.isfile(cand):
+                        path = cand
+                    break
+        if not os.path.isfile(path):
+            return None
+        d = miniaudio.decode_file(path)
+        y = np.array(d.samples, dtype=np.float32)
+        if d.nchannels > 1:
+            y = y.reshape(-1, d.nchannels).mean(axis=1)
+        y = y / max(1e-6, np.max(np.abs(y))) * 0.9
+        if d.sample_rate != voicefx.SR:
+            y = np.interp(np.linspace(0, len(y) - 1, int(len(y) * voicefx.SR / d.sample_rate)),
+                          np.arange(len(y)), y).astype(np.float32)
+        _SB_CACHE[sound_id] = y
+        return y
+
+    def soundboard_play(self, sound_id, out_idx=-1):
+        global _LAST_OUT
+        if not (_SD_OK and _MA_OK):
+            return {"success": False, "output": "Falta: pip install sounddevice miniaudio"}
+        _LAST_OUT = self._dev(out_idx, 1)
+        try:
+            y = self._sb_samples(sound_id)
+            if y is None:
+                return {"success": False, "output": "Som nao encontrado."}
+            sd.play(y, voicefx.SR, device=_LAST_OUT)
+            return {"success": True, "output": f"▶ {sound_id}"}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def soundboard_stop(self):
+        try:
+            if sd is not None:
+                sd.stop()
+        except Exception:
+            pass
+        return {"success": True, "output": "Soundboard parada."}
+
+    # ---------- HOTKEYS GLOBAIS ----------
+    def hotkey_set(self, bindings):
+        if not _KB_OK:
+            return {"success": False, "output": "Falta: pip install keyboard"}
+        self.hotkey_clear()
+        ok, fail = 0, []
+        for combo, b in (bindings or {}).items():
+            try:
+                _kb.add_hotkey(combo, self._hotkey_fire,
+                               args=(str(b.get("kind", "")), str(b.get("id", ""))),
+                               suppress=False)
+                _HK.append(combo)
+                ok += 1
+            except Exception:
+                fail.append(combo)
+        return {"success": True, "output": f"Atalhos ativos: {ok}" + (f" (falhas: {fail})" if fail else "")}
+
+    def hotkey_clear(self):
+        try:
+            if _kb is not None:
+                _kb.clear_all_hotkeys()
+        except Exception:
+            pass
+        _HK.clear()
+        return {"success": True, "output": "Atalhos limpos."}
+
+    def _hotkey_fire(self, kind, item_id):
+        try:
+            if kind == "voice":
+                self.voice_stop()
+                self.voice_start(item_id, _LAST_IN, _LAST_OUT, _LAST_GAIN)
+                try:
+                    if _WINDOW is not None:
+                        _WINDOW.evaluate_js(f"vmSelectFromHotkey('{item_id}')")
+                except Exception:
+                    pass
+            elif kind == "sound":
+                self.soundboard_play(item_id, _LAST_OUT)
+        except Exception:
+            pass
+
     # ---------- AUTO-UPDATE ----------
     def app_version(self):
         return {"version": APP_VERSION}
+
+    def log_error(self, msg):
+        return log_error(str(msg))
 
     def check_update(self):
         try:

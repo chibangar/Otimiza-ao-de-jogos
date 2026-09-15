@@ -40,9 +40,23 @@ async function getBackend(){
       voiceDevices: ()=>a.voice_devices(),
       voiceStart: (e,i,o,g)=>a.voice_start(e,i,o,g),
       voiceStop: ()=>a.voice_stop(),
+      monitorStart: (e,i,m,g)=>a.monitor_start(e,i,m,g),
+      monitorStop: ()=>a.monitor_stop(),
       voiceRecStart: (i)=>a.voice_record_start(i),
       voiceRecStop: (e,o,g)=>a.voice_record_stop(e,o,g),
       voiceReplay: (o)=>a.voice_replay(o),
+      soundboardList: ()=>a.soundboard_list(),
+      soundboardPlay: (id,o)=>a.soundboard_play(id,o),
+      soundboardStop: ()=>a.soundboard_stop(),
+      soundboardAdd: ()=>a.soundboard_add(),
+      soundboardRemove: (id)=>a.soundboard_remove(id),
+      usersList: ()=>a.users_list(),
+      accountRegister: (u,p)=>a.account_register(u,p),
+      accountLogin: (u,p)=>a.account_login(u,p),
+      accountLogout: ()=>a.account_logout(),
+      hotkeySet: (m)=>a.hotkey_set(m),
+      hotkeyClear: ()=>a.hotkey_clear(),
+      logError: (m)=>a.log_error(m),
     };
     return window.midnightAPI;
   }
@@ -64,7 +78,7 @@ for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*in
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -73,13 +87,17 @@ function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
 
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3200); }
+function withTimeout(p, ms, label){
+  return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout '+ms+'ms em '+label)), ms))]);
+}
 function log(msg){ const el=document.getElementById('log'); el.textContent += '\n'+msg; el.scrollTop=el.scrollHeight; }
 
 // Sistema
 async function refreshSystem(){
   if(!window.midnightAPI) return;
-  toast('A consultar os espíritos do sistema…');
-  const info = await window.midnightAPI.getSystemInfo();
+  try{
+    toast('A consultar os espíritos do sistema…');
+    const info = await withTimeout(window.midnightAPI.getSystemInfo(), 30000, 'getSystemInfo');
   document.getElementById('spec-cpu').textContent = info.cpu.slice(0,60);
   document.getElementById('spec-gpu').textContent = info.gpu.slice(0,60);
   document.getElementById('spec-ram').textContent = `${info.ramFree} / ${info.ramTotal} GB livres`;
@@ -89,6 +107,7 @@ async function refreshSystem(){
   document.getElementById('sys-os').textContent=info.os; document.getElementById('sys-cpu').textContent=info.cpu;
   document.getElementById('sys-gpu').textContent=info.gpu; document.getElementById('sys-ram').textContent=info.ramTotal+' GB';
   document.getElementById('sys-power').textContent=info.power.slice(0,120); document.getElementById('sys-host').textContent=info.hostname;
+  }catch(e){ try{ await window.midnightAPI.logError('refreshSystem: '+(e&&e.stack||e)); }catch{} }
 }
 document.getElementById('btn-refresh').addEventListener('click', refreshSystem);
 
@@ -143,8 +162,9 @@ document.querySelectorAll('[data-action="kill"]').forEach(b=>b.addEventListener(
 document.querySelectorAll('[data-action="temp"]').forEach(b=>b.addEventListener('click', async ()=>{ toast('A limpar…'); const r=await midnightAPI.cleanTemp(); log('🧹 '+(r.output||'Limpo')); toast('Limpeza concluída!'); }));
 document.querySelectorAll('[data-action="net"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.network(); log('◈ Rede:\n'+(r.output||'OK')); toast('Rede otimizada!'); }));
 
-// Jogos (localStorage)
-let games=[]; try{ games=JSON.parse(localStorage.getItem('midnight_games')||'[]'); }catch{ games=[]; }
+// Jogos (por conta)
+let games=[];
+function loadGames(){ try{ games=JSON.parse(localStorage.getItem(LS('midnight_games'))||'[]'); }catch{ games=[]; } }
 function renderGames(){
   const g=document.getElementById('games-grid');
   if(!games.length){ g.innerHTML='<div class="card">Nenhum jogo ainda. Clica em <b>＋ Adicionar jogo</b> e escolhe o .exe (ex: Valorant, CS2, LoL, Fortnite).</div>'; return; }
@@ -157,7 +177,7 @@ function renderGames(){
     g.appendChild(d);
   });
 }
-function saveGames(){ localStorage.setItem('midnight_games', JSON.stringify(games)); }
+function saveGames(){ localStorage.setItem(LS('midnight_games'), JSON.stringify(games)); }
 document.getElementById('btn-add-game').addEventListener('click', async ()=>{
   // Se for app Python nativa, usa diálogo real do Windows
   if(window.pywebview && window.pywebview.api && window.pywebview.api.pick_game_file){
@@ -174,75 +194,293 @@ document.getElementById('file-game').addEventListener('change',(e)=>{
   games.push({name:p.split(/[\\/]/).pop().replace('.exe','').replace('.lnk',''), path:p});
   saveGames(); renderGames(); toast('Jogo adicionado!');
 });
-(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); checkForUpdate(); initVoice(); })();
+(async ()=>{
+  const step=async(n,f)=>{ try{ await f(); }catch(e){ try{ await window.midnightAPI.logError(n+': '+(e&&e.stack||e)); }catch{} } };
+  await step('getBackend', getBackend);
+  await step('initLogin', initLogin);
+})();
+window.addEventListener('error',(ev)=>{
+  try{ const m='JSERR '+(ev.message||'')+' @'+(ev.lineno||''); if(window.midnightAPI&&window.midnightAPI.logError) window.midnightAPI.logError(m); }catch{}
+});
 document.getElementById('status-pill').className='status-pill normal';
 
-// ---------- ESTÚDIO DE VOZ ----------
-let voiceFx='robot', voiceFxLive=true, voiceLiveOn=false, voiceRecOn=false;
+// ---------- ESTÚDIO DE VOZ (estilo Voicemod) ----------
+let voiceFx='radio', voiceFxLive=true, voiceLiveOn=false, voiceRecOn=false, voiceMonOn=false;
+let voiceAll=[], voiceCat='Todos';
+const VOICE_CATS=["Todos","Memes","Agudo","Humano","Dispositivos","Profundo","Terror","FPS","Musical","Ficcao","Robotico","Interpretacao"];
+const VOICE_CAT_PT={"Todos":"Todos","Memes":"Memes","Agudo":"Agudo","Humano":"Humano","Dispositivos":"Dispositivos","Profundo":"Profundo","Terror":"Terror","FPS":"FPS","Musical":"Musical","Ficcao":"Ficção científica","Robotico":"Robótico","Interpretacao":"Interpretação de papéis"};
 function vlog(msg){ const el=document.getElementById('log-voice'); if(!el) return; el.textContent+='\n'+msg; el.scrollTop=el.scrollHeight; }
 function voiceGain(){ return parseFloat(document.getElementById('voice-gain').value)||1.5; }
+function vmSave(){ try{ localStorage.setItem(LS('vm_voice'), JSON.stringify({fx:voiceFx, mic:document.getElementById('voice-mic').value, out:document.getElementById('voice-out').value, mon:document.getElementById('voice-mon').value, gain:document.getElementById('voice-gain').value})); }catch{} }
+function vmLoad(){ try{ return JSON.parse(localStorage.getItem(LS('vm_voice'))||'{}'); }catch{ return {}; } }
 async function initVoice(){
   if(!window.midnightAPI || !window.midnightAPI.voiceEffects) return;
-  document.getElementById('voice-gain').addEventListener('input',(e)=>{
-    document.getElementById('voice-gain-val').textContent=e.target.value; });
+  if(!window._vmwired){
+    window._vmwired=true;
+    document.getElementById('voice-gain').addEventListener('input',(e)=>{
+      document.getElementById('voice-gain-val').textContent=e.target.value; vmSave(); });
+    document.getElementById('voice-mic').addEventListener('change', async ()=>{ vmSave(); if(voiceLiveOn){ await window.midnightAPI.voiceStop(); await startLive(); } });
+    document.getElementById('voice-out').addEventListener('change', async ()=>{ vmSave(); if(voiceLiveOn){ await window.midnightAPI.voiceStop(); await startLive(); } });
+    document.getElementById('voice-mon').addEventListener('change', async ()=>{ vmSave(); if(voiceMonOn){ await window.midnightAPI.monitorStop(); await startMonitor(); } });
+  }
   try{
-    const fx=await window.midnightAPI.voiceEffects();
-    const grid=document.getElementById('voice-grid'); grid.innerHTML='';
-    fx.forEach((f,i)=>{
-      const d=document.createElement('div'); d.className='pro-card'+(i===1?' selected':'');
-      d.innerHTML=`<img src="${f.photo}" alt="${f.name}"><h4>${f.name}</h4><div class="emoji">${f.emoji}</div><div class="specs">${f.desc}</div><div>${f.live?'<span class="live-badge">● LIVE</span>':'<span class="rec-badge">⏺ GRAVAR</span>'}</div>`;
-      d.addEventListener('click', async ()=>{
-        document.querySelectorAll('#voice-grid .pro-card').forEach(c=>c.classList.remove('selected'));
-        d.classList.add('selected'); voiceFx=f.id; voiceFxLive=f.live;
-        document.getElementById('voice-status').textContent=`Efeito: ${f.name} — ${f.desc}`;
-        if(voiceLiveOn){ await window.midnightAPI.voiceStop(); await startLive(); }
-      });
-      grid.appendChild(d);
+    voiceAll=await withTimeout(window.midnightAPI.voiceEffects(), 15000, 'voiceEffects');
+    const tabs=document.getElementById('vm-tabs'); tabs.innerHTML='';
+    VOICE_CATS.forEach(c=>{
+      const b=document.createElement('button'); b.className='vm-tab'+(c==='Todos'?' active':''); b.textContent=VOICE_CAT_PT[c]||c;
+      b.addEventListener('click',()=>{ voiceCat=c; tabs.querySelectorAll('.vm-tab').forEach(t=>t.classList.remove('active')); b.classList.add('active'); renderVoiceGrid(); });
+      tabs.appendChild(b);
     });
-    voiceFx='robot';
-  }catch(e){ vlog('Erro efeitos: '+e); }
+    renderVoiceGrid();
+    const _sel=voiceAll.find(f=>f.id==='radio'); if(_sel && !vmLoad().fx){ voiceFx=_sel.id; voiceFxLive=_sel.live; }
+  }catch(e){ vlog('Erro efeitos: '+e); const _g=document.getElementById('voice-grid'); if(_g) _g.innerHTML='<div class="card">Erro a carregar efeitos: '+String(e&&e.message||e)+'</div>'; try{ await window.midnightAPI.logError('initVoice: '+(e&&e.stack||e)); }catch{} }
   try{
-    const dv=await window.midnightAPI.voiceDevices();
+    const dv=await withTimeout(window.midnightAPI.voiceDevices(), 20000, 'voiceDevices');
     if(dv.success){
-      const mic=document.getElementById('voice-mic'), out=document.getElementById('voice-out');
-      mic.innerHTML=''; out.innerHTML='';
+      const mic=document.getElementById('voice-mic'), out=document.getElementById('voice-out'), mon=document.getElementById('voice-mon');
+      mic.innerHTML=''; out.innerHTML=''; mon.innerHTML='';
       dv.inputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; mic.appendChild(o); });
-      dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); });
+      dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); const m=document.createElement('option'); m.value=d.index; m.textContent=d.name; mon.appendChild(m); });
     } else vlog(dv.output);
   }catch(e){ vlog('Erro devices: '+e); }
+  // Sempre ligado como no Voicemod: restaura e arranca sozinho
+  try{
+    const s=vmLoad();
+    if(s.gain){ document.getElementById('voice-gain').value=s.gain; document.getElementById('voice-gain-val').textContent=s.gain; }
+    const mic=document.getElementById('voice-mic'), out=document.getElementById('voice-out'), mon=document.getElementById('voice-mon');
+    if(s.mic && [...mic.options].some(o=>o.value==s.mic)) mic.value=s.mic;
+    if(s.out && [...out.options].some(o=>o.value==s.out)) out.value=s.out;
+    if(s.mon && [...mon.options].some(o=>o.value==s.mon)) mon.value=s.mon;
+    if(s.fx && voiceAll.some(f=>f.id===s.fx)){ const f=voiceAll.find(x=>x.id===s.fx); voiceFx=f.id; voiceFxLive=f.live; renderVoiceGrid(); }
+    if(voiceFxLive){ await startLive(); vlog('⏻ Voz sempre ligada (estilo Voicemod).'); }
+    else document.getElementById('voice-status').textContent='Efeito de gravar ativo — prime ⏻ para ouvir em direto.';
+  }catch(e){ vlog('Auto-start: '+e); }
 }
+function renderVoiceGrid(){
+  const grid=document.getElementById('voice-grid'); if(!grid) return; grid.innerHTML='';
+  voiceAll.filter(f=>voiceCat==='Todos'||(f.cats||[]).includes(voiceCat)).forEach(f=>{
+    const hk=hkFind('voice',f.id);
+    const b=document.createElement('div'); b.className='vm-item'+(f.id===voiceFx?' selected':'');
+    b.innerHTML=`<span class="vm-avatar"><button class="vm-key${hk?' bound':''}" title="Tecla de atalho">⌨</button><img src="${f.photo}" alt="${f.name}" onerror="this.style.display='none'">${f.badge?`<span class="vm-badge ${f.badge}">${f.badge}</span>`:''}<span class="${f.live?'vm-live':'vm-rec'}">${f.live?'LIVE':'⏺'}</span></span><span class="vm-name">${f.name}</span><span class="vm-hk">${hk||''}</span>`;
+    b.querySelector('img').addEventListener('click', ()=>selectVoice(f.id));
+    b.querySelector('.vm-key').addEventListener('click',(ev)=>{ ev.stopPropagation(); hkToggle('voice',f.id,f.name); });
+    grid.appendChild(b);
+  });
+}
+async function selectVoice(id){
+  const f=voiceAll.find(x=>x.id===id); if(!f) return;
+  const wasOn=voiceLiveOn;
+  voiceFx=f.id; voiceFxLive=f.live; renderVoiceGrid(); vmSave();
+  document.getElementById('voice-status').textContent=`${f.emoji} ${f.name} — ${f.desc||''}`;
+  if(wasOn){ await window.midnightAPI.voiceStop(); await startLive(); }
+  if(voiceMonOn){ await window.midnightAPI.monitorStop(); await startMonitor(); }
+}
+function vmSelectFromHotkey(id){ selectVoice(id); }
+
+// ---------- CONTAS ----------
+let currentUser='';
+function LS(k){ return 'mno_'+(currentUser||'nouser')+'_'+k; }
+async function boot(){
+  const step=async(n,f)=>{ try{ await f(); }catch(e){ try{ await window.midnightAPI.logError(n+': '+(e&&e.stack||e)); }catch{} } };
+  try{ hkLoad(); }catch(e){}
+  loadGames();
+  await step('renderGames', async()=>renderGames());
+  await step('refreshSystem', refreshSystem);
+  await step('detectGames', detectGames);
+  await step('renderPros', renderPros);
+  await step('checkForUpdate', checkForUpdate);
+  await step('initVoice', initVoice);
+  await step('initSound', initSound);
+  await step('hkRegister', hkRegister);
+}
+async function initLogin(){
+  const $=id=>document.getElementById(id);
+  async function refreshUsers(){
+    try{
+      const r=await window.midnightAPI.usersList();
+      const box=$('login-users'); box.innerHTML='';
+      (r.users||[]).forEach(u=>{
+        const b=document.createElement('button'); b.textContent='👤 '+u;
+        b.addEventListener('click',()=>{ $('login-name').value=u; $('login-pass').focus(); });
+        box.appendChild(b);
+      });
+    }catch{}
+  }
+  async function enter(name){
+    currentUser=name; $('user-name').textContent=name;
+    $('login-overlay').style.display='none';
+    voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false;
+    await boot();
+  }
+  async function doLogin(){
+    const u=$('login-name').value.trim(), p=$('login-pass').value;
+    const r=await window.midnightAPI.accountLogin(u,p);
+    if(r.success) enter(u||'convidado');
+    else { const e=$('login-err'); e.textContent=r.output; e.style.color=''; }
+  }
+  $('btn-login').addEventListener('click', doLogin);
+  $('login-pass').addEventListener('keydown',(e)=>{ if(e.key==='Enter') doLogin(); });
+  $('btn-register').addEventListener('click', async ()=>{
+    const u=$('login-name').value.trim(), p=$('login-pass').value;
+    const r=await window.midnightAPI.accountRegister(u,p);
+    if(r.success){
+      $('login-pass').value='';
+      const e=$('login-err'); e.textContent=`Conta "${u}" criada! Agora prime Entrar.`; e.style.color='#7ef0c1';
+      refreshUsers();
+    }
+    else { const e=$('login-err'); e.textContent=r.output; e.style.color=''; }
+  });
+  $('btn-guest').addEventListener('click', async ()=>{
+    await window.midnightAPI.accountLogin('convidado',''); enter('convidado');
+  });
+  $('btn-logout').addEventListener('click', async ()=>{
+    try{ await window.midnightAPI.voiceStop(); await window.midnightAPI.monitorStop(); await window.midnightAPI.hotkeyClear(); await window.midnightAPI.accountLogout(); }catch{}
+    voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false; currentUser='';
+    document.getElementById('vm-power')?.classList.remove('on');
+    document.getElementById('vm-micbtn')?.classList.remove('on');
+    $('login-name').value=''; $('login-pass').value=''; $('login-err').textContent='';
+    $('login-overlay').style.display='flex';
+    refreshUsers();
+  });
+  await refreshUsers();
+}
+
+// ---------- HOTKEYS ----------
+let hkMap={}, hkOn=true;
+function hkLoad(){ try{ hkMap=JSON.parse(localStorage.getItem(LS('vm_hotkeys'))||'{}'); hkOn=localStorage.getItem(LS('vm_hkon'))!=='0'; }catch{ hkMap={}; } }
+function hkSave(){ try{ localStorage.setItem(LS('vm_hotkeys'),JSON.stringify(hkMap)); localStorage.setItem(LS('vm_hkon'),hkOn?'1':'0'); }catch{} }
+function hkFind(kind,id){ for(const [c,b] of Object.entries(hkMap)) if(b.kind===kind&&b.id===id) return c; return ''; }
+async function hkRegister(){
+  if(!window.midnightAPI || !window.midnightAPI.hotkeySet) return;
+  try{
+    const r = (hkOn && Object.keys(hkMap).length)
+      ? await window.midnightAPI.hotkeySet(hkMap)
+      : await window.midnightAPI.hotkeyClear();
+    if(r && r.output && /falha/i.test(r.output)) toast(r.output);
+  }catch(e){ toast('Atalhos falharam: '+e); }
+  const t=document.getElementById('btn-hk-toggle'); if(t) t.textContent=`⌨ Atalhos: ${hkOn?'ON':'OFF'}`;
+}
+let hkCapturing=null;
+function hkBuildCombo(e){
+  const mods=[]; if(e.ctrlKey)mods.push('ctrl'); if(e.altKey)mods.push('alt'); if(e.shiftKey)mods.push('shift');
+  const k=e.key||'', loc=e.location||0, lower=k.toLowerCase();
+  if(loc===3 && /^[0-9]$/.test(k)) return [...mods,'num '+k].join('+');
+  if(/^f([1-9]|1[0-2])$/i.test(k)) return [...mods,lower].join('+');
+  const special={insert:'insert',delete:'delete',home:'home',end:'end',pageup:'page up',pagedown:'page down',pause:'pause',scrolllock:'scroll lock',printscreen:'print screen'};
+  if(special[lower]) return [...mods,special[lower]].join('+');
+  if(k===' ') return mods.length? [...mods,'space'].join('+') : '';
+  if(/^[a-z0-9]$/i.test(k)) return (mods.includes('ctrl')||mods.includes('alt')) ? [...mods,lower].join('+') : '';
+  return '';
+}
+function hkToggle(kind,id,label){
+  const cur=hkFind(kind,id);
+  if(cur){ delete hkMap[cur]; hkSave(); hkRegister(); renderVoiceGrid(); renderSoundGrid(); toast(`Atalho ${cur} removido.`); return; }
+  hkCapturing={kind,id,label};
+  document.getElementById('hk-cap-title').textContent=`Tecla para "${label}"`;
+  document.getElementById('hk-capture').style.display='flex';
+}
+window.addEventListener('keydown',(e)=>{
+  if(!hkCapturing) return;
+  e.preventDefault(); e.stopPropagation();
+  if(e.key==='Escape'){ hkCapturing=null; document.getElementById('hk-capture').style.display='none'; return; }
+  if(['Control','Alt','Shift','Meta'].includes(e.key)) return;
+  const combo=hkBuildCombo(e);
+  if(!combo){ toast('Tecla inválida — usa F1-F12, Insert, Numpad ou letra com Ctrl/Alt.'); return; }
+  hkMap[combo]={kind:hkCapturing.kind,id:hkCapturing.id};
+  const label=hkCapturing.label;
+  hkCapturing=null; document.getElementById('hk-capture').style.display='none';
+  hkSave(); hkRegister(); renderVoiceGrid(); renderSoundGrid();
+  toast(`⌨ ${combo} → ${label}`);
+}, true);
+document.getElementById('btn-hk-toggle')?.addEventListener('click', async ()=>{
+  hkOn=!hkOn; hkSave(); hkRegister(); toast(`Atalhos ${hkOn?'ligados':'desligados'}.`);
+});
+
+// ---------- SOUNDBOARD ----------
+let soundAll=[];
+function slog(m){ const el=document.getElementById('log-sound'); if(!el)return; el.textContent+='\n'+m; el.scrollTop=el.scrollHeight; }
+function soundOut(){ const o=document.getElementById('voice-out'); return parseInt((o&&o.value)||'-1'); }
+async function initSound(){
+  if(!window.midnightAPI || !window.midnightAPI.soundboardList) return;
+  try{ soundAll=await window.midnightAPI.soundboardList(); }catch{ soundAll=[]; }
+  renderSoundGrid();
+}
+function renderSoundGrid(){
+  const grid=document.getElementById('sound-grid'); if(!grid) return; grid.innerHTML='';
+  if(!soundAll.length){ grid.innerHTML='<div class="card">Sem sons.</div>'; return; }
+  soundAll.forEach(s=>{
+    const hk=hkFind('sound',s.id);
+    const b=document.createElement('div'); b.className='vm-item';
+    b.innerHTML=`<span class="vm-avatar"><button class="vm-key${hk?' bound':''}" title="Tecla de atalho">⌨</button>${s.custom?'<button class="vm-del" title="Remover meu som">✕</button>':''}<img src="${s.photo||''}" alt="" onerror="this.style.display='none'"></span><span class="vm-name">${s.title}</span><span class="vm-hk">${hk||''}</span>`;
+    b.querySelector('img').addEventListener('click', async ()=>{
+      const r=await window.midnightAPI.soundboardPlay(s.id,soundOut()); slog(r.output);
+    });
+    b.querySelector('.vm-key').addEventListener('click',(ev)=>{ ev.stopPropagation(); hkToggle('sound',s.id,s.title); });
+    const del=b.querySelector('.vm-del');
+    if(del) del.addEventListener('click', async (ev)=>{
+      ev.stopPropagation();
+      const r=await window.midnightAPI.soundboardRemove(s.id);
+      slog(r.output); toast(r.output);
+      try{ soundAll=await window.midnightAPI.soundboardList(); }catch{ }
+      renderSoundGrid();
+    });
+    grid.appendChild(b);
+  });
+}
+document.getElementById('btn-add-sound')?.addEventListener('click', async ()=>{
+  toast('Escolhe um mp3/wav/ogg…');
+  const r=await window.midnightAPI.soundboardAdd();
+  slog(r.output); toast(r.output);
+  if(r.success){ try{ soundAll=await window.midnightAPI.soundboardList(); }catch{} renderSoundGrid(); }
+});
+document.getElementById('btn-sound-stop')?.addEventListener('click', async ()=>{
+  const r=await window.midnightAPI.soundboardStop(); slog(r.output);
+});
 async function startLive(){
   const r=await window.midnightAPI.voiceStart(voiceFx,
     parseInt(document.getElementById('voice-mic').value||'-1'),
     parseInt(document.getElementById('voice-out').value||'-1'), voiceGain());
   vlog(r.output); voiceLiveOn=r.success;
+  document.getElementById('vm-power').classList.toggle('on', r.success);
   document.getElementById('voice-status').textContent=r.success?`🔴 AO VIVO: ${voiceFx} — fala!`:'Falha: '+r.output;
-  toast(r.output);
+  if(!r.success) toast(r.output);
 }
-document.getElementById('btn-voice-live')?.addEventListener('click', async ()=>{
-  if(!voiceFxLive){ toast('Este efeito é de GRAVAR — usa o botão ⏺.'); vlog('Efeito '+voiceFx+' só em modo gravar.'); return; }
-  await startLive();
+document.getElementById('vm-power')?.addEventListener('click', async ()=>{
+  if(voiceLiveOn){ await window.midnightAPI.voiceStop(); voiceLiveOn=false; document.getElementById('vm-power').classList.remove('on'); document.getElementById('voice-status').textContent='Desligado.'; }
+  else {
+    if(!voiceFxLive){ toast('Este efeito é de GRAVAR — usa o microfone grande.'); return; }
+    await startLive();
+  }
 });
-document.getElementById('btn-voice-stop')?.addEventListener('click', async ()=>{
-  const r=await window.midnightAPI.voiceStop(); voiceLiveOn=false; voiceRecOn=false;
-  vlog(r.output); document.getElementById('voice-status').textContent='Parado.';
+async function startMonitor(){
+  const r=await window.midnightAPI.monitorStart(voiceFx,
+    parseInt(document.getElementById('voice-mic').value||'-1'),
+    parseInt(document.getElementById('voice-mon').value||'-1'), voiceGain());
+  vlog(r.output); voiceMonOn=r.success;
+  document.getElementById('vm-micbtn').classList.toggle('on', r.success);
+  if(!r.success) toast(r.output);
+}
+document.getElementById('vm-micbtn')?.addEventListener('click', async ()=>{
+  const btn=document.getElementById('vm-micbtn');
+  if(voiceMonOn){ await window.midnightAPI.monitorStop(); voiceMonOn=false; btn.classList.remove('on'); document.getElementById('voice-status').textContent='Monitor desligado.'; }
+  else { await startMonitor(); if(voiceMonOn) document.getElementById('voice-status').textContent=`🎙️ A ouvires-te com ${voiceFx}.`; }
 });
 document.getElementById('btn-voice-rec')?.addEventListener('click', async ()=>{
+  const btn=document.getElementById('btn-voice-rec');
   if(!voiceRecOn){
     const r=await window.midnightAPI.voiceRecStart(parseInt(document.getElementById('voice-mic').value||'-1'));
     vlog(r.output);
-    if(r.success){ voiceRecOn=true; document.getElementById('btn-voice-rec').textContent='⏹ Parar e transformar'; document.getElementById('voice-status').textContent='🔴 A GRAVAR… prime outra vez para transformar.'; }
+    if(r.success){ voiceRecOn=true; btn.textContent='⏹ Parar e transformar'; document.getElementById('voice-status').textContent='🔴 A GRAVAR… prime outra vez para transformar.'; }
     else toast(r.output);
   } else {
     document.getElementById('voice-status').textContent='A transformar…';
     const r=await window.midnightAPI.voiceRecStop(voiceFx, parseInt(document.getElementById('voice-out').value||'-1'), voiceGain());
-    vlog(r.output); voiceRecOn=false;
-    document.getElementById('btn-voice-rec').textContent='⏺ Gravar (segurar efeito)';
-    document.getElementById('voice-status').textContent='Pronto. Toca outra vez com ↻.';
+    vlog(r.output); voiceRecOn=false; btn.textContent='⏺ Gravar e transformar';
+    document.getElementById('voice-status').textContent='Pronto. Ouve com 👂.';
     toast(r.output);
   }
 });
-document.getElementById('btn-voice-replay')?.addEventListener('click', async ()=>{
+document.getElementById('vm-ear')?.addEventListener('click', async ()=>{
   const r=await window.midnightAPI.voiceReplay(parseInt(document.getElementById('voice-out').value||'-1'));
   vlog(r.output);
 });
@@ -283,7 +521,7 @@ async function renderPros(){
   const grid = document.getElementById('pros-grid'); if(!grid) return;
   if(!window.midnightAPI || !window.midnightAPI.listPros){ grid.innerHTML='<div class="card">Backend sem pros.</div>'; return; }
   try{
-    const list = await window.midnightAPI.listPros();
+    const list = await withTimeout(window.midnightAPI.listPros(), 15000, 'listPros');
     grid.innerHTML='';
     list.forEach(p=>{
       const d=document.createElement('div'); d.className='pro-card';
@@ -296,7 +534,7 @@ async function renderPros(){
       });
       grid.appendChild(d);
     });
-  }catch(e){ grid.innerHTML='<div class="card">Erro a carregar pros.</div>'; }
+  }catch(e){ grid.innerHTML='<div class="card">Erro a carregar pros: '+String(e&&e.message||e)+'</div>'; try{ await window.midnightAPI.logError('renderPros: '+(e&&e.stack||e)); }catch{} }
 }
 
 // ---------- IN-GAME CS2 & WOW ----------
@@ -304,7 +542,7 @@ function ilog(msg){ const el=document.getElementById('log-ingame'); if(!el) retu
 async function detectGames(){
   if(!window.midnightAPI || !window.midnightAPI.detectGames) return;
   try{
-    const d = await window.midnightAPI.detectGames();
+    const d = await withTimeout(window.midnightAPI.detectGames(), 30000, 'detectGames');
     const cs = d.cs2, wow = d.wow;
     const csS = document.getElementById('cs2-status'), csP = document.getElementById('cs2-path');
     if(csS){ csS.textContent = cs.found ? '✔ CS2 detetado' : '✘ CS2 não detetado (abre no Steam uma vez)'; csS.style.color = cs.found ? '#7ef0c1' : '#ff9d9d'; }
