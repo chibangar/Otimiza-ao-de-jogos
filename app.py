@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.8.0"
+APP_VERSION = "1.8.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -931,22 +931,76 @@ class Api:
         if not new_exe or not os.path.isfile(new_exe):
             return {"success": False, "output": "Atualizacao ainda nao descarregada."}
         cur = sys.executable
+        logf = os.path.join(tempfile.gettempdir(), "midnight_update.log")
+        try:
+            if os.path.isfile(logf):
+                os.remove(logf)
+        except Exception:
+            pass
         bat = os.path.join(tempfile.gettempdir(), "midnight_update.bat")
         with open(bat, "w") as f:
             f.write("@echo off\n")
+            f.write(f'echo inicio > "{logf}"\n')
             f.write("timeout /t 2 /nobreak >nul\n")
-            f.write(":loop\n")
+            f.write("set N=0\n:loop\n")
             f.write(f'move /Y "{new_exe}" "{cur}" >nul 2>&1\n')
-            f.write('if errorlevel 1 (timeout /t 1 /nobreak >nul & goto loop)\n')
+            f.write("if not errorlevel 1 goto done\n")
+            f.write("set /a N+=1\n")
+            f.write(f'echo tentativa %N% falhou >> "{logf}"\n')
+            f.write("if %N% GEQ 20 goto fail\n")
+            f.write("timeout /t 1 /nobreak >nul\n")
+            f.write("goto loop\n:fail\n")
+            f.write(f'echo FALHOU sem permissao >> "{logf}"\n')
+            f.write("exit /b 1\n:done\n")
+            f.write(f'echo OK >> "{logf}"\n')
             f.write(f'start "" "{cur}"\n')
             f.write('del "%~f0"\n')
-        subprocess.Popen(["cmd", "/c", bat], shell=False, **_hidden(),
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            admin = False
+            try:
+                admin = bool(self.is_admin().get("admin"))
+            except Exception:
+                pass
+            if admin or self._dir_writable(cur):
+                subprocess.Popen(["cmd", "/c", bat], shell=False, **_hidden(),
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            else:
+                import ctypes
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", "cmd.exe",
+                                                    f'/c "{bat}"', None, 0)
+        except Exception as e:
+            return {"success": False, "output": f"Falha a aplicar (usa o botao Manual): {e}"}
         try:
             if _WINDOW is not None:
                 _WINDOW.destroy()
         finally:
             os._exit(0)
+
+    def _dir_writable(self, path):
+        try:
+            t = os.path.join(os.path.dirname(path) or ".", ".midnight_wtest")
+            with open(t, "w") as f:
+                f.write("x")
+            os.remove(t)
+            return True
+        except Exception:
+            return False
+
+    def update_last_result(self):
+        try:
+            p = os.path.join(tempfile.gettempdir(), "midnight_update.log")
+            if os.path.isfile(p):
+                txt = open(p, encoding="utf-8", errors="ignore").read()
+                if "FALHOU" in txt:
+                    try:
+                        os.remove(p)
+                    except Exception:
+                        pass
+                    return {"success": False,
+                            "output": "O ultimo update falhou (sem permissao). Corre como administrador ou usa o botao Manual."}
+        except Exception:
+            pass
+        return {"success": True}
 
 
 def main():

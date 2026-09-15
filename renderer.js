@@ -38,6 +38,7 @@ async function getBackend(){
       startUpdate: ()=>a.start_update(),
       updateProgress: ()=>a.update_progress(),
       applyUpdate: ()=>a.apply_update_and_restart(),
+      updateLastResult: ()=>a.update_last_result(),
       voiceEffects: ()=>a.voice_effects(),
       voiceDevices: ()=>a.voice_devices(),
       voiceStart: (e,i,o,g)=>a.voice_start(e,i,o,g),
@@ -676,7 +677,20 @@ document.getElementById('vm-ear')?.addEventListener('click', async ()=>{
 async function checkForUpdate(silent){
   try{
     if(!window.midnightAPI || !window.midnightAPI.checkUpdate) return;
+    try{
+      const last=await window.midnightAPI.updateLastResult();
+      if(last && last.success===false){
+        document.getElementById('update-banner').style.display='flex';
+        document.getElementById('update-text').textContent='⚠ '+last.output;
+        toast('⚠ '+last.output);
+        return;
+      }
+    }catch{}
     const r = await window.midnightAPI.checkUpdate();
+    if(!(r && r.success)){
+      try{ await window.midnightAPI.logError('checkUpdate falhou: '+((r&&r.output)||'desconhecido')); }catch{}
+      return;
+    }
     if(r && r.success && r.available){
       const banner=document.getElementById('update-banner');
       const wasHidden=banner.style.display==='none';
@@ -684,7 +698,7 @@ async function checkForUpdate(silent){
       document.getElementById('update-text').textContent=`Nova versão ${r.latest} disponível — atualiza sem sair da app!`;
       if(wasHidden) toast(`✦ Nova versão ${r.latest} disponível!`);
     }
-  }catch{}
+  }catch(e){ try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{} }
 }
 setInterval(()=>{ const b=document.getElementById('update-banner'); if(b && b.style.display==='none') checkForUpdate(true); }, 30*60*1000);
 document.getElementById('btn-update-manual')?.addEventListener('click', async ()=>{
