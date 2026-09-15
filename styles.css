@@ -133,6 +133,15 @@ nav{display:flex;flex-direction:column;gap:8px}
 .update-banner{display:flex;gap:10px;align-items:center;background:linear-gradient(90deg, rgba(212,175,55,.15), rgba(124,108,240,.15));border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px}
 .update-bar{flex:1;height:8px;background:#0a0d24;border-radius:99px;overflow:hidden;border:1px solid var(--border)}
 .update-bar div{height:100%;width:0%;background:linear-gradient(90deg,#b78d1f,#f0d47a);transition:width .3s}
+/* Voz */
+.voice-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px}
+.voice-row label{font-size:11px;color:var(--gold-soft);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px}
+.voice-row select{width:100%;background:#0a0d24;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px}
+.voice-row input[type=range]{width:100%}
+.pro-card.selected{border-color:#2effa3;box-shadow:0 0 24px rgba(46,255,163,.35)}
+.live-badge{display:inline-block;font-size:10px;font-weight:700;background:#2effa3;color:#04120a;border-radius:6px;padding:2px 6px;margin-top:6px}
+.rec-badge{display:inline-block;font-size:10px;font-weight:700;background:#ffb02e;color:#1a1200;border-radius:6px;padding:2px 6px;margin-top:6px}
+.pro-card .emoji{font-size:30px;margin-top:6px}
 /* Pros */
 .pros-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:12px}
 .pro-card{background:linear-gradient(180deg,#1a204f,#0a0d28);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;transition:.2s}

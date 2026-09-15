@@ -36,6 +36,13 @@ async function getBackend(){
       startUpdate: ()=>a.start_update(),
       updateProgress: ()=>a.update_progress(),
       applyUpdate: ()=>a.apply_update_and_restart(),
+      voiceEffects: ()=>a.voice_effects(),
+      voiceDevices: ()=>a.voice_devices(),
+      voiceStart: (e,i,o,g)=>a.voice_start(e,i,o,g),
+      voiceStop: ()=>a.voice_stop(),
+      voiceRecStart: (i)=>a.voice_record_start(i),
+      voiceRecStop: (e,o,g)=>a.voice_record_stop(e,o,g),
+      voiceReplay: (o)=>a.voice_replay(o),
     };
     return window.midnightAPI;
   }
@@ -57,7 +64,7 @@ for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*in
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -167,8 +174,78 @@ document.getElementById('file-game').addEventListener('change',(e)=>{
   games.push({name:p.split(/[\\/]/).pop().replace('.exe','').replace('.lnk',''), path:p});
   saveGames(); renderGames(); toast('Jogo adicionado!');
 });
-(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); checkForUpdate(); })();
+(async ()=>{ await getBackend(); renderGames(); refreshSystem(); detectGames(); renderPros(); checkForUpdate(); initVoice(); })();
 document.getElementById('status-pill').className='status-pill normal';
+
+// ---------- ESTÚDIO DE VOZ ----------
+let voiceFx='robot', voiceFxLive=true, voiceLiveOn=false, voiceRecOn=false;
+function vlog(msg){ const el=document.getElementById('log-voice'); if(!el) return; el.textContent+='\n'+msg; el.scrollTop=el.scrollHeight; }
+function voiceGain(){ return parseFloat(document.getElementById('voice-gain').value)||1.5; }
+async function initVoice(){
+  if(!window.midnightAPI || !window.midnightAPI.voiceEffects) return;
+  document.getElementById('voice-gain').addEventListener('input',(e)=>{
+    document.getElementById('voice-gain-val').textContent=e.target.value; });
+  try{
+    const fx=await window.midnightAPI.voiceEffects();
+    const grid=document.getElementById('voice-grid'); grid.innerHTML='';
+    fx.forEach((f,i)=>{
+      const d=document.createElement('div'); d.className='pro-card'+(i===1?' selected':'');
+      d.innerHTML=`<img src="${f.photo}" alt="${f.name}"><h4>${f.name}</h4><div class="emoji">${f.emoji}</div><div class="specs">${f.desc}</div><div>${f.live?'<span class="live-badge">● LIVE</span>':'<span class="rec-badge">⏺ GRAVAR</span>'}</div>`;
+      d.addEventListener('click', async ()=>{
+        document.querySelectorAll('#voice-grid .pro-card').forEach(c=>c.classList.remove('selected'));
+        d.classList.add('selected'); voiceFx=f.id; voiceFxLive=f.live;
+        document.getElementById('voice-status').textContent=`Efeito: ${f.name} — ${f.desc}`;
+        if(voiceLiveOn){ await window.midnightAPI.voiceStop(); await startLive(); }
+      });
+      grid.appendChild(d);
+    });
+    voiceFx='robot';
+  }catch(e){ vlog('Erro efeitos: '+e); }
+  try{
+    const dv=await window.midnightAPI.voiceDevices();
+    if(dv.success){
+      const mic=document.getElementById('voice-mic'), out=document.getElementById('voice-out');
+      mic.innerHTML=''; out.innerHTML='';
+      dv.inputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; mic.appendChild(o); });
+      dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); });
+    } else vlog(dv.output);
+  }catch(e){ vlog('Erro devices: '+e); }
+}
+async function startLive(){
+  const r=await window.midnightAPI.voiceStart(voiceFx,
+    parseInt(document.getElementById('voice-mic').value||'-1'),
+    parseInt(document.getElementById('voice-out').value||'-1'), voiceGain());
+  vlog(r.output); voiceLiveOn=r.success;
+  document.getElementById('voice-status').textContent=r.success?`🔴 AO VIVO: ${voiceFx} — fala!`:'Falha: '+r.output;
+  toast(r.output);
+}
+document.getElementById('btn-voice-live')?.addEventListener('click', async ()=>{
+  if(!voiceFxLive){ toast('Este efeito é de GRAVAR — usa o botão ⏺.'); vlog('Efeito '+voiceFx+' só em modo gravar.'); return; }
+  await startLive();
+});
+document.getElementById('btn-voice-stop')?.addEventListener('click', async ()=>{
+  const r=await window.midnightAPI.voiceStop(); voiceLiveOn=false; voiceRecOn=false;
+  vlog(r.output); document.getElementById('voice-status').textContent='Parado.';
+});
+document.getElementById('btn-voice-rec')?.addEventListener('click', async ()=>{
+  if(!voiceRecOn){
+    const r=await window.midnightAPI.voiceRecStart(parseInt(document.getElementById('voice-mic').value||'-1'));
+    vlog(r.output);
+    if(r.success){ voiceRecOn=true; document.getElementById('btn-voice-rec').textContent='⏹ Parar e transformar'; document.getElementById('voice-status').textContent='🔴 A GRAVAR… prime outra vez para transformar.'; }
+    else toast(r.output);
+  } else {
+    document.getElementById('voice-status').textContent='A transformar…';
+    const r=await window.midnightAPI.voiceRecStop(voiceFx, parseInt(document.getElementById('voice-out').value||'-1'), voiceGain());
+    vlog(r.output); voiceRecOn=false;
+    document.getElementById('btn-voice-rec').textContent='⏺ Gravar (segurar efeito)';
+    document.getElementById('voice-status').textContent='Pronto. Toca outra vez com ↻.';
+    toast(r.output);
+  }
+});
+document.getElementById('btn-voice-replay')?.addEventListener('click', async ()=>{
+  const r=await window.midnightAPI.voiceReplay(parseInt(document.getElementById('voice-out').value||'-1'));
+  vlog(r.output);
+});
 
 // ---------- AUTO-UPDATE ----------
 async function checkForUpdate(){

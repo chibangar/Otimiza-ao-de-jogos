@@ -15,8 +15,19 @@ import urllib.request
 import webview
 import game_tweaks
 import pros
+import voicefx
 
-APP_VERSION = "1.2.0"
+try:
+    import sounddevice as sd
+    _SD_OK = True
+except Exception:
+    sd = None
+    _SD_OK = False
+
+_VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
+       "rec": None, "recording": False, "last_wav": ""}
+
+APP_VERSION = "1.3.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -260,6 +271,173 @@ class Api:
 
     def apply_pro(self, pro_id):
         return pros.apply_pro(pro_id)
+
+    # ---------- ESTUDIO DE VOZ ----------
+    def voice_effects(self):
+        out = []
+        for e in voicefx.EFFECTS:
+            out.append({**e, "photo": f"assets/voice/{e['id']}.png"})
+        return out
+
+    def voice_devices(self):
+        if not _SD_OK:
+            return {"success": False, "output": "Falta: pip install sounddevice numpy"}
+        try:
+            devs = sd.query_devices()
+            ins, outs = [], []
+            for i, d in enumerate(devs):
+                if d["max_input_channels"] > 0:
+                    ins.append({"index": i, "name": d["name"]})
+                if d["max_output_channels"] > 0:
+                    outs.append({"index": i, "name": d["name"]})
+            return {"success": True, "inputs": ins, "outputs": outs,
+                    "default_in": sd.default.device[0], "default_out": sd.default.device[1]}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def _dev(self, idx, which):
+        try:
+            i = int(idx)
+            if i < 0:
+                raise ValueError
+            return i
+        except Exception:
+            try:
+                return int(sd.default.device[which])
+            except Exception:
+                return None
+
+    def _open_stream(self, in_idx, out_idx, callback):
+        import numpy as np
+        last_err = None
+        for ch in (1, 2):
+            try:
+                s = sd.Stream(samplerate=voicefx.SR, blocksize=1024, dtype="float32",
+                              device=(in_idx, out_idx), channels=ch, callback=callback)
+                s.start()
+                return s, ch, None
+            except Exception as e:
+                last_err = e
+        return None, 0, str(last_err)
+
+    def voice_start(self, effect_id="robot", in_idx=-1, out_idx=-1, gain=1.5):
+        if not _SD_OK:
+            return {"success": False, "output": "Falta: pip install sounddevice numpy"}
+        self.voice_stop()
+        import numpy as np
+        st = voicefx.new_state(effect_id)
+        holder = {}
+
+        def cb(indata, outdata, frames, time_info, status):
+            x = np.asarray(indata, dtype=np.float32)
+            if x.shape[1] > 1:
+                x = x.mean(axis=1, dtype=np.float32)
+            else:
+                x = x[:, 0]
+            y = voicefx.process_block(x, effect_id, st, voicefx.SR, float(gain))
+            outdata[:, 0] = y[:frames]
+            if outdata.shape[1] > 1:
+                outdata[:, 1] = y[:frames]
+
+        s, ch, err = self._open_stream(self._dev(in_idx, 0), self._dev(out_idx, 1), cb)
+        if s is None:
+            return {"success": False, "output": f"Audio falhou: {err}"}
+        _VS.update({"stream": s, "state": st, "effect": effect_id, "gain": float(gain)})
+        holder["ch"] = ch
+        return {"success": True, "output": f"AO VIVO: {effect_id} (canais {ch})"}
+
+    def voice_stop(self):
+        try:
+            if _VS.get("stream") is not None:
+                _VS["stream"].stop()
+                _VS["stream"].close()
+        except Exception:
+            pass
+        _VS["stream"] = None
+        try:
+            if sd is not None:
+                sd.stop()
+        except Exception:
+            pass
+        return {"success": True, "output": "Voz parada."}
+
+    def voice_record_start(self, in_idx=-1):
+        if not _SD_OK:
+            return {"success": False, "output": "Falta: pip install sounddevice numpy"}
+        import numpy as np
+        self.voice_stop()
+        buf = []
+
+        def cb(indata, frames, time_info, status):
+            x = np.asarray(indata, dtype=np.float32)
+            buf.append(x.mean(axis=1, dtype=np.float32) if x.shape[1] > 1 else x[:, 0].copy())
+
+        try:
+            s = sd.InputStream(samplerate=voicefx.SR, dtype="float32",
+                               device=self._dev(in_idx, 0),
+                               channels=1, callback=cb)
+            s.start()
+        except Exception:
+            try:
+                s = sd.InputStream(samplerate=voicefx.SR, dtype="float32",
+                                   device=self._dev(in_idx, 0),
+                                   channels=2, callback=cb)
+                s.start()
+            except Exception as e2:
+                return {"success": False, "output": f"Mic falhou: {e2}"}
+        _VS.update({"rec": s, "recording": True, "_buf": buf})
+        return {"success": True, "output": "A gravar... fala agora (max 15s)."}
+
+    def voice_record_stop(self, effect_id="demon", out_idx=-1, gain=1.5):
+        import numpy as np
+        import wave
+        s = _VS.get("rec")
+        buf = _VS.get("_buf", [])
+        _VS["recording"] = False
+        try:
+            if s is not None:
+                s.stop()
+                s.close()
+        except Exception:
+            pass
+        _VS["rec"] = None
+        if not buf:
+            return {"success": False, "output": "Nada gravado."}
+        x = np.concatenate(buf)
+        maxn = voicefx.SR * 15
+        x = x[:maxn]
+        y = voicefx.transform(x, effect_id, voicefx.SR, float(gain))
+        wav = os.path.join(tempfile.gettempdir(), f"midnight_voz_{effect_id}.wav")
+        try:
+            with wave.open(wav, "wb") as w:
+                w.setnchannels(1)
+                w.setsampwidth(2)
+                w.setframerate(voicefx.SR)
+                w.writeframes((np.clip(y, -1, 1) * 32767).astype(np.int16).tobytes())
+            _VS["last_wav"] = wav
+        except Exception as e:
+            return {"success": False, "output": f"Falha WAV: {e}"}
+        try:
+            sd.play(y, voicefx.SR, device=self._dev(out_idx, 1))
+        except Exception as e:
+            return {"success": False, "output": f"Transformado mas falha a tocar: {e}"}
+        return {"success": True, "output": f"✔ {effect_id}: {len(x)/voicefx.SR:.1f}s -> a tocar.",
+                "secs": round(len(x) / voicefx.SR, 1), "wav": wav}
+
+    def voice_replay(self, out_idx=-1):
+        w = _VS.get("last_wav", "")
+        if not w or not os.path.isfile(w):
+            return {"success": False, "output": "Grava primeiro."}
+        try:
+            import wave
+            import numpy as np
+            with wave.open(w, "rb") as f:
+                raw = f.readframes(f.getnframes())
+                y = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32767.0
+            sd.play(y, voicefx.SR, device=self._dev(out_idx, 1))
+            return {"success": True, "output": "A repetir ultima transformacao."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
 
     # ---------- AUTO-UPDATE ----------
     def app_version(self):

@@ -28,6 +28,7 @@
       <button class="nav-btn active" data-page="dashboard"><i>◉</i> Dashboard</button>
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
       <button class="nav-btn" data-page="ingame"><i>🎯</i> In-Game CS2 & WoW</button>
+      <button class="nav-btn" data-page="voz"><i>🎙️</i> Estúdio de Voz</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
       <button class="nav-btn" data-page="jogos"><i>♞</i> Meus Jogos</button>
       <button class="nav-btn" data-page="sistema"><i>☾</i> Sistema</button>
@@ -190,6 +191,28 @@
         <div class="card opt" data-opt="net"><div><h4>◈ Otimizar Rede</h4><p>Anti-throttling + SystemResponsiveness 0.</p></div><button class="btn small gold" data-action="net">Otimizar</button></div>
       </div>
       <div class="console"><div class="console-head">✦ Registo Arcano</div><pre id="log">Pronto. Escolhe uma otimização…</pre></div>
+    </section>
+
+    <!-- ESTÚDIO DE VOZ -->
+    <section class="page" id="page-voz">
+      <div class="card wide" style="margin-bottom:14px">
+        <h4>🎙️ Estúdio de Voz — tipo Voicemod</h4>
+        <p class="muted small">AO VIVO: efeitos com selo <b>LIVE</b> (Robot, Rádio, Caverna, Abismo) saem direto na saída. Para Discord/CS2, instala um cabo virtual (ex: VB-CABLE) e escolhe-o como <b>Saída</b>, depois usa-o como microfone no Discord. GRAVAR: funciona com todos, grava → transforma → toca.</p>
+        <div class="voice-row">
+          <div><label>Microfone</label><select id="voice-mic"></select></div>
+          <div><label>Saída</label><select id="voice-out"></select></div>
+          <div><label>Ganho <span id="voice-gain-val">1.5</span></label><input type="range" id="voice-gain" min="0.5" max="3" step="0.1" value="1.5"></div>
+        </div>
+        <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
+          <button class="btn gold" id="btn-voice-live">▶ Ativar voz ao vivo</button>
+          <button class="btn ghost" id="btn-voice-stop">⏹ Parar tudo</button>
+          <button class="btn gold" id="btn-voice-rec">⏺ Gravar (segurar efeito)</button>
+          <button class="btn ghost" id="btn-voice-replay">↻ Repetir última</button>
+        </div>
+        <p class="muted small" id="voice-status">Escolhe um efeito em baixo e prime Ativar.</p>
+      </div>
+      <div class="pros-grid" id="voice-grid"><div class="card">A carregar efeitos…</div></div>
+      <div class="console"><div class="console-head">🎙️ Registo de Voz</div><pre id="log-voice">Pronto.</pre></div>
     </section>
 
     <!-- JOGOS -->
