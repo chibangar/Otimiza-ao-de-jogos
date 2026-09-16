@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.9.0"
+APP_VERSION = "1.9.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -99,6 +99,7 @@ def _ver_tuple(v):
 
 _UPDATE = {"status": "idle", "pct": 0, "error": "", "path": "", "version": "", "notes": ""}
 _WINDOW = None
+_ISSUES_CACHE = {"at": 0, "items": []}
 
 def log_error(msg):
     try:
@@ -1069,7 +1070,19 @@ class Api:
 
     def bugs_list(self):
         try:
-            return {"success": True, "bugs": self._bugs_load()}
+            local = self._bugs_load()
+            linked = {e.get("issue") for e in local if e.get("issue")}
+            merged = list(local)
+            for it in self._github_issues():
+                if it.get("number") in linked:
+                    continue
+                merged.append({
+                    "user": it.get("user", "GitHub"),
+                    "text": it.get("text", ""),
+                    "when": it.get("when", ""),
+                    "issue": it.get("number"),
+                })
+            return {"success": True, "bugs": merged[-500:]}
         except Exception as e:
             return {"success": False, "output": str(e)}
 
@@ -1081,16 +1094,111 @@ class Api:
             return {"success": False, "output": "Mensagem demasiado longa (max 2000)."}
         try:
             import datetime
+            me = self._me()
             items = self._bugs_load()
-            items.append({
-                "user": self._me(),
+            entry = {
+                "user": me,
                 "text": text[:2000],
                 "when": datetime.datetime.now().strftime("%d/%m %H:%M"),
-            })
+            }
+            items.append(entry)
             self._bugs_save(items)
+            idx = len(items) - 1
+            # Envia para o GitHub em 2º plano (não bloqueia nem rebenta).
+            threading.Thread(target=self._report_issue,
+                             args=(me, text[:2000], idx),
+                             daemon=True).start()
             return {"success": True, "output": "Bug registado. Obrigado!"}
         except Exception as e:
             return {"success": False, "output": str(e)}
+
+    def _github_token(self):
+        """Token para criar issues. Vem de ficheiro LOCAL (nunca do repo)."""
+        try:
+            t = (os.environ.get("GITHUB_TOKEN") or "").strip()
+            if t:
+                return t
+            cands = [os.path.join(BASE_DIR, "bugs_config.json")]
+            try:
+                cands.append(os.path.join(accounts.data_root(), "bugs_config.json"))
+            except Exception:
+                pass
+            for p in cands:
+                if os.path.isfile(p):
+                    with open(p, encoding="utf-8") as f:
+                        d = json.load(f)
+                    if isinstance(d, dict):
+                        t = (d.get("github_token") or d.get("token") or "").strip()
+                        if t:
+                            return t
+        except Exception:
+            pass
+        return ""
+
+    def _github_issues(self):
+        """Issues com label 'bug' (cache 60s). Leitura publica, sem token."""
+        import time
+        try:
+            if time.time() - _ISSUES_CACHE.get("at", 0) < 60:
+                return _ISSUES_CACHE.get("items", [])
+        except Exception:
+            pass
+        items = []
+        try:
+            req = urllib.request.Request(
+                f"https://api.github.com/repos/{REPO}/issues?state=open&labels=bug&per_page=50",
+                headers={"User-Agent": "MidnightOptimizer",
+                         "Accept": "application/vnd.github+json"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = json.loads(r.read().decode())
+            for it in data or []:
+                if "pull_request" in (it or {}):
+                    continue
+                body = (it.get("body") or "").strip()
+                title = (it.get("title") or "").strip()
+                if title.startswith("[Bug]"):
+                    title = title[5:].strip()
+                items.append({
+                    "number": it.get("number"),
+                    "user": "GitHub #" + str(it.get("number", "?")),
+                    "text": (title + ("\n" + body if body else "")).strip()[:2000],
+                    "when": (it.get("created_at") or "")[:10],
+                })
+        except Exception as e:
+            log_error("github issues GET: " + str(e))
+        try:
+            _ISSUES_CACHE.update({"at": time.time(), "items": items})
+        except Exception:
+            pass
+        return items
+
+    def _report_issue(self, user, text, idx):
+        """Cria a issue no GitHub e liga-a a entrada local. Nunca rebenta."""
+        try:
+            token = self._github_token()
+            if not token:
+                return
+            import datetime
+            first = (text.strip().split("\n") or ["Bug"])[0][:80] or "Bug"
+            body = (f"**Utilizador:** {user}\n**Versão:** {APP_VERSION}\n"
+                    f"**Data:** {datetime.datetime.now():%d/%m %H:%M}\n\n{text}")
+            payload = json.dumps({"title": f"[Bug] {first}",
+                                  "body": body, "labels": ["bug"]}).encode()
+            req = urllib.request.Request(
+                f"https://api.github.com/repos/{REPO}/issues", data=payload,
+                headers={"User-Agent": "MidnightOptimizer",
+                         "Accept": "application/vnd.github+json",
+                         "Authorization": f"Bearer {token}"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                issue = json.loads(r.read().decode())
+            num = issue.get("number")
+            if num:
+                items = self._bugs_load()
+                if 0 <= idx < len(items):
+                    items[idx]["issue"] = num
+                    self._bugs_save(items)
+        except Exception as e:
+            log_error("github issue POST: " + str(e))
 
     def bugs_clear(self):
         try:
