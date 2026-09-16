@@ -220,13 +220,22 @@ def login_discord():
     if not (cid and csec):
         return {"success": False, "output": "Discord nao configurado. Ve oauth_config.example.json."}
     redirect = f"http://127.0.0.1:{DISCORD_PORT}/callback"
+    # prompt=consent = mostra sempre o ecrã "Autorizar" (o mais fiável).
+    # (prompt=none falhava logo se a pessoa não estivesse logada no browser.)
     params = urllib.parse.urlencode({
         "client_id": cid, "redirect_uri": redirect, "response_type": "code",
-        "scope": "identify email", "prompt": "none",
+        "scope": "identify email", "prompt": "consent",
     })
     _open_browser("https://discord.com/oauth2/authorize?" + params)
     code, err = _wait_code(DISCORD_PORT)
     if err:
+        if "access_denied" in err:
+            return {"success": False,
+                    "output": "Cancelaste no browser. Prime outra vez e carrega em Autorizar."}
+        if "Tempo esgotado" in err:
+            return {"success": False,
+                    "output": "Tempo esgotado. Confirma no portal do Discord que o redirect "
+                              "http://127.0.0.1:8742/callback está registado e autoriza no browser."}
         return {"success": False, "output": err}
     try:
         tok = _post("https://discord.com/api/oauth2/token", {

@@ -52,7 +52,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.4.0"
+APP_VERSION = "2.4.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -63,6 +63,7 @@ APP_NEWS = [
     "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
     "℈ Login Discord: o formulário de chaves esconde-se quando já está ativo",
     "💬 Nova aba Online — vê quem está na app, chat geral e mensagens privadas",
+    "℈ Login com Discord a funcionar (ecrã de Autorizar + erros claros)",
     "🛠️ Correções e melhorias de estabilidade",
 ]
 
