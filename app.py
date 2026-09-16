@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.0.0"
+APP_VERSION = "2.1.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -480,6 +480,67 @@ class Api:
                     None, "runas", sys.executable, f'"{os.path.abspath(__file__)}"', None, 1)
             threading.Timer(1.0, lambda: os._exit(0)).start()
             return {"success": True, "output": "A reiniciar como administrador…"}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    # ---------- ARRANQUE COM O WINDOWS ----------
+    _AUTOSTART_NAME = "Midnight Optimizer"
+    _AUTOSTART_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+    def _autostart_target(self):
+        """Caminho do .exe a registar no arranque (entre aspas)."""
+        try:
+            if getattr(sys, "frozen", False):
+                return f'"{sys.executable}"'
+            return f'"{sys.executable}" "{os.path.abspath(__file__)}"'
+        except Exception:
+            return ""
+
+    def autostart_get(self):
+        """Diz se a app arranca com o Windows (chave Run do HKCU)."""
+        try:
+            import winreg
+            h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
+                               0, winreg.KEY_READ)
+            try:
+                val, _ = winreg.QueryValueEx(h, self._AUTOSTART_NAME)
+            finally:
+                h.Close()
+            return {"success": True, "enabled": bool(val), "path": val or ""}
+        except FileNotFoundError:
+            return {"success": True, "enabled": False, "path": ""}
+        except Exception as e:
+            return {"success": False, "enabled": False, "output": str(e)}
+
+    def autostart_set(self, enable=True):
+        """Liga/desliga o arranque com o Windows (sem precisar de admin)."""
+        try:
+            import winreg
+            on = bool(enable)
+            if on:
+                target = self._autostart_target()
+                if not target:
+                    return {"success": False, "output": "Nao consegui resolver o caminho do .exe."}
+                h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
+                                   0, winreg.KEY_SET_VALUE)
+                try:
+                    winreg.SetValueEx(h, self._AUTOSTART_NAME, 0,
+                                      winreg.REG_SZ, target)
+                finally:
+                    h.Close()
+                return {"success": True, "enabled": True,
+                        "output": "Arranque com o Windows ATIVADO. ✔"}
+            h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
+                               0, winreg.KEY_SET_VALUE)
+            try:
+                try:
+                    winreg.DeleteValue(h, self._AUTOSTART_NAME)
+                except FileNotFoundError:
+                    pass
+            finally:
+                h.Close()
+            return {"success": True, "enabled": False,
+                    "output": "Arranque com o Windows DESATIVADO."}
         except Exception as e:
             return {"success": False, "output": str(e)}
 

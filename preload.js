@@ -16,4 +16,6 @@ contextBridge.exposeInMainWorld('midnightAPI', {
   launchGame: (p) => ipcRenderer.invoke('launch-game-boosted', p),
   bugsList: () => ipcRenderer.invoke('bugs-list'),
   bugsAdd: (t) => ipcRenderer.invoke('bugs-add', t),
+  autostartGet: () => ipcRenderer.invoke('autostart-get'),
+  autostartSet: (e) => ipcRenderer.invoke('autostart-set', e),
 });

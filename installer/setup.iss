@@ -1,5 +1,5 @@
 ; Midnight Optimizer — instalador Windows (Inno Setup 6)
-#define AppVersion "2.0.0"
+#define AppVersion "2.1.0"
 
 [Setup]
 AppName=Midnight Optimizer
@@ -24,6 +24,7 @@ Name: "portuguese"; MessagesFile: "compiler:Languages\Portuguese.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Criar atalho no ambiente de trabalho"; GroupDescription: "Atalhos:"; Flags: unchecked
+Name: "startupicon"; Description: "Iniciar o Midnight Optimizer com o Windows"; GroupDescription: "Arranque:"; Flags: unchecked
 
 [Files]
 Source: "..\dist\MidnightOptimizer.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -33,6 +34,9 @@ Source: "..\oauth_config.example.json"; DestDir: "{app}"; Flags: ignoreversion s
 Name: "{group}\Midnight Optimizer"; Filename: "{app}\MidnightOptimizer.exe"
 Name: "{group}\Desinstalar Midnight Optimizer"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\Midnight Optimizer"; Filename: "{app}\MidnightOptimizer.exe"; Tasks: desktopicon
+
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Midnight Optimizer"; ValueData: """{app}\MidnightOptimizer.exe"""; Tasks: startupicon; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\MidnightOptimizer.exe"; Description: "Abrir o Midnight Optimizer"; Flags: nowait postinstall skipifsilent

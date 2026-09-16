@@ -241,3 +241,31 @@ ipcMain.handle('bugs-add', async (e, text) => {
   bugsSave(items);
   return { success: true, output: 'Bug registado. Obrigado!' };
 });
+
+// ---------- ARRANQUE COM O WINDOWS (Electron) ----------
+const AUTOSTART_NAME = 'Midnight Optimizer';
+ipcMain.handle('autostart-get', async () => {
+  try {
+    if (process.platform !== 'win32') {
+      const s = app.getLoginItemSettings();
+      return { success: true, enabled: !!s.openAtLogin };
+    }
+    const r = await runCMD(`reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${AUTOSTART_NAME}"`);
+    return { success: true, enabled: !!r.success, path: r.success ? r.output : '' };
+  } catch (err) { return { success: false, enabled: false, output: String(err) }; }
+});
+ipcMain.handle('autostart-set', async (e, enable) => {
+  try {
+    app.setLoginItemSettings({ openAtLogin: !!enable, name: AUTOSTART_NAME });
+    if (process.platform === 'win32') {
+      if (enable) {
+        const exe = process.execPath;
+        const r = await runCMD(`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${AUTOSTART_NAME}" /t REG_SZ /d "\\"${exe}\\"" /f`);
+        return { success: r.success, enabled: !!r.success, output: r.success ? 'Arranque com o Windows ATIVADO. ✔' : ('Falha: ' + r.output) };
+      }
+      await runCMD(`reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${AUTOSTART_NAME}" /f`);
+      return { success: true, enabled: false, output: 'Arranque com o Windows DESATIVADO.' };
+    }
+    return { success: true, enabled: !!enable, output: !!enable ? 'Arranque ATIVADO. ✔' : 'Arranque DESATIVADO.' };
+  } catch (err) { return { success: false, output: String(err) }; }
+});

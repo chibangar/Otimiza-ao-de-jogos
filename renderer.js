@@ -68,6 +68,8 @@ async function getBackend(){
       openReleasesPage: ()=>a.open_releases_page(),
       isAdmin: ()=>a.is_admin(),
       restartAsAdmin: ()=>a.restart_as_admin(),
+      autostartGet: ()=>a.autostart_get(),
+      autostartSet: (e)=>a.autostart_set(e),
       serversList: ()=>a.servers_list(),
       serversRefresh: ()=>a.servers_refresh(),
       serversHistory: ()=>a.servers_history(),
@@ -461,6 +463,7 @@ async function boot(){
   await step('initSound', initSound);
   await step('initServers', initServers);
   await step('initBugs', initBugs);
+  await step('initAutostart', initAutostart);
   await step('hkRegister', hkRegister);
 }
 async function initLogin(){
@@ -1123,4 +1126,46 @@ async function sendBug(){
     inp.value='';
     await refreshBugs();
   }catch(e){ toast('Falha a enviar: '+e); }
+}
+
+// ---------- ARRANQUE COM O WINDOWS + ADMIN ----------
+let _autostartOn = false;
+function paintAutostart(){
+  const btn = document.getElementById('btn-autostart');
+  const st = document.getElementById('autostart-status');
+  if (btn) btn.textContent = _autostartOn ? 'Desativar arranque automático' : 'Ativar arranque automático';
+  if (st) st.textContent = _autostartOn ? '✔ A app abre sozinha quando ligas o PC.' : '○ A app NÃO arranca com o Windows.';
+}
+async function initAutostart(){
+  // Botão admin (estava sem listener): reinicia como administrador.
+  document.getElementById('btn-admin')?.addEventListener('click', async ()=>{
+    try{
+      toast('A reiniciar como administrador…');
+      const r = await window.midnightAPI.restartAsAdmin();
+      toast(r.output || 'OK');
+    }catch(e){ toast('Falha: ' + e); }
+  });
+  const btn = document.getElementById('btn-autostart');
+  if (btn && !btn._wired){
+    btn._wired = true;
+    btn.addEventListener('click', async ()=>{
+      try{
+        btn.disabled = true;
+        toast(_autostartOn ? 'A desativar arranque…' : 'A ativar arranque…');
+        const r = await window.midnightAPI.autostartSet(!_autostartOn);
+        if (r && r.success) _autostartOn = !!r.enabled;
+        else if (r && r.output) toast(r.output);
+        paintAutostart();
+        toast((r && r.output) || 'OK');
+      }catch(e){ toast('Falha: ' + e); }
+      finally { btn.disabled = false; }
+    });
+  }
+  try{
+    if (window.midnightAPI && window.midnightAPI.autostartGet){
+      const r = await withTimeout(window.midnightAPI.autostartGet(), 10000, 'autostartGet');
+      if (r && r.success) _autostartOn = !!r.enabled;
+    }
+  }catch{}
+  paintAutostart();
 }
