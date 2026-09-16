@@ -1,5 +1,5 @@
 ; Midnight Optimizer — instalador Windows (Inno Setup 6)
-#define AppVersion "1.9.2"
+#define AppVersion "1.9.3"
 
 [Setup]
 AppName=Midnight Optimizer

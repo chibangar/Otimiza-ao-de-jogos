@@ -60,6 +60,7 @@ async function getBackend(){
       whoami: ()=>a.whoami(),
       sessionResume: ()=>a.session_resume(),
       sessionForget: ()=>a.session_forget(),
+      openUrl: (u)=>a.open_url(u),
       openReleasesPage: ()=>a.open_releases_page(),
       isAdmin: ()=>a.is_admin(),
       restartAsAdmin: ()=>a.restart_as_admin(),
@@ -70,6 +71,7 @@ async function getBackend(){
       oauthStatus: ()=>a.oauth_status(),
       oauthGoogle: ()=>a.oauth_google(),
       oauthDiscord: ()=>a.oauth_discord(),
+      oauthSaveDiscord: (id,sec)=>a.oauth_save_discord(id,sec),
       hotkeySet: (m)=>a.hotkey_set(m),
       hotkeyClear: ()=>a.hotkey_clear(),
       logError: (m)=>a.log_error(m),
@@ -445,6 +447,19 @@ async function initLogin(){
   }
   $('btn-google').addEventListener('click', ()=>doOauth('google'));
   $('btn-discord').addEventListener('click', ()=>doOauth('discord'));
+  $('link-discord-portal')?.addEventListener('click', async (e)=>{
+    e.preventDefault();
+    try{ await window.midnightAPI.openUrl('https://discord.com/developers/applications'); }
+    catch{ toast('Abre discord.com/developers/applications no browser.'); }
+  });
+  $('btn-discord-save')?.addEventListener('click', async ()=>{
+    const st=$('cfg-discord-status'); st.style.color=''; st.textContent='A guardar…';
+    try{
+      const r=await window.midnightAPI.oauthSaveDiscord($('cfg-discord-id').value, $('cfg-discord-secret').value);
+      st.textContent=r.output; st.style.color=r.success?'#7ef0c1':'';
+      if(r.success){ toast('Discord ativo! A recarregar…'); setTimeout(()=>location.reload(), 1200); }
+    }catch(e){ st.textContent='Falha: '+e; }
+  });
   $('btn-logout').addEventListener('click', async ()=>{
     try{ await window.midnightAPI.voiceStop(); await window.midnightAPI.monitorStop(); await window.midnightAPI.hotkeyClear(); await window.midnightAPI.accountLogout(); }catch{}
     voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false; currentUser='';

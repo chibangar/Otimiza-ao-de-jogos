@@ -26,6 +26,14 @@
       <button class="btn social google" id="btn-google"><b>G</b> Continuar com Google</button>
       <button class="btn social discord" id="btn-discord">℈ Entrar com Discord</button>
     </div>
+    <details class="login-discord-cfg" id="discord-cfg">
+      <summary>⚙ Ativar login com Discord</summary>
+      <p class="muted small">Do <a href="#" id="link-discord-portal">Portal de Programador do Discord</a>: copia o <b>Client ID</b> e o <b>Client Secret</b> da tua aplicação (redirect: <b>http://127.0.0.1:8742/callback</b>).</p>
+      <input id="cfg-discord-id" placeholder="Client ID" autocomplete="off">
+      <input id="cfg-discord-secret" type="password" placeholder="Client Secret" autocomplete="off">
+      <button class="btn ghost small" id="btn-discord-save">Guardar e ativar</button>
+      <p class="login-err" id="cfg-discord-status"></p>
+    </details>
     <p class="login-err" id="login-err"></p>
   </div>
 </div>

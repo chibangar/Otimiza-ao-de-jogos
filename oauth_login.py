@@ -31,8 +31,13 @@ def _base_dir():
 
 
 def load_config():
+    seen = []
     for p in [os.path.join(_base_dir(), "oauth_config.json"),
+              os.path.join(accounts.data_root(), "oauth_config.json"),
               os.path.join(os.path.dirname(os.path.abspath(__file__)), "oauth_config.json")]:
+        if p in seen:
+            continue
+        seen.append(p)
         if os.path.isfile(p):
             try:
                 with open(p, encoding="utf-8") as f:
@@ -40,6 +45,31 @@ def load_config():
             except Exception:
                 pass
     return {}
+
+
+def save_discord_config(client_id, client_secret):
+    """Guarda as chaves do Discord em local sempre gravável (sem admin)."""
+    cid = (client_id or "").strip()
+    csec = (client_secret or "").strip()
+    if not cid or not csec:
+        return {"success": False, "output": "Cola o Client ID e o Client Secret."}
+    try:
+        current = load_config()
+    except Exception:
+        current = {}
+    if not isinstance(current, dict):
+        current = {}
+    current["discord"] = {"client_id": cid, "client_secret": csec}
+    try:
+        dest = os.path.join(accounts.data_root(), "oauth_config.json")
+        with open(dest, "w", encoding="utf-8") as f:
+            json.dump(current, f, ensure_ascii=False, indent=1)
+    except Exception as e:
+        return {"success": False, "output": f"Não consegui guardar: {e}"}
+    ok = status().get("discord", False)
+    if not ok:
+        return {"success": False, "output": "Guardei mas o Discord continua inativo."}
+    return {"success": True, "output": "Discord ativo! OK"}
 
 
 def status():

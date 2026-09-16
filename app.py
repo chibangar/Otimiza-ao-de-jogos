@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.9.2"
+APP_VERSION = "1.9.3"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -437,6 +437,9 @@ class Api:
             _SESSION["user"] = r["user"]
             accounts.save_session(r["user"])
         return r
+
+    def oauth_save_discord(self, client_id, client_secret):
+        return oauth_login.save_discord_config(client_id, client_secret)
 
     def _me(self):
         return _SESSION.get("user") or accounts.GUEST
