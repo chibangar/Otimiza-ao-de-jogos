@@ -73,6 +73,7 @@ async function getBackend(){
       hotkeySet: (m)=>a.hotkey_set(m),
       hotkeyClear: ()=>a.hotkey_clear(),
       logError: (m)=>a.log_error(m),
+      appVersion: ()=>a.app_version(),
       bugsList: ()=>a.bugs_list(),
       bugsAdd: (t)=>a.bugs_add(t),
       bugsClear: ()=>a.bugs_clear(),
@@ -110,6 +111,19 @@ function withTimeout(p, ms, label){
   return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout '+ms+'ms em '+label)), ms))]);
 }
 function log(msg){ const el=document.getElementById('log'); el.textContent += '\n'+msg; el.scrollTop=el.scrollHeight; }
+
+// Versão da app (sidebar + página Sistema)
+async function refreshVersion(){
+  try{
+    if(!window.midnightAPI || !window.midnightAPI.appVersion) return;
+    const r=await withTimeout(window.midnightAPI.appVersion(), 10000, 'appVersion');
+    const v=(r && r.version) || '?';
+    const sb=document.getElementById('app-version');
+    if(sb) sb.textContent=`Forja do Vazio • v${v}`;
+    const sv=document.getElementById('sys-version');
+    if(sv) sv.textContent='v'+v;
+  }catch{}
+}
 
 // Sistema
 async function refreshSystem(){
@@ -353,6 +367,7 @@ async function boot(){
   if(!themeSaved()) document.getElementById('theme-overlay').style.display='flex';
   else applyTheme(themeSaved());
   await step('renderGames', async()=>renderGames());
+  await step('refreshVersion', refreshVersion);
   await step('refreshSystem', refreshSystem);
   await step('detectGames', detectGames);
   await step('renderPros', renderPros);
