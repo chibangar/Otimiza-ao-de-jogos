@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.3.0"
+APP_VERSION = "2.3.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -60,6 +60,7 @@ APP_NEWS = [
     "★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo",
     "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
     "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
+    "℈ Login Discord: o formulário de chaves esconde-se quando já está ativo",
     "🛠️ Correções e melhorias de estabilidade",
 ]
 

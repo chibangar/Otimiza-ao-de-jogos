@@ -593,7 +593,11 @@ async function initLogin(){
     try{
       const r=await window.midnightAPI.oauthSaveDiscord($('cfg-discord-id').value, $('cfg-discord-secret').value);
       st.textContent=r.output; st.style.color=r.success?'#7ef0c1':'';
-      if(r.success){ toast('Discord ativo! A recarregar…'); setTimeout(()=>location.reload(), 1200); }
+      if(r.success){
+        $('cfg-discord-id').value=''; $('cfg-discord-secret').value='';
+        toast('Discord ativo!');
+        await refreshOAuth();
+      }
     }catch(e){ st.textContent='Falha: '+e; }
   });
   $('btn-logout').addEventListener('click', async ()=>{
@@ -605,15 +609,44 @@ async function initLogin(){
     $('login-overlay').style.display='flex';
     refreshUsers();
   });
-  await refreshUsers();
-  try{
-    const st=await window.midnightAPI.oauthStatus();
-    if(st && (st.google || st.discord)){
+  function paintOAuth(st){
+    st = st || {};
+    if(st.google || st.discord){
       $('login-social').style.display='flex';
-      if(!st.google) $('btn-google').style.display='none';
-      if(!st.discord) $('btn-discord').style.display='none';
+      if(!st.google) $('btn-google').style.display='none'; else $('btn-google').style.display='';
+      if(!st.discord) $('btn-discord').style.display='none'; else $('btn-discord').style.display='';
     }
-  }catch{}
+    // Se o Discord já está configurado, esconde o formulário de chaves.
+    // (Os campos aparecem sempre vazios por segurança — vazio NÃO é erro.)
+    const dc=$('discord-cfg');
+    let note=document.getElementById('discord-active-note');
+    if(st.discord && dc){
+      dc.style.display='none'; dc.open=false;
+      if(!note){
+        note=document.createElement('p');
+        note.id='discord-active-note';
+        note.className='muted small';
+        note.innerHTML='℈ Login com Discord ativo ✔ (<a href="#" id="link-discord-reconfig">mudar chaves</a>)';
+        const a=note.querySelector('#link-discord-reconfig');
+        a.style.color='var(--accent)';
+        a.addEventListener('click',(ev)=>{ ev.preventDefault(); dc.style.display=''; dc.open=true; note.style.display='none'; });
+        dc.parentNode.insertBefore(note, dc.nextSibling);
+      }
+      note.style.display='';
+    } else if(note) note.style.display='none';
+  }
+  async function refreshOAuth(){
+    try{
+      if(!window.midnightAPI || !window.midnightAPI.oauthStatus){
+        const s=$('cfg-discord-status');
+        if(s) s.textContent='Login social só funciona na app nativa (.exe). Aqui no Electron está desligado.';
+        return;
+      }
+      paintOAuth(await window.midnightAPI.oauthStatus());
+    }catch{}
+  }
+  await refreshUsers();
+  await refreshOAuth();
 }
 
 // ---------- SERVIDORES ----------
