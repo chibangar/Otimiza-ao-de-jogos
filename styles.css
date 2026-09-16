@@ -203,6 +203,16 @@ nav{display:flex;flex-direction:column;gap:2px;overflow-y:auto;padding:12px 0;fl
 .sup-live{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--ok)}
 .sup-game.add{background:transparent;border-style:dashed}
 .sup-game.add b{color:var(--faint);font-size:24px;font-weight:400}
+/* Tiles com arte oficial */
+.sup-game.has-img{padding:0;min-height:118px;display:flex;align-items:flex-end;justify-content:center}
+.sup-game.has-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sup-game.has-img::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,6,14,0) 30%,rgba(4,6,14,.88) 100%)}
+.sup-game.has-img small{position:relative;z-index:1;margin:0 0 10px;font-weight:600;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.9);font-size:11.5px;padding:0 6px}
+/* Banners oficiais nos cartões In-Game */
+.game-banner{display:block;width:100%;height:150px;object-fit:cover;object-position:center 22%;
+  border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:12px}
 
 /* Histórico */
 .hist-list{display:flex;flex-direction:column;max-height:230px;overflow:auto}
@@ -334,9 +344,9 @@ body[data-theme="cs2"] h1,body[data-theme="cs2"] h2,body[data-theme="cs2"] h3,bo
 .theme-opt:hover{transform:translateY(-2px)}
 .theme-opt.wow.sel{border-color:var(--accent)}
 .theme-opt.cs2.sel{border-color:var(--accent)}
-.theme-preview{display:block;width:60px;height:60px;border-radius:50%;margin:0 auto 10px}
-.theme-opt.wow .theme-preview{background:radial-gradient(circle at 50% 35%, #FF8A1F, #2a1c0e 70%)}
-.theme-opt.cs2 .theme-preview{background:radial-gradient(circle at 50% 35%, #F59E0B, #241a08 70%)}
+.theme-preview{display:block;width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background-size:cover;background-position:center}
+.theme-opt.wow .theme-preview{background-image:url('assets/games/wow.jpg'),radial-gradient(circle at 50% 35%, #FF8A1F, #2a1c0e 70%)}
+.theme-opt.cs2 .theme-preview{background-image:url('assets/games/cs2.jpg'),radial-gradient(circle at 50% 35%, #F59E0B, #241a08 70%)}
 .theme-opt b{display:block;font-size:15px}.theme-opt small{color:var(--muted)}
 .theme-switch{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);padding:0 4px}
 .theme-switch span{margin-right:auto}

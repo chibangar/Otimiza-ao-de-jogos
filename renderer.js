@@ -1057,15 +1057,17 @@ function renderSupportedGames(){
   const box=document.getElementById('supported-games'); if(!box) return;
   box.innerHTML='';
   const tiles=[
-    {name:'Counter-Strike 2', short:'CS2', cls:'cs2', page:'ingame', live:window._detectedCs2},
-    {name:'World of Warcraft', short:'WoW', cls:'wow', page:'ingame', live:window._detectedWow},
+    {name:'Counter-Strike 2', short:'CS2', cls:'cs2', page:'ingame', live:window._detectedCs2, img:'assets/games/cs2.jpg'},
+    {name:'World of Warcraft', short:'WoW', cls:'wow', page:'ingame', live:window._detectedWow, img:'assets/games/wow.jpg'},
     {name:'Valorant', short:'VAL', cls:'val', page:'jogos'},
     {name:'Fortnite', short:'FORT', cls:'fort', page:'jogos'},
     {name:'GTA V', short:'V', cls:'gta', page:'jogos'},
   ];
   tiles.forEach(t=>{
-    const d=document.createElement('div'); d.className='sup-game '+t.cls; d.title=t.name;
-    d.innerHTML=`<b>${t.short}</b><small>${t.name}</small>${t.live?'<span class="sup-live"></span>':''}`;
+    const d=document.createElement('div'); d.className='sup-game '+t.cls+(t.img?' has-img':''); d.title=t.name;
+    d.innerHTML=t.img
+      ? `<img src="${t.img}" alt="${t.name}" loading="lazy"><small>${t.name}</small>${t.live?'<span class="sup-live"></span>':''}`
+      : `<b>${t.short}</b><small>${t.name}</small>${t.live?'<span class="sup-live"></span>':''}`;
     d.addEventListener('click',()=>go(t.page));
     box.appendChild(d);
   });
