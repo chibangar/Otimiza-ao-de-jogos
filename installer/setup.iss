@@ -1,5 +1,5 @@
 ; Midnight Optimizer — instalador Windows (Inno Setup 6)
-#define AppVersion "1.8.2"
+#define AppVersion "1.9.2"
 
 [Setup]
 AppName=Midnight Optimizer
@@ -62,6 +62,6 @@ begin
     Cmd := 'Expand-Archive -LiteralPath "' + CableZip + '" -DestinationPath "' + DestDir + '" -Force';
     Exec('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -Command ' + Cmd, '', SW_HIDE, ewWaitUntilTerminated, ResCode);
     Exec(DestDir + '\VBCABLE_Setup_x64.exe', '-i -h', '', SW_HIDE, ewWaitUntilTerminated, ResCode);
-    MsgBox('Micro virtual instalado! Reinicia o PC para o "CABLE Output" aparecer. Depois e so escolheres "CABLE Output" como microfone no CS2/Discord.', mbInformation, MB_OK);
+    MsgBox('Micro virtual instalado! A app rebatiza-o para "Midnight Mic" sozinha. Reinicia o PC e no CS2/Discord escolhe "Midnight Mic" como microfone.', mbInformation, MB_OK);
   end;
 end;

@@ -73,6 +73,8 @@ async function getBackend(){
       hotkeySet: (m)=>a.hotkey_set(m),
       hotkeyClear: ()=>a.hotkey_clear(),
       logError: (m)=>a.log_error(m),
+      audioBrand: ()=>a.audio_brand_virtual(),
+      audioRestart: ()=>a.audio_restart_service(),
       appVersion: ()=>a.app_version(),
       bugsList: ()=>a.bugs_list(),
       bugsAdd: (t)=>a.bugs_add(t),
@@ -296,12 +298,13 @@ async function initVoice(){
       dv.inputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; mic.appendChild(o); });
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); const m=document.createElement('option'); m.value=d.index; m.textContent=d.name; mon.appendChild(m); });
       const cableEl=document.getElementById('voice-cable');
-      if(cableEl) cableEl.textContent = dv.cable ? '✔ Micro virtual pronto.' : '⚠ Sem micro virtual — corre o Setup.';
-      // Sem escolha guardada: usa o CABLE sozinho, como no Voicemod
+      const virtOk = (dv.virtual !== undefined) ? dv.virtual : dv.cable;
+      if(cableEl) cableEl.textContent = virtOk ? '✔ Micro virtual Midnight pronto.' : '⚠ Sem micro virtual — corre o Setup.';
+      // Sem escolha guardada: usa o Midnight sozinho, como no Voicemod
       try{
         const s0=vmLoad();
         if(!s0.out){
-          const c=[...out.options].find(o=>/CABLE/i.test(o.text));
+          const c=[...out.options].find(o=>/midnight|cable/i.test(o.text));
           if(c){ out.value=c.value; vmSave(); }
         }
       }catch{}
@@ -600,18 +603,35 @@ async function initSound(){
       sel.innerHTML='';
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; sel.appendChild(o); });
       if(saved && [...sel.options].some(o=>o.value==saved)) sel.value=saved;
-      else { const c=[...sel.options].find(o=>/CABLE/i.test(o.text)); if(c) sel.value=c.value; }
+      else { const c=[...sel.options].find(o=>/midnight|cable/i.test(o.text)); if(c) sel.value=c.value; }
       sel.addEventListener('change',()=>{ try{ localStorage.setItem(LS('sound_out'),sel.value); }catch{} });
       const sc=document.getElementById('sound-cable');
-      if(sc) sc.textContent = dv.cable ? '✔ Micro virtual pronto.' : '⚠ Sem micro virtual — corre o Setup e reinicia o PC.';
+      const virtOk2 = (dv.virtual !== undefined) ? dv.virtual : dv.cable;
+      if(sc) sc.textContent = virtOk2 ? '✔ Micro virtual Midnight pronto.' : '⚠ Sem micro virtual — corre o Setup e reinicia o PC.';
     }
   }catch{}
 }
 document.getElementById('btn-cable-out')?.addEventListener('click', ()=>{
   const sel=document.getElementById('sound-out');
-  const c=[...sel.options].find(o=>/CABLE/i.test(o.text));
-  if(c){ sel.value=c.value; try{ localStorage.setItem(LS('sound_out'),c.value); }catch{} toast('✔ Sons agora saem no CABLE → CS2. No CS2 escolhe "CABLE Output" como microfone.'); }
+  const c=[...sel.options].find(o=>/midnight|cable/i.test(o.text));
+  if(c){ sel.value=c.value; try{ localStorage.setItem(LS('sound_out'),c.value); }catch{} toast('✔ Sons agora saem no Midnight → CS2/Discord. No jogo escolhe "Midnight Mic" como microfone.'); }
   else toast('⚠ Sem micro virtual. Corre o Setup (instala sozinho) e reinicia o PC.');
+});
+document.getElementById('btn-brand-audio')?.addEventListener('click', async ()=>{
+  toast('A rebatizar micro virtual para Midnight…');
+  try{
+    const r=await window.midnightAPI.audioBrand();
+    toast(r.output);
+    try{ await initSound(); await initVoice(); }catch{}
+  }catch(e){ toast('Falha: '+e); }
+});
+document.getElementById('btn-audio-restart')?.addEventListener('click', async ()=>{
+  toast('A reiniciar áudio do Windows (o som corta uns segundos)…');
+  try{
+    const r=await window.midnightAPI.audioRestart();
+    toast(r.output);
+    try{ await initSound(); await initVoice(); }catch{}
+  }catch(e){ toast('Falha: '+e); }
 });
 function renderSoundGrid(){
   const grid=document.getElementById('sound-grid'); if(!grid) return; grid.innerHTML='';

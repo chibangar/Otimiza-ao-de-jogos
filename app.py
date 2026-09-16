@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.9.1"
+APP_VERSION = "1.9.2"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -503,11 +503,121 @@ class Api:
                     ins.append({"index": i, "name": d["name"]})
                 if d["max_output_channels"] > 0:
                     outs.append({"index": i, "name": d["name"]})
+            names = [(o["name"] or "").lower() for o in outs] + \
+                    [(o["name"] or "").lower() for o in ins]
+            virtual = any("midnight" in n or "cable" in n for n in names)
             return {"success": True, "inputs": ins, "outputs": outs,
                     "default_in": sd.default.device[0], "default_out": sd.default.device[1],
-                    "cable": any("cable" in (o["name"] or "").lower() for o in outs)}
+                    "virtual": virtual,
+                    "cable": virtual}
         except Exception as e:
             return {"success": False, "output": str(e)}
+
+    # ---------- MICRO VIRTUAL "MIDNIGHT" (por cima do VB-CABLE) ----------
+    # Um driver de audio virtual do zero exigiria driver assinado; em vez
+    # disso rebatizamos os endpoints do VB-CABLE (que o Setup ja instala)
+    # para o nome da app. Discord/CS2 passam a mostrar "Midnight".
+    _MIDNIGHT_NAMES = {"Render": "Midnight Speakers", "Capture": "Midnight Mic"}
+    _MIDNIGHT_PKEY = "{a45c254e-df1c-4efd-8020-67d146a850e0},14"
+    _MIDNIGHT_DESC = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"
+
+    def audio_virtual_endpoints(self):
+        """Lista endpoints do micro virtual (VB-CABLE, com ou sem rebrand)."""
+        found = []
+        try:
+            import winreg
+        except Exception as e:
+            return found
+        for direction in ("Render", "Capture"):
+            base = (r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices"
+                    rf"\Audio\{direction}")
+            try:
+                h = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base)
+            except Exception:
+                continue
+            try:
+                i = 0
+                while True:
+                    try:
+                        guid = winreg.EnumKey(h, i)
+                    except OSError:
+                        break
+                    i += 1
+                    try:
+                        hp = winreg.OpenKey(h, guid + "\\Properties")
+                        try:
+                            desc, _ = winreg.QueryValueEx(hp, self._MIDNIGHT_DESC)
+                        except Exception:
+                            desc = ""
+                        try:
+                            fr, _ = winreg.QueryValueEx(hp, self._MIDNIGHT_PKEY)
+                        except Exception:
+                            fr = ""
+                        hp.Close()
+                    except Exception:
+                        continue
+                    # Só o par principal (evita duplicar nomes na variante 16ch).
+                    fr_u = (fr or "").upper()
+                    if ((direction == "Render" and (desc or "") == "CABLE Input") or
+                            (direction == "Capture" and (desc or "") == "CABLE Output") or
+                            ("MIDNIGHT" in fr_u and ("CABLE" in (desc or "").upper()
+                                                     or "VB-AUDIO" in (desc or "").upper()))):
+                        want = self._MIDNIGHT_NAMES[direction]
+                        found.append({"direction": direction, "guid": guid,
+                                      "desc": desc, "friendly": fr or "",
+                                      "branded": (fr or "") == want})
+            finally:
+                try:
+                    h.Close()
+                except Exception:
+                    pass
+        return found
+
+    def audio_brand_virtual(self):
+        """Rebatiza CABLE Input/Output -> Midnight Speakers/Mic (precisa admin)."""
+        eps = self.audio_virtual_endpoints()
+        if not eps:
+            return {"success": False,
+                    "output": "Micro virtual não encontrado. Corre o Setup para instalar."}
+        if all(e.get("branded") for e in eps):
+            return {"success": True, "output": "Já está como Midnight. ✔"}
+        try:
+            import winreg
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+        done = []
+        for e in eps:
+            if e.get("branded"):
+                continue
+            want = self._MIDNIGHT_NAMES[e["direction"]]
+            key = (r"SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices"
+                   rf"\Audio\{e['direction']}\{e['guid']}\Properties")
+            try:
+                h = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key,
+                                   0, winreg.KEY_SET_VALUE)
+                winreg.SetValueEx(h, self._MIDNIGHT_PKEY, 0,
+                                  winreg.REG_SZ, want)
+                h.Close()
+                done.append(f"{e['desc']} -> {want}")
+            except PermissionError:
+                return {"success": False,
+                        "output": "Corre a app como Administrador para rebatizar."}
+            except Exception as ex:
+                return {"success": False, "output": f"Falha em {e['desc']}: {ex}"}
+        return {"success": True,
+                "output": "Micro virtual agora é Midnight:\n" + "\n".join(done) +
+                          "\n\nSe os nomes antigos persistirem, reinicia o PC."}
+
+    def audio_restart_service(self):
+        """Reinicia o serviço de áudio (refresca os nomes; o som corta uns segundos)."""
+        r = run_cmd("net stop Audiosrv /y")
+        r2 = run_cmd("net start Audiosrv")
+        ok = r2["success"]
+        out = (r.get("output", "") + "\n" + r2.get("output", "")).strip()
+        if not ok:
+            return {"success": False,
+                    "output": "Falha (corre como Administrador). " + out}
+        return {"success": True, "output": "Serviço de áudio reiniciado. ✔"}
 
     def _dev(self, idx, which):
         try:
