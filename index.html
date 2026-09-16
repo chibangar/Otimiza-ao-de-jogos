@@ -50,6 +50,7 @@
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
       <button class="nav-btn" data-page="jogos"><i>♞</i> Meus Jogos</button>
       <button class="nav-btn" data-page="sistema"><i>☾</i> Sistema</button>
+      <button class="nav-btn" data-page="bugs"><i>🐞</i> Bugs</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -300,6 +301,22 @@
           <button class="btn gold" id="btn-admin">🛡️ Reiniciar como Administrador</button>
         </div>
         <p class="muted small">Dica: corre a app como Administrador (botão direito → Executar como administrador) para as otimizações de registo e energia funcionarem a 100%.</p>
+      </div>
+    </section>
+
+    <!-- BUGS -->
+    <section class="page" id="page-bugs">
+      <div class="games-head">
+        <div><h3>🐞 Chat de Bugs</h3><p class="muted">Escreve aqui os bugs que encontrares. Ficam guardados neste PC.</p></div>
+        <div><button class="btn ghost" id="btn-bugs-refresh">↻ Atualizar</button></div>
+      </div>
+      <div class="card wide">
+        <div class="bug-list" id="bugs-list"><p class="muted">Sem bugs registados. Sê o primeiro a reportar!</p></div>
+        <div class="bug-input-row">
+          <textarea id="bugs-input" rows="2" maxlength="2000" placeholder="Descreve o bug… ex: o boost rápido não limpou o DNS no CS2"></textarea>
+          <button class="btn gold" id="btn-bugs-send">Enviar 🐞</button>
+        </div>
+        <p class="muted small">Enter = enviar • Shift+Enter = nova linha</p>
       </div>
     </section>
   </main>

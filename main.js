@@ -216,3 +216,28 @@ ipcMain.handle('launch-game-boosted', async (e, gamePath) => {
 ipcMain.handle('open-external', async (e, url) => {
   shell.openExternal(url);
 });
+
+// ---------- CHAT DE BUGS (Electron: ficheiro local) ----------
+function bugsFile() {
+  try { return path.join(app.getPath('userData'), 'bugs.json'); }
+  catch { return path.join(os.tmpdir(), 'midnight_bugs.json'); }
+}
+function bugsLoad() {
+  try {
+    const p = bugsFile();
+    if (fs.existsSync(p)) { const d = JSON.parse(fs.readFileSync(p, 'utf8')); return Array.isArray(d) ? d : []; }
+  } catch {}
+  return [];
+}
+function bugsSave(items) {
+  try { fs.writeFileSync(bugsFile(), JSON.stringify(items.slice(-500), null, 1), 'utf8'); } catch {}
+}
+ipcMain.handle('bugs-list', async () => ({ success: true, bugs: bugsLoad() }));
+ipcMain.handle('bugs-add', async (e, text) => {
+  text = (text || '').trim();
+  if (!text) return { success: false, output: 'Escreve o bug primeiro.' };
+  const items = bugsLoad();
+  items.push({ user: 'eu', text: text.slice(0, 2000), when: new Date().toLocaleString('pt-PT') });
+  bugsSave(items);
+  return { success: true, output: 'Bug registado. Obrigado!' };
+});

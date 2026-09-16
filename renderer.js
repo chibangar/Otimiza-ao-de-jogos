@@ -73,6 +73,9 @@ async function getBackend(){
       hotkeySet: (m)=>a.hotkey_set(m),
       hotkeyClear: ()=>a.hotkey_clear(),
       logError: (m)=>a.log_error(m),
+      bugsList: ()=>a.bugs_list(),
+      bugsAdd: (t)=>a.bugs_add(t),
+      bugsClear: ()=>a.bugs_clear(),
     };
     return window.midnightAPI;
   }
@@ -94,7 +97,7 @@ for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*in
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'], bugs:['Chat de Bugs','Reporta bugs e vê os já registados.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -357,6 +360,7 @@ async function boot(){
   await step('initVoice', initVoice);
   await step('initSound', initSound);
   await step('initServers', initServers);
+  await step('initBugs', initBugs);
   await step('hkRegister', hkRegister);
 }
 async function initLogin(){
@@ -810,3 +814,58 @@ document.getElementById('btn-wow-balanced')?.addEventListener('click', async ()=
 document.getElementById('btn-wow-restore')?.addEventListener('click', async ()=>{
   const r = await window.midnightAPI.wowRestore(); ilog(r.output); toast('Backup WoW restaurado.');
 });
+
+// ---------- CHAT DE BUGS ----------
+function bugsLocalLoad(){ try{ return JSON.parse(localStorage.getItem(LS('bugs'))||'[]'); }catch{ return []; } }
+function bugsLocalSave(l){ try{ localStorage.setItem(LS('bugs'), JSON.stringify(l.slice(-500))); }catch{} }
+function renderBugsList(list){
+  const box=document.getElementById('bugs-list'); if(!box) return;
+  if(!list.length){ box.innerHTML='<p class="muted">Sem bugs registados. Sê o primeiro a reportar!</p>'; return; }
+  box.innerHTML='';
+  list.forEach(b=>{
+    const d=document.createElement('div'); d.className='bug-item';
+    const user=document.createElement('b'); user.textContent='🐞 '+(b.user||'anónimo');
+    const when=document.createElement('span'); when.className='bug-when'; when.textContent=b.when||'';
+    const p=document.createElement('p'); p.textContent=b.text||'';
+    d.appendChild(user); d.appendChild(when); d.appendChild(p);
+    box.appendChild(d);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+async function initBugs(){
+  await refreshBugs();
+  document.getElementById('btn-bugs-refresh')?.addEventListener('click', refreshBugs);
+  document.getElementById('btn-bugs-send')?.addEventListener('click', sendBug);
+  document.getElementById('bugs-input')?.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendBug(); }
+  });
+}
+async function refreshBugs(){
+  const box=document.getElementById('bugs-list'); if(!box) return;
+  try{
+    if(window.midnightAPI && window.midnightAPI.bugsList){
+      const r=await window.midnightAPI.bugsList();
+      if(r && r.success){ renderBugsList(r.bugs||[]); return; }
+    }
+    renderBugsList(bugsLocalLoad());
+  }catch{ renderBugsList(bugsLocalLoad()); }
+}
+async function sendBug(){
+  const inp=document.getElementById('bugs-input'); if(!inp) return;
+  const text=(inp.value||'').trim();
+  if(!text){ toast('Escreve o bug primeiro.'); return; }
+  try{
+    if(window.midnightAPI && window.midnightAPI.bugsAdd){
+      const r=await window.midnightAPI.bugsAdd(text);
+      toast(r.output||'Enviado!');
+      if(!r.success) return;
+    } else {
+      const l=bugsLocalLoad();
+      l.push({user:currentUser||'eu', text, when:new Date().toLocaleString('pt-PT')});
+      bugsLocalSave(l);
+      toast('Bug registado!');
+    }
+    inp.value='';
+    await refreshBugs();
+  }catch(e){ toast('Falha a enviar: '+e); }
+}

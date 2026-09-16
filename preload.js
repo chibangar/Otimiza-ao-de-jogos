@@ -14,4 +14,6 @@ contextBridge.exposeInMainWorld('midnightAPI', {
   competitiveOn: () => ipcRenderer.invoke('competitive-on'),
   competitiveOff: () => ipcRenderer.invoke('competitive-off'),
   launchGame: (p) => ipcRenderer.invoke('launch-game-boosted', p),
+  bugsList: () => ipcRenderer.invoke('bugs-list'),
+  bugsAdd: (t) => ipcRenderer.invoke('bugs-add', t),
 });

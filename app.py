@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.8.2"
+APP_VERSION = "1.8.3"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -1017,6 +1017,60 @@ class Api:
         except Exception:
             pass
         return {"success": True}
+
+    # ---------- CHAT DE BUGS ----------
+    def _bugs_file(self):
+        try:
+            return os.path.join(accounts.data_root(), "bugs.json")
+        except Exception:
+            return os.path.join(BASE_DIR, "bugs.json")
+
+    def _bugs_load(self):
+        try:
+            p = self._bugs_file()
+            if os.path.isfile(p):
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                    return d if isinstance(d, list) else []
+        except Exception:
+            pass
+        return []
+
+    def _bugs_save(self, items):
+        with open(self._bugs_file(), "w", encoding="utf-8") as f:
+            json.dump(items[-500:], f, ensure_ascii=False, indent=1)
+
+    def bugs_list(self):
+        try:
+            return {"success": True, "bugs": self._bugs_load()}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def bugs_add(self, text):
+        text = (text or "").strip()
+        if not text:
+            return {"success": False, "output": "Escreve o bug primeiro."}
+        if len(text) > 2000:
+            return {"success": False, "output": "Mensagem demasiado longa (max 2000)."}
+        try:
+            import datetime
+            items = self._bugs_load()
+            items.append({
+                "user": self._me(),
+                "text": text[:2000],
+                "when": datetime.datetime.now().strftime("%d/%m %H:%M"),
+            })
+            self._bugs_save(items)
+            return {"success": True, "output": "Bug registado. Obrigado!"}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def bugs_clear(self):
+        try:
+            self._bugs_save([])
+            return {"success": True, "output": "Chat de bugs limpo."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
 
 
 def main():
