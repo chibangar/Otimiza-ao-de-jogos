@@ -726,7 +726,21 @@ document.getElementById('btn-update-now')?.addEventListener('click', async ()=>{
   },500);
 });
 document.getElementById('btn-update-restart')?.addEventListener('click', async ()=>{
-  await window.midnightAPI.applyUpdate();
+  const btn=document.getElementById('btn-update-restart');
+  btn.disabled=true; btn.textContent='A reiniciar…';
+  toast('A aplicar atualização e a reiniciar…');
+  try{
+    const r=await window.midnightAPI.applyUpdate();
+    // Se chegámos aqui, o restart falhou (o sucesso fecha o processo).
+    btn.disabled=false; btn.textContent='Reiniciar agora';
+    const msg=(r && r.output) || 'Falha desconhecida no restart.';
+    toast('⚠ '+msg);
+    try{ await window.midnightAPI.logError('applyUpdate falhou: '+msg); }catch{}
+  }catch(e){
+    btn.disabled=false; btn.textContent='Reiniciar agora';
+    toast('⚠ Falha no restart: '+e);
+    try{ await window.midnightAPI.logError('applyUpdate excecao: '+(e&&e.stack||e)); }catch{}
+  }
 });
 
 // ---------- GALERIA PROS ----------
