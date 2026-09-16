@@ -53,6 +53,7 @@
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
       <button class="nav-btn" data-page="ingame"><i>◎</i> In-Game CS2 &amp; WoW</button>
       <button class="nav-btn" data-page="servers"><i>⌖</i> Servidores</button>
+      <button class="nav-btn" data-page="online"><i>💬</i> Online</button>
       <button class="nav-btn" data-page="voz"><i>♪</i> Estúdio de Voz</button>
       <button class="nav-btn" data-page="sound"><i>♫</i> Soundboard</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
@@ -325,6 +326,27 @@
       <div class="card wide" style="margin-top:14px">
         <h4>🕘 Histórico — os teus últimos servidores</h4>
         <div class="sys-rows" id="servers-history"><p class="muted">Ainda não entraste em nenhum.</p></div>
+      </div>
+    </section>
+
+    <!-- ONLINE -->
+    <section class="page" id="page-online">
+      <div class="online-grid">
+        <div class="card wide">
+          <div class="card-head"><h4>🟢 Pessoas online (<span id="online-count">0</span>)</h4><button class="btn small ghost" id="btn-online-refresh">↻</button></div>
+          <p class="muted small" id="online-status">A ligar…</p>
+          <div class="online-list" id="online-list"><p class="muted small">À procura de jogadores…</p></div>
+        </div>
+        <div class="card wide">
+          <div class="card-head"><h4>💬 Chat</h4></div>
+          <div class="vm-tabs" id="chat-tabs"></div>
+          <div class="chat-box" id="chat-box"><p class="muted small">Escolhe o separador Geral ou uma conversa.</p></div>
+          <div class="bug-input-row" style="margin-top:10px">
+            <textarea id="chat-input" rows="2" maxlength="500" placeholder="Escreve… (Enter = enviar)"></textarea>
+            <button class="btn gold" id="btn-chat-send">Enviar ➤</button>
+          </div>
+          <p class="muted small">Chat público via broker gratuito — não partilhes palavras-passe.</p>
+        </div>
       </div>
     </section>
 

@@ -20,6 +20,7 @@ import voicefx
 import accounts
 import oauth_login
 import servers
+import online
 
 try:
     import sounddevice as sd
@@ -51,7 +52,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.3.1"
+APP_VERSION = "2.4.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -61,6 +62,7 @@ APP_NEWS = [
     "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
     "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
     "℈ Login Discord: o formulário de chaves esconde-se quando já está ativo",
+    "💬 Nova aba Online — vê quem está na app, chat geral e mensagens privadas",
     "🛠️ Correções e melhorias de estabilidade",
 ]
 
@@ -619,6 +621,55 @@ class Api:
                 break
         servers.add_history(self._me(), {"ip": ip, "port": port, "name": name, "mode": mode})
         return servers.connect(ip, port)
+
+    # ---------- ONLINE (pessoas + chat) ----------
+    def online_start(self):
+        try:
+            return online.start(self._me())
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def online_stop(self):
+        try:
+            return online.stop()
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def online_state(self):
+        try:
+            return online.state()
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def chat_lobby_send(self, text):
+        try:
+            return online.lobby_send(text)
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def chat_lobby_fetch(self, after=0):
+        try:
+            return online.lobby_fetch(after)
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def chat_dm_send(self, peer, text):
+        try:
+            return online.dm_send(peer, text)
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def chat_dm_fetch(self, peer, after=0):
+        try:
+            return online.dm_fetch(peer, after)
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def chat_dm_threads(self):
+        try:
+            return online.dm_threads()
+        except Exception as e:
+            return {"success": False, "output": str(e)}
 
     # ---------- PROS CS2 ----------
     def list_pros(self):

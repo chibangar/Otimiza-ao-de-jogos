@@ -6,3 +6,4 @@ pillow>=10.0
 miniaudio>=1.6
 keyboard>=0.13
 psutil>=6.0
+paho-mqtt>=1.6

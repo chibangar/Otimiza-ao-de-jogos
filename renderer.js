@@ -74,6 +74,14 @@ async function getBackend(){
       serversRefresh: ()=>a.servers_refresh(),
       serversHistory: ()=>a.servers_history(),
       serverConnect: (ip,port)=>a.server_connect(ip,port),
+      onlineStart: ()=>a.online_start(),
+      onlineStop: ()=>a.online_stop(),
+      onlineState: ()=>a.online_state(),
+      lobbySend: (t)=>a.chat_lobby_send(t),
+      lobbyFetch: (n)=>a.chat_lobby_fetch(n),
+      dmSend: (p,t)=>a.chat_dm_send(p,t),
+      dmFetch: (p,n)=>a.chat_dm_fetch(p,n),
+      dmThreads: ()=>a.chat_dm_threads(),
       oauthStatus: ()=>a.oauth_status(),
       oauthGoogle: ()=>a.oauth_google(),
       oauthDiscord: ()=>a.oauth_discord(),
@@ -109,7 +117,7 @@ for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*in
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'], bugs:['Chat de Bugs','Reporta bugs e vê os já registados.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], online:['Online','Vê quem está na app e conversa em direto.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'], bugs:['Chat de Bugs','Reporta bugs e vê os já registados.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -515,6 +523,7 @@ async function boot(){
   await step('initVoice', initVoice);
   await step('initSound', initSound);
   await step('initServers', initServers);
+  await step('initOnline', initOnline);
   await step('initBugs', initBugs);
   await step('initAutostart', initAutostart);
   await step('hkRegister', hkRegister);
@@ -719,6 +728,135 @@ async function renderSrvHistory(){
   }catch{}
 }
 document.getElementById('btn-servers-refresh')?.addEventListener('click', ()=>serversRefreshNow(false));
+
+// ---------- ONLINE (pessoas + chat) ----------
+let chatTab = 'lobby'; // 'lobby' ou 'dm:<cid>'
+let chatCursor = 0;
+let chatThreads = [];
+let _onlineWired = false;
+let _onlineTimer = null;
+function chatPeer(){ return chatTab.startsWith('dm:') ? chatTab.slice(3) : ''; }
+function chatAppend(box, m){
+  const d = document.createElement('div');
+  d.className = 'chat-msg' + (m.mine ? ' mine' : '');
+  const h = document.createElement('div'); h.className = 'chat-head';
+  const b = document.createElement('b'); b.textContent = m.mine ? 'Tu' : (m.from || m.from_name || '?');
+  const s = document.createElement('span'); s.textContent = m.ts || '';
+  h.appendChild(b); h.appendChild(s);
+  const p = document.createElement('p'); p.textContent = m.text || '';
+  d.appendChild(h); d.appendChild(p);
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+function renderChatTabs(){
+  const tabs = document.getElementById('chat-tabs'); if(!tabs) return;
+  tabs.innerHTML = '';
+  const mk = (key, label)=>{
+    const b = document.createElement('button');
+    b.className = 'vm-tab' + (chatTab === key ? ' active' : '');
+    b.textContent = label;
+    b.addEventListener('click', ()=>{ chatTab = key; chatCursor = 0; renderChatTabs(); pollChat(true); });
+    tabs.appendChild(b);
+  };
+  mk('lobby', '🌍 Geral');
+  chatThreads.forEach(t=>mk('dm:' + t.id, '💬 ' + (t.name || '?') + (t.online ? '' : ' (off)')));
+}
+async function pollOnline(){
+  if(!window.midnightAPI || !window.midnightAPI.onlineState) return;
+  try{
+    const r = await window.midnightAPI.onlineState();
+    const st = document.getElementById('online-status');
+    const list = document.getElementById('online-list');
+    const cnt = document.getElementById('online-count');
+    if(!(r && r.success)){
+      if(st) st.textContent = '⚠ ' + ((r && r.output) || 'Offline');
+      return;
+    }
+    if(!r.connected){
+      if(st) st.textContent = '🟡 A ligar ao broker… ' + (r.error || '');
+    } else {
+      const n = (r.users || []).length;
+      if(st) st.textContent = `✔ Ligado como ${r.me.user} — ${n} pessoa(s) online.`;
+      if(cnt) cnt.textContent = n;
+    }
+    if(list){
+      const users = r.users || [];
+      list.innerHTML = '';
+      if(!users.length){
+        list.innerHTML = '<p class="muted small">Só tu por aqui. Partilha a app com os amigos!</p>';
+      }
+      users.forEach(u=>{
+        const d = document.createElement('div'); d.className = 'online-user';
+        const dot = document.createElement('span'); dot.className = 'online-dot';
+        const b = document.createElement('b'); b.textContent = u.name;
+        const btn = document.createElement('button'); btn.className = 'btn small gold'; btn.textContent = '💬';
+        btn.title = 'Conversar com ' + u.name;
+        btn.addEventListener('click', ()=>{ chatTab = 'dm:' + u.id; chatCursor = 0; renderChatTabs(); pollChat(true); });
+        d.appendChild(dot); d.appendChild(b); d.appendChild(btn);
+        list.appendChild(d);
+      });
+    }
+  }catch{}
+}
+async function pollChat(reset){
+  const box = document.getElementById('chat-box'); if(!box) return;
+  if(!window.midnightAPI) return;
+  try{
+    if(reset){ box.innerHTML = ''; chatCursor = 0; }
+    const peer = chatPeer();
+    let msgs = [];
+    if(!peer && window.midnightAPI.lobbyFetch){
+      const r = await window.midnightAPI.lobbyFetch(chatCursor);
+      msgs = (r && r.msgs) || [];
+    } else if(peer && window.midnightAPI.dmFetch){
+      const r = await window.midnightAPI.dmFetch(peer, chatCursor);
+      msgs = (r && r.msgs) || [];
+    }
+    msgs.forEach(m=>{ chatAppend(box, m); if(m.id > chatCursor) chatCursor = m.id; });
+    if(window.midnightAPI.dmThreads){
+      const t = await window.midnightAPI.dmThreads();
+      const ids = JSON.stringify(((t && t.threads) || []).map(x=>x.id));
+      if(ids !== JSON.stringify(chatThreads.map(x=>x.id))){ chatThreads = (t && t.threads) || []; renderChatTabs(); }
+      else chatThreads = (t && t.threads) || [];
+    }
+  }catch{}
+}
+async function sendChat(){
+  const inp = document.getElementById('chat-input'); if(!inp) return;
+  const text = (inp.value || '').trim();
+  if(!text) return;
+  const peer = chatPeer();
+  try{
+    const r = peer ? await window.midnightAPI.dmSend(peer, text)
+                   : await window.midnightAPI.lobbySend(text);
+    if(r && r.success){ inp.value = ''; await pollChat(false); }
+    else toast((r && r.output) || 'Falha a enviar.');
+  }catch(e){ toast('Falha a enviar: ' + e); }
+}
+async function initOnline(){
+  if(!window.midnightAPI) return;
+  if(!_onlineWired){
+    _onlineWired = true;
+    document.getElementById('btn-chat-send')?.addEventListener('click', sendChat);
+    document.getElementById('chat-input')?.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }
+    });
+    document.getElementById('btn-online-refresh')?.addEventListener('click', async ()=>{
+      await pollOnline(); await pollChat(false);
+    });
+    _onlineTimer = setInterval(()=>{
+      if(document.getElementById('page-online')?.classList.contains('active')){
+        pollOnline(); pollChat(false);
+      }
+    }, 3000);
+  }
+  try{
+    if(window.midnightAPI.onlineStart) await window.midnightAPI.onlineStart();
+  }catch{}
+  await pollOnline();
+  renderChatTabs();
+  await pollChat(true);
+}
 
 // ---------- HOTKEYS ----------
 let hkMap={}, hkOn=true;
@@ -1069,6 +1207,8 @@ const SEARCH_INDEX=[
   {label:'Modo Competitivo — ativar', run:()=>setCompetitive(true)},
   {label:'In-Game CS2 & WoW', run:()=>go('ingame')},
   {label:'Servidores', run:()=>go('servers')},
+  {label:'Pessoas online', run:()=>go('online')},
+  {label:'Chat', run:()=>go('online')},
   {label:'Estúdio de Voz', run:()=>go('voz')},
   {label:'Soundboard', run:()=>go('sound')},
   {label:'Otimizações Windows', run:()=>go('otimizacoes')},
