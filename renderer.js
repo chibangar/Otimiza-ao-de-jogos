@@ -84,6 +84,7 @@ async function getBackend(){
       audioBrand: ()=>a.audio_brand_virtual(),
       audioRestart: ()=>a.audio_restart_service(),
       appVersion: ()=>a.app_version(),
+      getNews: ()=>a.get_news(),
       bugsList: ()=>a.bugs_list(),
       bugsAdd: (t)=>a.bugs_add(t),
       bugsClear: ()=>a.bugs_clear(),
@@ -429,19 +430,70 @@ function vmSelectFromHotkey(id){ selectVoice(id); }
 
 // ---------- TEMAS ----------
 function applyTheme(t){
-  t = (t==='cs2') ? 'cs2' : 'wow';
+  t = (t==='cs2') ? 'cs2' : (t==='cod') ? 'cod' : 'wow';
   if(t==='cs2') document.body.dataset.theme='cs2';
+  else if(t==='cod') document.body.dataset.theme='cod';
   else document.body.removeAttribute('data-theme');
   try{ localStorage.setItem(LS('theme'), t); }catch{}
   document.querySelectorAll('.theme-switch button').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
   document.querySelectorAll('.theme-opt').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
 }
 function themeSaved(){ try{ return localStorage.getItem(LS('theme'))||''; }catch{ return ''; } }
-document.querySelectorAll('.theme-switch button').forEach(b=>b.addEventListener('click',()=>{ applyTheme(b.dataset.theme); toast(b.dataset.theme==='cs2'?'Interface CS2 Tático ativa.':'Interface WoW Midnight ativa.'); }));
+document.querySelectorAll('.theme-switch button').forEach(b=>b.addEventListener('click',()=>{ applyTheme(b.dataset.theme); toast(b.dataset.theme==='cs2'?'Interface CS2 Tático ativa.':(b.dataset.theme==='cod'?'Interface Call of Duty ativa. Soldado!':'Interface WoW Midnight ativa.')); }));
 document.querySelectorAll('.theme-opt').forEach(b=>b.addEventListener('click',()=>{
   applyTheme(b.dataset.theme);
   document.getElementById('theme-overlay').style.display='none';
 }));
+
+// ---------- NOVIDADES DA APP (popup ao iniciar) ----------
+const NEWS_FALLBACK = [
+  '★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo',
+  '📰 Este popup de novidades — vês sempre o que mudou ao ligar a app',
+  '🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game',
+  '🛠️ Correções e melhorias de estabilidade',
+];
+function newsSeenKey(v){ return 'mno_news_seen_' + (v || 'x'); }
+async function fetchNews(){
+  try{
+    if(window.midnightAPI && window.midnightAPI.getNews){
+      const r = await withTimeout(window.midnightAPI.getNews(), 10000, 'getNews');
+      if(r && r.version) return r;
+    }
+  }catch{}
+  try{
+    const r = await window.midnightAPI.appVersion();
+    return {version: (r && r.version) || '2.3.0', news: NEWS_FALLBACK};
+  }catch{}
+  return {version: '2.3.0', news: NEWS_FALLBACK};
+}
+async function showNewsIfNeeded(){
+  const ov = document.getElementById('news-overlay');
+  if(!ov) return;
+  if(!window._newsWired){
+    window._newsWired = true;
+    document.getElementById('btn-news-ok')?.addEventListener('click', ()=>{ ov.style.display='none'; });
+    document.getElementById('btn-news-later')?.addEventListener('click', ()=>{ ov.style.display='none'; });
+    ov.addEventListener('click', (e)=>{ if(e.target === ov) ov.style.display='none'; });
+  }
+  try{
+    const n = await fetchNews();
+    const ver = n.version || '?';
+    let seen = '';
+    try{ seen = localStorage.getItem(newsSeenKey(ver)) || ''; }catch{}
+    if(seen) return; // esta versão já foi vista
+    const list = document.getElementById('news-list');
+    if(list){
+      list.innerHTML = '';
+      (n.news || NEWS_FALLBACK).forEach(t=>{
+        const li = document.createElement('li'); li.textContent = t; list.appendChild(li);
+      });
+    }
+    const vv = document.getElementById('news-ver');
+    if(vv) vv.textContent = 'NOVIDADES • v' + ver;
+    try{ localStorage.setItem(newsSeenKey(ver), '1'); }catch{}
+    ov.style.display = 'flex';
+  }catch{}
+}
 
 // ---------- CONTAS ----------
 let currentUser='';
@@ -459,6 +511,7 @@ async function boot(){
   await step('detectGames', detectGames);
   await step('renderPros', renderPros);
   await step('checkForUpdate', checkForUpdate);
+  await step('showNews', showNewsIfNeeded);
   await step('initVoice', initVoice);
   await step('initSound', initSound);
   await step('initServers', initServers);
@@ -1059,6 +1112,7 @@ function renderSupportedGames(){
   const tiles=[
     {name:'Counter-Strike 2', short:'CS2', cls:'cs2', page:'ingame', live:window._detectedCs2, img:'assets/games/cs2.jpg'},
     {name:'World of Warcraft', short:'WoW', cls:'wow', page:'ingame', live:window._detectedWow, img:'assets/games/wow.jpg'},
+    {name:'Call of Duty', short:'COD', cls:'cod', page:'ingame', img:'assets/games/cod.jpg'},
     {name:'Valorant', short:'VAL', cls:'val', page:'jogos'},
     {name:'Fortnite', short:'FORT', cls:'fort', page:'jogos'},
     {name:'GTA V', short:'V', cls:'gta', page:'jogos'},

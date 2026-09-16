@@ -62,7 +62,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <div class="theme-switch"><span>Tema</span><button data-theme="wow" id="th-wow">WoW</button><button data-theme="cs2" id="th-cs2">CS2</button></div>
+      <div class="theme-switch"><span>Tema</span><button data-theme="wow" id="th-wow">WoW</button><button data-theme="cs2" id="th-cs2">CS2</button><button data-theme="cod" id="th-cod">COD</button></div>
       <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
       <p class="hint" id="admin-hint">Executa como <b>Administrador</b> para poder total.</p>
       <p class="sidebar-sub" id="app-version">Midnight Optimizer • …</p>
@@ -280,6 +280,22 @@
           </ul>
         </div>
       </div>
+      <div class="card wide" style="margin-top:14px">
+        <img class="game-banner" src="assets/games/cod.jpg" alt="Call of Duty — arte tática" loading="lazy">
+        <h4>★ Call of Duty (Warzone / MW) — Dicas de performance</h4>
+        <p class="muted small">O COD não tem ficheiro de config simples como o CS2 — estas são as definições que mais FPS dão no jogo:</p>
+        <ul class="comp-list" style="margin-top:10px">
+          <li>Display Mode: Fullscreen Exclusive • Refresh Rate: máximo do monitor</li>
+          <li>Render Resolution: 100 • DLSS/FSR: Performance (se o PC for fraco)</li>
+          <li>Texture Resolution: Low • Shadow Map: OFF • Cache Spot/Sun Shadows: OFF</li>
+          <li>Anti-Aliasing: SMAA T2X • Filmic Strength: 0 • Motion Blur: OFF</li>
+          <li>No Windows: ativa o <b>Modo Competitivo</b> aqui da app antes de abrir o Battle.net/Steam</li>
+        </ul>
+        <div class="comp-btns" style="margin-top:12px">
+          <button class="btn gold" data-goto="competitivo">⚔ Ativar Competitivo p/ COD</button>
+          <button class="btn ghost" data-goto="jogos">＋ Adicionar COD à biblioteca</button>
+        </div>
+      </div>
       <div class="console"><div class="console-head">🎯 Registo In-Game</div><pre id="log-ingame">Pronto. Deteta os jogos primeiro.</pre></div>
     </section>
 
@@ -416,6 +432,21 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="news-overlay" id="news-overlay" style="display:none">
+  <div class="news-card">
+    <img class="news-banner" id="news-banner" src="assets/games/cod.jpg" alt="Novidades da app">
+    <div class="news-body">
+      <span class="news-ver" id="news-ver">NOVIDADES • v2.3.0</span>
+      <h2>📰 Novidades da app</h2>
+      <p class="muted small" id="news-sub">O que mudou nesta versão.</p>
+      <ul class="news-list" id="news-list"></ul>
+      <div class="news-actions">
+        <button class="btn gold" id="btn-news-ok">Entendido, bora jogar! ▶</button>
+        <button class="btn ghost" id="btn-news-later">Depois</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="hk-capture" id="hk-capture" style="display:none"><div><h3 id="hk-cap-title">Tecla de atalho</h3><p>Prime as teclas que queres usar… (ESC cancela)<br><span class="muted small">Vale tudo: F1-F12, Insert, Numpad, letras com Ctrl/Alt/Shift.</span></p></div></div>
 <div class="theme-overlay" id="theme-overlay" style="display:none">
   <div class="theme-card">
@@ -424,6 +455,7 @@
     <div class="theme-opts">
       <button class="theme-opt wow" data-theme="wow"><span class="theme-preview"></span><b>☾ WoW Midnight</b><small>Roxo e dourado do Vazio</small></button>
       <button class="theme-opt cs2" data-theme="cs2"><span class="theme-preview"></span><b>◉ CS2 Tático</b><small>Laranja tático</small></button>
+      <button class="theme-opt cod" data-theme="cod"><span class="theme-preview"></span><b>★ Call of Duty</b><small>Verde militar + ouro</small></button>
     </div>
   </div>
 </div>

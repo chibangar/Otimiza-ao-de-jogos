@@ -1,6 +1,6 @@
 {
   "name": "midnight-optimizer",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Otimizador de jogos para Windows - Modo Competitivo estilo WoW Midnight",
   "main": "main.js",
   "scripts": {

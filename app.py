@@ -51,9 +51,17 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Novidades mostradas no popup ao ligar a app (uma linha por novidade).
+APP_NEWS = [
+    "★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo",
+    "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
+    "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
+    "🛠️ Correções e melhorias de estabilidade",
+]
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
@@ -1122,6 +1130,10 @@ class Api:
     # ---------- AUTO-UPDATE ----------
     def app_version(self):
         return {"version": APP_VERSION}
+
+    def get_news(self):
+        """Novidades da versão atual (popup ao ligar a app)."""
+        return {"version": APP_VERSION, "news": list(APP_NEWS)}
 
     def log_error(self, msg):
         return log_error(str(msg))
