@@ -45,39 +45,52 @@
   <aside class="sidebar">
     <div class="logo">
       <img class="logo-img" src="assets/logo.png" alt="Midnight Optimizer">
+      <div class="logo-text"><b>Midnight</b><span>OPTIMIZER</span></div>
     </div>
-    <p class="sidebar-sub" id="app-version">Forja do Vazio • …</p>
 
     <nav>
-      <button class="nav-btn active" data-page="dashboard"><i>◉</i> Dashboard</button>
+      <button class="nav-btn active" data-page="dashboard"><i>⌂</i> Dashboard</button>
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
-      <button class="nav-btn" data-page="ingame"><i>🎯</i> In-Game CS2 & WoW</button>
-      <button class="nav-btn" data-page="servers"><i>🌐</i> Servidores</button>
-      <button class="nav-btn" data-page="voz"><i>🎙️</i> Estúdio de Voz</button>
-      <button class="nav-btn" data-page="sound"><i>🔊</i> Soundboard</button>
+      <button class="nav-btn" data-page="ingame"><i>◎</i> In-Game CS2 &amp; WoW</button>
+      <button class="nav-btn" data-page="servers"><i>⌖</i> Servidores</button>
+      <button class="nav-btn" data-page="voz"><i>♪</i> Estúdio de Voz</button>
+      <button class="nav-btn" data-page="sound"><i>♫</i> Soundboard</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
-      <button class="nav-btn" data-page="jogos"><i>♞</i> Meus Jogos</button>
-      <button class="nav-btn" data-page="sistema"><i>☾</i> Sistema</button>
-      <button class="nav-btn" data-page="bugs"><i>🐞</i> Bugs</button>
+      <button class="nav-btn" data-page="jogos"><i>▶</i> Meus Jogos</button>
+      <button class="nav-btn" data-page="sistema"><i>⚙</i> Sistema</button>
+      <button class="nav-btn" data-page="bugs"><i>⚠</i> Bugs</button>
     </nav>
 
     <div class="sidebar-footer">
-      <div class="theme-switch">Tema: <button data-theme="wow" id="th-wow">☾ WoW</button><button data-theme="cs2" id="th-cs2">◉ CS2</button></div>      <div class="status-pill" id="user-pill" title="Sessão"><img id="user-avatar" style="display:none;width:22px;height:22px;border-radius:50%"><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
+      <div class="theme-switch"><span>Tema</span><button data-theme="wow" id="th-wow">WoW</button><button data-theme="cs2" id="th-cs2">CS2</button></div>
       <div class="status-pill" id="status-pill"><span class="dot"></span><span id="status-text">Modo Normal</span></div>
-      <p class="hint">Executa como <b>Administrador</b> para poder total.</p>
+      <p class="hint" id="admin-hint">Executa como <b>Administrador</b> para poder total.</p>
+      <p class="sidebar-sub" id="app-version">Midnight Optimizer • …</p>
     </div>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
     <header class="topbar">
-      <div>
-        <h2 id="page-title">Dashboard</h2>
-        <p id="page-desc">Visão geral da tua máquina de batalha.</p>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="tb-search" placeholder="Procurar jogos, otimizações, …" autocomplete="off">
+        <span class="search-kbd">Ctrl + K</span>
+        <div class="search-results" id="search-results" style="display:none"></div>
       </div>
       <div class="top-actions">
-        <button class="btn ghost" id="btn-refresh">↻ Atualizar</button>
-        <button class="btn gold" id="btn-quick-boost">⚔ Boost Rápido</button>
+        <button class="icon-btn" id="notif-btn" title="Notificações">🔔<span class="notif-dot" id="notif-dot" style="display:none"></span></button>
+        <button class="icon-btn" id="settings-btn" title="Definições">⚙</button>
+        <div class="win-controls">
+          <button class="icon-btn" id="win-min" title="Minimizar">–</button>
+          <button class="icon-btn" id="win-max" title="Maximizar">▢</button>
+          <button class="icon-btn danger" id="win-close" title="Fechar">✕</button>
+        </div>
+        <div class="top-user" id="user-pill" title="Sessão"><img id="user-avatar" style="display:none"><span id="user-name">…</span><button id="btn-logout" title="Sair">⏻</button></div>
+      </div>
+      <div class="notif-panel" id="notif-panel" style="display:none">
+        <h4>Atividade recente</h4>
+        <div id="notif-list"><p class="muted small">Sem atividade ainda.</p></div>
       </div>
     </header>
     <div class="update-banner" id="update-banner" style="display:none">
@@ -91,39 +104,97 @@
 
     <!-- DASHBOARD -->
     <section class="page active" id="page-dashboard">
-      <div class="hero">
-        <div class="hero-text">
-          <p class="eyebrow">A HORA DA MEIA-NOITE APROXIMA-SE</p>
-          <h3>Prepara-te para a <em>arena</em>.</h3>
-          <p>Corta o peso do Windows, estabiliza o ping e espreme cada frame. Um clique para entrar em modo de guerra.</p>
-          <div class="hero-btns">
-            <button class="btn gold big" id="btn-hero-competitive">Ativar Modo Competitivo</button>
-            <button class="btn outline" data-goto="otimizacoes">Ver otimizações</button>
+      <div class="hero2">
+        <div class="hero2-text">
+          <h3>Boa gaming!<br><span>O teu PC, no seu melhor.</span></h3>
+          <p>Otimiza. Joga. Domina.</p>
+          <div class="hero-badges">
+            <div class="hero-badge"><span class="hb-ico orange">+</span><div><b>+ FPS</b><small>Mais desempenho</small></div></div>
+            <div class="hero-badge"><span class="hb-ico purple">↓</span><div><b>−LATÊNCIA</b><small>Resposta mais rápida</small></div></div>
+            <div class="hero-badge"><span class="hb-ico blue">◉</span><div><b>+ ESTABILIDADE</b><small>Joga sem interrupções</small></div></div>
+            <div class="hero-badge"><span class="hb-ico green">✓</span><div><b>100% FOCUS</b><small>Para o que realmente importa</small></div></div>
           </div>
         </div>
-        <div class="hero-card">
-          <div class="ring-wrap">
-            <svg viewBox="0 0 120 120" class="ring">
-              <circle cx="60" cy="60" r="52" class="ring-bg"/>
-              <circle cx="60" cy="60" r="52" class="ring-fg" id="ram-ring"/>
-            </svg>
-            <div class="ring-center"><b id="ram-pct">--%</b><span>RAM em uso</span></div>
+        <div class="hero2-quote">
+          <p>“Good players play.<br>Great players optimize.”</p>
+          <span>Midnight Optimizer</span>
+        </div>
+      </div>
+
+      <div class="dash-row3">
+        <div class="card perf-card">
+          <div class="card-head"><h4>⚡ Desempenho em Tempo Real</h4><button class="btn small ghost" data-goto="sistema">Detalhes ›</button></div>
+          <div class="gauges">
+            <div class="gauge"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="gauge-bg"/><circle cx="60" cy="60" r="52" class="gauge-fg green" id="g-cpu-ring"/></svg><div class="gauge-center"><b id="g-cpu-pct">–</b></div><label>CPU</label><small id="g-cpu-sub">…</small></div>
+            <div class="gauge"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="gauge-bg"/><circle cx="60" cy="60" r="52" class="gauge-fg orange" id="g-gpu-ring"/></svg><div class="gauge-center"><b id="g-gpu-pct">–</b></div><label>GPU</label><small id="g-gpu-sub">…</small></div>
+            <div class="gauge"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="gauge-bg"/><circle cx="60" cy="60" r="52" class="gauge-fg blue" id="g-ram-ring"/></svg><div class="gauge-center"><b id="g-ram-pct">–</b></div><label>RAM</label><small id="g-ram-sub">…</small></div>
+            <div class="gauge"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="gauge-bg"/><circle cx="60" cy="60" r="52" class="gauge-fg purple" id="g-disk-ring"/></svg><div class="gauge-center"><b id="g-disk-pct">–</b></div><label>DISCO</label><small id="g-disk-sub">…</small></div>
           </div>
-          <div class="hero-specs">
-            <div><label>CPU</label><p id="spec-cpu">…</p></div>
-            <div><label>GPU</label><p id="spec-gpu">…</p></div>
-            <div class="row2">
-              <div><label>RAM Livre</label><p id="spec-ram">…</p></div>
-              <div><label>Disco C: livre</label><p id="spec-disk">…</p></div>
+        </div>
+        <div class="card profile-card">
+          <div class="card-head"><h4>◉ Perfil Ativo</h4></div>
+          <div class="profile-body">
+            <div class="profile-cross">⌖</div>
+            <div><b id="profile-name">Modo Competitivo</b><p class="muted small" id="profile-desc">Desempenho máximo para jogos competitivos.</p></div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn gold" id="btn-profile-change">Alterar Perfil</button>
+            <div class="menu-wrap">
+              <button class="btn ghost" id="btn-profile-menu" title="Opções">…</button>
+              <div class="mini-menu" id="profile-menu" style="display:none">
+                <button id="pm-toggle">Ativar / Desativar</button>
+                <button id="pm-goto">Abrir Modo Competitivo</button>
+              </div>
             </div>
+          </div>
+        </div>
+        <div class="card sys-card">
+          <div class="card-head"><h4>⚙ Sistema</h4><button class="btn small ghost" data-goto="sistema">Ver Detalhes ›</button></div>
+          <div class="sys-list">
+            <div><i>▣</i><span id="sys2-cpu">…</span></div>
+            <div><i>▣</i><span id="sys2-gpu">…</span></div>
+            <div><i>▣</i><span id="sys2-ram">…</span></div>
+            <div><i>▣</i><span id="sys2-os">…</span></div>
+            <div><i>▣</i><span id="sys2-board">…</span></div>
           </div>
         </div>
       </div>
 
-      <div class="grid3">
-        <div class="card"><h4>⚡ FPS & Fluidez</h4><p>Plano Ultimate Performance + prioridade GPU + efeitos leves.</p></div>
-        <div class="card"><h4>◈ Ping Estável</h4><p>Flush DNS + anti-throttling de rede do Windows.</p></div>
-        <div class="card"><h4>☾ Foco Total</h4><p>Mata browsers e apps em 2º plano antes da ranked.</p></div>
+      <div class="dash-row2">
+        <div class="qa-grid">
+          <div class="card qa"><div class="qa-ico orange">🚀</div><h4>Otimização Rápida</h4><p>Aplica as melhores definições para o teu sistema.</p><button class="btn gold small" id="btn-qa-perfil">Otimizar Agora</button></div>
+          <div class="card qa"><div class="qa-ico orange">🧹</div><h4>Limpeza do Sistema</h4><p>Remove ficheiros inúteis e liberta espaço.</p><button class="btn gold small" data-action="temp">Limpar Agora</button></div>
+          <div class="card qa"><div class="qa-ico orange">🎮</div><h4>Otimizar Jogos</h4><p>Aplica tweaks por jogo (CS2, WoW, etc.).</p><button class="btn gold small" data-goto="ingame">Otimizar Jogos</button></div>
+          <div class="card qa"><div class="qa-ico purple">🌐</div><h4>Servidores</h4><p>Melhora a tua ligação e reduz o ping.</p><button class="btn gold small" data-action="net">Otimizar Rede</button></div>
+          <div class="card qa"><div class="qa-ico purple">🎙</div><h4>Estúdio de Voz</h4><p>Melhora a qualidade do teu microfone.</p><button class="btn gold small" data-goto="voz">Abrir Estúdio</button></div>
+        </div>
+        <div class="card fps-card">
+          <div class="card-head"><h4>📈 FPS em Tempo Real</h4><select id="fps-game"></select></div>
+          <div class="fps-wrap">
+            <canvas id="fps-canvas" width="360" height="140"></canvas>
+            <div class="fps-empty" id="fps-empty">Sem dados.<br><small>Telemetria de FPS em breve.</small></div>
+          </div>
+          <div class="fps-stats">
+            <div><label>FPS ATUAL</label><b id="fps-cur">–</b></div>
+            <div><label>MÉDIA</label><b id="fps-avg">–</b></div>
+            <div><label>1% LOW</label><b id="fps-low1">–</b></div>
+            <div><label>0.1% LOW</label><b id="fps-low01">–</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-row3b">
+        <div class="card games-card">
+          <div class="card-head"><h4>🎮 Jogos Suportados</h4><button class="btn small ghost" data-goto="jogos">Ver Todos ›</button></div>
+          <div class="sup-games" id="supported-games"></div>
+        </div>
+        <div class="card hist-card">
+          <div class="card-head"><h4>◉ Últimas Otimizações</h4><button class="btn small ghost" id="btn-hist-toggle">Ver Histórico ›</button></div>
+          <div class="hist-list" id="opt-history"><p class="muted small">Ainda sem ações registadas.</p></div>
+        </div>
+        <div class="card motivational">
+          <div><b>DISCIPLINA<br>TAMBÉM É<br>UMA SKILL.</b><span>Midnight Optimizer</span></div>
+        </div>
       </div>
     </section>
 
@@ -306,6 +377,7 @@
           <div><label>RAM Total</label><p id="sys-ram">…</p></div>
           <div><label>Plano de energia</label><p id="sys-power">…</p></div>
           <div><label>PC</label><p id="sys-host">…</p></div>
+          <div><label>Motherboard</label><p id="sys-board">…</p></div>
           <div><label>Administrador</label><p id="sys-admin">…</p></div>
         </div>
         <div class="comp-btns" style="margin-top:12px">

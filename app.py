@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.9.4"
+APP_VERSION = "2.0.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -122,6 +122,7 @@ class Api:
         disk_free = run_ps("[math]::Round((Get-PSDrive C).Free/1GB,1)")
         win = run_ps("(Get-CimInstance Win32_OperatingSystem).Caption")
         power = run_cmd("powercfg /getactivescheme")
+        board = run_ps("(Get-CimInstance Win32_BaseBoard).Product")
 
         try:
             total = float((ram_total["output"] or "16").split()[0].replace(",", "."))
@@ -144,7 +145,80 @@ class Api:
             "os": win["output"] or f"{platform.system()} {platform.release()}",
             "power": power["output"] or "",
             "hostname": socket.gethostname(),
+            "motherboard": (board["output"] or "").split("\n")[0].strip() or "—",
         }
+
+    def get_perf(self):
+        """Métricas reais rápidas: CPU/RAM/DISCO (psutil) + GPU (nvidia-smi)."""
+        out = {"cpuPct": None, "cpuGHz": None, "gpuPct": None,
+               "gpuMemUsed": None, "gpuMemTotal": None,
+               "ramPct": None, "ramUsed": None, "ramTotal": None,
+               "diskPct": None, "diskUsed": None, "diskTotal": None}
+        try:
+            import psutil
+            out["cpuPct"] = round(psutil.cpu_percent(interval=0.3))
+            try:
+                f = psutil.cpu_freq()
+                if f and f.current:
+                    out["cpuGHz"] = round(f.current / 1000, 1)
+            except Exception:
+                pass
+            m = psutil.virtual_memory()
+            out["ramPct"] = round(m.percent)
+            out["ramUsed"] = round(m.used / (1024 ** 3), 1)
+            out["ramTotal"] = round(m.total / (1024 ** 3), 1)
+            try:
+                d = psutil.disk_usage("C:\\")
+                out["diskPct"] = round(d.percent)
+                out["diskUsed"] = round(d.used / (1024 ** 3))
+                out["diskTotal"] = round(d.total / (1024 ** 3))
+            except Exception:
+                pass
+        except Exception as e:
+            log_error("get_perf psutil: " + str(e))
+        try:
+            r = subprocess.run(
+                ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used,memory.total",
+                 "--format=csv,noheader,nounits"],
+                capture_output=True, text=True, timeout=15, **_hidden())
+            parts = (r.stdout or "").strip().split(",")
+            if len(parts) >= 3:
+                out["gpuPct"] = int(parts[0].strip())
+                out["gpuMemUsed"] = int(parts[1].strip())
+                out["gpuMemTotal"] = int(parts[2].strip())
+        except Exception:
+            pass
+        return out
+
+    # ---------- JANELA ----------
+    def window_minimize(self):
+        try:
+            if _WINDOW is not None:
+                _WINDOW.minimize()
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def window_toggle_maximize(self):
+        try:
+            if _WINDOW is not None:
+                if getattr(_WINDOW, "_mid_max", False):
+                    _WINDOW.restore()
+                    _WINDOW._mid_max = False
+                else:
+                    _WINDOW.maximize()
+                    _WINDOW._mid_max = True
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def window_close(self):
+        try:
+            if _WINDOW is not None:
+                _WINDOW.destroy()
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
 
     # ---------- Otimizações ----------
     def power_high(self):

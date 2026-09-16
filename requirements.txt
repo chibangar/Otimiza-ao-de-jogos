@@ -5,3 +5,4 @@ numpy>=1.26
 pillow>=10.0
 miniaudio>=1.6
 keyboard>=0.13
+psutil>=6.0

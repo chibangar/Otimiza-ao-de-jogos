@@ -10,6 +10,10 @@ async function getBackend(){
     const a = window.pywebview.api;
     window.midnightAPI = {
       getSystemInfo: ()=>a.get_system_info(),
+      getPerf: ()=>a.get_perf(),
+      winMin: ()=>a.window_minimize(),
+      winMax: ()=>a.window_toggle_maximize(),
+      winClose: ()=>a.window_close(),
       powerHigh: ()=>a.power_high(),
       powerBalanced: ()=>a.power_balanced(),
       gameMode: (e)=>a.game_mode(e),
@@ -106,8 +110,14 @@ const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
-  document.getElementById('page-title').textContent=titles[page][0];
-  document.getElementById('page-desc').textContent=titles[page][1]; }
+  try{
+    const t=titles[page]||['Midnight Optimizer',''];
+    document.title=t[0]+' — Midnight Optimizer';
+    const h=document.getElementById('page-title'), d=document.getElementById('page-desc');
+    if(h) h.textContent=t[0];
+    if(d) d.textContent=t[1];
+  }catch{}
+}
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
 
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3200); }
@@ -123,39 +133,66 @@ async function refreshVersion(){
     const r=await withTimeout(window.midnightAPI.appVersion(), 10000, 'appVersion');
     const v=(r && r.version) || '?';
     const sb=document.getElementById('app-version');
-    if(sb) sb.textContent=`Forja do Vazio • v${v}`;
+    if(sb) sb.textContent=`Midnight Optimizer • v${v}`;
     const sv=document.getElementById('sys-version');
     if(sv) sv.textContent='v'+v;
   }catch{}
 }
 
-// Sistema
+// Sistema + gauges do dashboard (dados 100% reais)
+function shortGpu(name){
+  const m=(name||'').match(/RTX\s*\d+|GTX\s*\d+|RX\s*[\w ]+|Radeon[^\|]*/i);
+  return (m?m[0]:name||'GPU').trim().slice(0,22);
+}
+function setGauge(id, pct){
+  const el=document.getElementById(id); if(!el) return;
+  const c=326.7, p=Math.max(0,Math.min(100,pct||0));
+  el.style.strokeDashoffset=(c-(c*p/100)).toFixed(1);
+}
+let _sysCache=null;
 async function refreshSystem(){
   if(!window.midnightAPI) return;
   try{
-    toast('A consultar os espíritos do sistema…');
     const info = await withTimeout(window.midnightAPI.getSystemInfo(), 30000, 'getSystemInfo');
-  document.getElementById('spec-cpu').textContent = info.cpu.slice(0,60);
-  document.getElementById('spec-gpu').textContent = info.gpu.slice(0,60);
-  document.getElementById('spec-ram').textContent = `${info.ramFree} / ${info.ramTotal} GB livres`;
-  document.getElementById('spec-disk').textContent = `${info.diskFree} GB`;
-  document.getElementById('ram-pct').textContent = info.ramUsedPct+'%';
-  const ring=document.getElementById('ram-ring'); const c=326; ring.style.strokeDashoffset = c-(c*info.ramUsedPct/100);
-  document.getElementById('sys-os').textContent=info.os; document.getElementById('sys-cpu').textContent=info.cpu;
-  document.getElementById('sys-gpu').textContent=info.gpu; document.getElementById('sys-ram').textContent=info.ramTotal+' GB';
-  document.getElementById('sys-power').textContent=info.power.slice(0,120); document.getElementById('sys-host').textContent=info.hostname;
+    _sysCache=info;
+    const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+    set('sys2-cpu', (info.cpu||'CPU').slice(0,48));
+    set('sys2-gpu', (info.gpu||'GPU').split('|').map(s=>s.trim()).filter(Boolean).slice(-1)[0]?.slice(0,48) || 'GPU');
+    set('sys2-ram', `${info.ramTotal} GB`);
+    set('sys2-os', `${info.os} ${info.hostname?'• '+info.hostname:''}`.slice(0,64));
+    set('sys2-board', (info.motherboard||'—').slice(0,48));
+    set('sys-os',info.os); set('sys-cpu',info.cpu);
+    set('sys-gpu',info.gpu); set('sys-ram',info.ramTotal+' GB');
+    set('sys-power',(info.power||'').slice(0,120)); set('sys-host',info.hostname);
+    set('sys-board',info.motherboard||'—');
+    await refreshPerf();
   }catch(e){ try{ await window.midnightAPI.logError('refreshSystem: '+(e&&e.stack||e)); }catch{} }
   try{
     const adm=await window.midnightAPI.isAdmin();
     const el=document.getElementById('sys-admin');
-    if(el){ el.textContent=adm.admin?'Sim ✔':'Não — prime o botão para poder total'; el.style.color=adm.admin?'#7ef0c1':'#ffd479'; }
+    if(el){ el.textContent=adm.admin?'Sim ✔':'Não — prime o botão para poder total'; el.style.color=adm.admin?'#34c98e':'#e5a83c'; }
+    const hint=document.getElementById('admin-hint');
+    if(hint) hint.innerHTML=adm.admin?'A correr como <b>Administrador</b> ✔':'Executa como <b>Administrador</b> para poder total.';
   }catch{}
 }
-document.getElementById('btn-admin')?.addEventListener('click', async ()=>{
-  toast('A reiniciar como administrador… aceita o pedido.');
-  await window.midnightAPI.restartAsAdmin();
-});
-document.getElementById('btn-refresh').addEventListener('click', refreshSystem);
+async function refreshPerf(){
+  if(!window.midnightAPI || !window.midnightAPI.getPerf) return;
+  try{
+    const p=await withTimeout(window.midnightAPI.getPerf(), 15000, 'getPerf');
+    const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+    if(p.cpuPct!==null && p.cpuPct!==undefined){ set('g-cpu-pct',p.cpuPct+'%'); setGauge('g-cpu-ring',p.cpuPct); }
+    else { set('g-cpu-pct','–'); }
+    set('g-cpu-sub', p.cpuGHz? p.cpuGHz.toFixed(1)+' GHz' : ((_sysCache&&_sysCache.cpu)||'CPU').split('@')[0].slice(0,26));
+    const gpuName=_sysCache? shortGpu((_sysCache.gpu||'').split('|').map(s=>s.trim()).filter(Boolean).slice(-1)[0]||'GPU') : 'GPU';
+    if(p.gpuPct!==null && p.gpuPct!==undefined){ set('g-gpu-pct',p.gpuPct+'%'); setGauge('g-gpu-ring',p.gpuPct); }
+    else { set('g-gpu-pct','–'); setGauge('g-gpu-ring',0); }
+    set('g-gpu-sub', gpuName);
+    if(p.ramPct!==null && p.ramPct!==undefined){ set('g-ram-pct',p.ramPct+'%'); setGauge('g-ram-ring',p.ramPct); }
+    if(p.ramUsed!==null && p.ramUsed!==undefined) set('g-ram-sub',`${p.ramUsed} / ${p.ramTotal} GB`);
+    if(p.diskPct!==null && p.diskPct!==undefined){ set('g-disk-pct',p.diskPct+'%'); setGauge('g-disk-ring',p.diskPct); }
+    if(p.diskUsed!==null && p.diskUsed!==undefined) set('g-disk-sub',`${p.diskUsed} / ${p.diskTotal} GB`);
+  }catch(e){ /* mantém últimos valores */ }
+}
 
 // Competitivo
 let competitive=false;
@@ -164,31 +201,73 @@ async function setCompetitive(on){
   const big=document.getElementById('big-toggle'), lbl=document.getElementById('comp-state-label');
   const list=document.getElementById('comp-log');
   if(on){
-    toast('⚔ A invocar o poder da Meia-Noite…'); list.innerHTML='<li>A aplicar runas…</li>';
+    toast('A ativar Modo Competitivo…'); if(list) list.innerHTML='<li>A aplicar…</li>';
     const r=await window.midnightAPI.competitiveOn();
-    competitive=true; list.innerHTML=r.output.split('\n').map(l=>`<li>${l}</li>`).join('');
-    pill.className='status-pill war'; txt.textContent='Modo Competitivo ATIVO';
-    big.classList.add('active'); lbl.textContent='EM GUERRA'; lbl.style.color='#ff9d5c';
-    document.getElementById('btn-hero-competitive').textContent='Desativar Modo Competitivo';
-    log('⚔ COMPETITIVO ATIVO:\n'+r.output); toast('⚔ Modo Competitivo ATIVO. Boa ranked!');
+    competitive=true; if(list) list.innerHTML=r.output.split('\n').map(l=>`<li>${l}</li>`).join('');
+    if(pill) pill.className='status-pill war'; if(txt) txt.textContent='Modo Competitivo ATIVO';
+    if(big) big.classList.add('active'); if(lbl){ lbl.textContent='EM GUERRA'; lbl.style.color='#ff9d5c'; }
+    setCompetitiveUI(true); histAdd('✓','Perfil Competitivo ativado');
+    log('COMPETITIVO ATIVO:\n'+r.output); toast('Modo Competitivo ATIVO. Boa ranked!');
   } else {
     const r=await window.midnightAPI.competitiveOff();
-    competitive=false; list.innerHTML=r.output.split('\n').map(l=>`<li>${l}</li>`).join('');
-    pill.className='status-pill normal'; txt.textContent='Modo Normal';
-    big.classList.remove('active'); lbl.textContent='DESATIVADO'; lbl.style.color='';
-    document.getElementById('btn-hero-competitive').textContent='Ativar Modo Competitivo';
-    log('☾ Modo normal restaurado.'); toast('Modo normal restaurado.');
+    competitive=false; if(list) list.innerHTML=r.output.split('\n').map(l=>`<li>${l}</li>`).join('');
+    if(pill) pill.className='status-pill normal'; if(txt) txt.textContent='Modo Normal';
+    if(big) big.classList.remove('active'); if(lbl){ lbl.textContent='DESATIVADO'; lbl.style.color=''; }
+    setCompetitiveUI(false); histAdd('○','Perfil Normal restaurado');
+    log('Modo normal restaurado.'); toast('Modo normal restaurado.');
   }
 }
 document.getElementById('btn-comp-on').addEventListener('click',()=>setCompetitive(true));
 document.getElementById('btn-comp-off').addEventListener('click',()=>setCompetitive(false));
 document.getElementById('big-toggle').addEventListener('click',()=>setCompetitive(!competitive));
-document.getElementById('btn-hero-competitive').addEventListener('click',()=>{ if(!competitive) go('competitivo'); setCompetitive(!competitive); });
-document.getElementById('btn-quick-boost').addEventListener('click', async ()=>{
-  toast('Boost rápido: temp + DNS + 2º plano…');
-  await window.midnightAPI.cleanTemp(); await window.midnightAPI.killBackground();
-  log('⚡ Boost rápido concluído.'); toast('⚡ Boost rápido concluído!');
-});
+document.getElementById('btn-qa-perfil')?.addEventListener('click',()=>setCompetitive(!competitive));
+document.getElementById('btn-profile-change')?.addEventListener('click',()=>setCompetitive(!competitive));
+document.getElementById('pm-toggle')?.addEventListener('click',()=>{ document.getElementById('profile-menu').style.display='none'; setCompetitive(!competitive); });
+document.getElementById('pm-goto')?.addEventListener('click',()=>{ document.getElementById('profile-menu').style.display='none'; go('competitivo'); });
+document.getElementById('btn-profile-menu')?.addEventListener('click',(e)=>{ e.stopPropagation(); const m=document.getElementById('profile-menu'); m.style.display=m.style.display==='none'?'':'none'; });
+document.addEventListener('click',()=>{ const m=document.getElementById('profile-menu'); if(m) m.style.display='none'; });
+document.getElementById('btn-hist-toggle')?.addEventListener('click',()=>{ toast(histLoad().length+' ações no histórico desta conta.'); });
+
+// ---------- DASHBOARD: perfil, histórico, pesquisa, janelas ----------
+function setCompetitiveUI(on){
+  const pn=document.getElementById('profile-name'), pd=document.getElementById('profile-desc');
+  if(pn) pn.textContent = on ? 'Modo Competitivo' : 'Modo Normal';
+  if(pd) pd.textContent = on ? 'Desempenho máximo para jogos competitivos.' : 'Equilíbrio entre desempenho e conforto.';
+  const bq=document.getElementById('btn-qa-perfil');
+  if(bq) bq.textContent = on ? 'Desativar' : 'Otimizar Agora';
+  const bh=document.getElementById('btn-profile-change');
+  if(bh) bh.textContent = on ? 'Desativar Perfil' : 'Alterar Perfil';
+}
+// Histórico real de ações (persistente, por conta)
+function histLoad(){ try{ return JSON.parse(localStorage.getItem(LS('history'))||'[]'); }catch{ return []; } }
+function histSave(h){ try{ localStorage.setItem(LS('history'), JSON.stringify(h.slice(-30))); }catch{} }
+function histAdd(icon, text){
+  const h=histLoad();
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0');
+  h.push({t:`${hh}:${mm}`, icon, text});
+  histSave(h); renderHistory();
+}
+function renderHistory(){
+  const box=document.getElementById('opt-history'); if(!box) return;
+  const h=histLoad().slice(-8).reverse();
+  if(!h.length){ box.innerHTML='<p class="muted small">Ainda sem ações registadas.</p>'; return; }
+  box.innerHTML='';
+  h.forEach(e=>{
+    const d=document.createElement('div'); d.className='hist-item';
+    const t=document.createElement('span'); t.className='hist-time'; t.textContent=e.t;
+    const i=document.createElement('span'); i.className='hist-ico'; i.textContent=e.icon;
+    const p=document.createElement('span'); p.textContent=e.text;
+    d.appendChild(t); d.appendChild(i); d.appendChild(p);
+    box.appendChild(d);
+  });
+  const nl=document.getElementById('notif-list');
+  if(nl){ nl.innerHTML=''; h.slice(0,5).forEach(e=>{
+    const d=document.createElement('div'); d.className='hist-item';
+    d.innerHTML=''; const t=document.createElement('span'); t.className='hist-time'; t.textContent=e.t;
+    const p=document.createElement('span'); p.textContent=e.icon+' '+e.text;
+    d.appendChild(t); d.appendChild(p); nl.appendChild(d); }); }
+}
 
 // Switches individuais
 document.querySelectorAll('.switch').forEach(sw=>{
@@ -204,9 +283,9 @@ document.querySelectorAll('.switch').forEach(sw=>{
     log(`${willOn?'✔':'○'} ${action}: ${r.output||'OK'}`); toast(`${willOn?'Ativado':'Desativado'}: ${action}`);
   });
 });
-document.querySelectorAll('[data-action="kill"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.killBackground(); log('⚔ '+r.output); toast('Apps em 2º plano encerradas.'); }));
-document.querySelectorAll('[data-action="temp"]').forEach(b=>b.addEventListener('click', async ()=>{ toast('A limpar…'); const r=await midnightAPI.cleanTemp(); log('🧹 '+(r.output||'Limpo')); toast('Limpeza concluída!'); }));
-document.querySelectorAll('[data-action="net"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.network(); log('◈ Rede:\n'+(r.output||'OK')); toast('Rede otimizada!'); }));
+document.querySelectorAll('[data-action="kill"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.killBackground(); log('⚔ '+r.output); toast('Apps em 2º plano encerradas.'); histAdd('✓','Apps em 2º plano encerradas'); }));
+document.querySelectorAll('[data-action="temp"]').forEach(b=>b.addEventListener('click', async ()=>{ toast('A limpar…'); const r=await midnightAPI.cleanTemp(); log('🧹 '+(r.output||'Limpo')); toast('Limpeza concluída!'); histAdd('✓','Limpeza de sistema concluída'); }));
+document.querySelectorAll('[data-action="net"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.network(); log('◈ Rede:\n'+(r.output||'OK')); toast('Rede otimizada!'); histAdd('✓','DNS otimizado'); }));
 
 // Jogos (por conta)
 let games=[];
@@ -374,6 +453,7 @@ async function boot(){
   await step('renderGames', async()=>renderGames());
   await step('refreshVersion', refreshVersion);
   await step('refreshSystem', refreshSystem);
+  await step('initDashboard', initDashboard);
   await step('detectGames', detectGames);
   await step('renderPros', renderPros);
   await step('checkForUpdate', checkForUpdate);
@@ -840,6 +920,8 @@ async function detectGames(){
     if(wowS){ wowS.textContent = wow.found ? '✔ WoW detetado ('+(wow.flavor||'retail')+')' : (wow.base ? '⚠ WoW encontrado mas abre o jogo uma vez p/ gerar Config.wtf' : '✘ WoW não detetado'); wowS.style.color = wow.found ? '#7ef0c1' : '#ffd479'; }
     if(wowP){ wowP.textContent = wow.config || wow.base || ''; }
     ilog('Deteção: CS2 '+(cs.found?'OK':'falhou')+' | WoW '+(wow.found?'OK':'falhou'));
+    window._detectedCs2=!!cs.found; window._detectedWow=!!wow.found;
+    try{ renderSupportedGames(); window._fpsRefill&&window._fpsRefill(); }catch{}
   }catch(e){ ilog('Erro deteção: '+e); }
 }
 document.getElementById('btn-detect-games')?.addEventListener('click', detectGames);
@@ -857,6 +939,7 @@ document.getElementById('btn-cs2-kill')?.addEventListener('click', async ()=>{
 });
 document.getElementById('btn-cs2-apply')?.addEventListener('click', async ()=>{
   toast('⚔ A aplicar CS2 competitivo…'); const r = await window.midnightAPI.cs2Competitive();
+  if(r.success) histAdd('✓','Otimização CS2 aplicada');
   ilog((r.success?'✔ ':'✘ ')+(r.output||'')); if(r.launch){ document.getElementById('cs2-launch-preview').textContent = 'Launch Options:\n'+r.launch; }
   toast(r.success ? 'CS2 competitivo aplicado!' : 'CS2: '+r.output);
 });
@@ -872,6 +955,7 @@ document.getElementById('btn-cs2-restore')?.addEventListener('click', async ()=>
 document.getElementById('btn-wow-apply')?.addEventListener('click', async ()=>{
   toast('⚔ A aplicar WoW Raid FPS… (fecha o jogo primeiro)');
   const r = await window.midnightAPI.wowCompetitive(); ilog((r.success?'✔ ':'✘ ')+r.output); toast(r.success?'WoW competitivo aplicado!':r.output);
+  if(r.success) histAdd('✓','Otimização WoW aplicada');
 });
 document.getElementById('btn-wow-balanced')?.addEventListener('click', async ()=>{
   const r = await window.midnightAPI.wowBalanced(); ilog((r.success?'✔ ':'✘ ')+r.output); toast('WoW modo bonito aplicado.');
@@ -880,7 +964,113 @@ document.getElementById('btn-wow-restore')?.addEventListener('click', async ()=>
   const r = await window.midnightAPI.wowRestore(); ilog(r.output); toast('Backup WoW restaurado.');
 });
 
-// ---------- CHAT DE BUGS ----------
+// ---------- DASHBOARD NOVO ----------
+function initDashboard(){
+  setCompetitiveUI(competitive);
+  renderHistory();
+  initSearch(); initTopbar(); initFpsCard(); renderSupportedGames();
+  try{
+    if(window._perfTimer) clearInterval(window._perfTimer);
+    window._perfTimer=setInterval(()=>{ if(document.getElementById('page-dashboard')?.classList.contains('active')) refreshPerf(); }, 5000);
+  }catch{}
+}
+// Pesquisa global (Ctrl+K)
+const SEARCH_INDEX=[
+  {label:'Dashboard', run:()=>go('dashboard')},
+  {label:'Modo Competitivo — ativar', run:()=>setCompetitive(true)},
+  {label:'In-Game CS2 & WoW', run:()=>go('ingame')},
+  {label:'Servidores', run:()=>go('servers')},
+  {label:'Estúdio de Voz', run:()=>go('voz')},
+  {label:'Soundboard', run:()=>go('sound')},
+  {label:'Otimizações Windows', run:()=>go('otimizacoes')},
+  {label:'Meus Jogos', run:()=>go('jogos')},
+  {label:'Sistema', run:()=>go('sistema')},
+  {label:'Chat de Bugs', run:()=>go('bugs')},
+  {label:'Limpeza do sistema', run:()=>go('otimizacoes')},
+  {label:'Otimizar rede / ping', run:()=>go('otimizacoes')},
+];
+function initSearch(){
+  const inp=document.getElementById('tb-search'), box=document.getElementById('search-results');
+  if(!inp||!box) return;
+  document.addEventListener('keydown',(e)=>{
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); go('dashboard'); inp.focus(); }
+  });
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim().toLowerCase();
+    if(!q){ box.style.display='none'; return; }
+    const hits=SEARCH_INDEX.filter(s=>s.label.toLowerCase().includes(q)).slice(0,7);
+    box.innerHTML='';
+    if(!hits.length){ box.innerHTML='<div class="search-hit muted">Sem resultados.</div>'; }
+    hits.forEach(h=>{
+      const d=document.createElement('div'); d.className='search-hit'; d.textContent=h.label;
+      d.addEventListener('click',()=>{ box.style.display='none'; inp.value=''; h.run(); });
+      box.appendChild(d);
+    });
+    box.style.display='';
+  });
+  inp.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'){ const f=box.querySelector('.search-hit'); if(f) f.click(); }
+    if(e.key==='Escape'){ box.style.display='none'; inp.blur(); }
+  });
+  document.addEventListener('click',(e)=>{ if(!e.target.closest('.search-wrap')) box.style.display='none'; });
+}
+// Topbar: notificações, definições, controlos de janela
+function initTopbar(){
+  document.getElementById('settings-btn')?.addEventListener('click',()=>go('sistema'));
+  const panel=document.getElementById('notif-panel');
+  document.getElementById('notif-btn')?.addEventListener('click',(e)=>{
+    e.stopPropagation(); renderHistory();
+    panel.style.display=panel.style.display==='none'?'':'none';
+    const dot=document.getElementById('notif-dot'); if(dot) dot.style.display='none';
+  });
+  document.addEventListener('click',(e)=>{ if(panel && !e.target.closest('#notif-panel') && !e.target.closest('#notif-btn')) panel.style.display='none'; });
+  document.getElementById('win-min')?.addEventListener('click', async ()=>{ try{ await window.midnightAPI.winMin(); }catch(e){ toast('Falha: '+e); } });
+  document.getElementById('win-max')?.addEventListener('click', async ()=>{ try{ await window.midnightAPI.winMax(); }catch(e){ toast('Falha: '+e); } });
+  document.getElementById('win-close')?.addEventListener('click', async ()=>{ try{ await window.midnightAPI.winClose(); }catch(e){ toast('Falha: '+e); } });
+}
+// FPS: sem telemetria real -> "Sem dados" (nunca inventar números)
+function initFpsCard(){
+  const sel=document.getElementById('fps-game'); if(!sel) return;
+  const draw=()=>{
+    const cv=document.getElementById('fps-canvas'); if(!cv) return;
+    const ctx=cv.getContext('2d'); const W=cv.width, H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.fillStyle='rgba(255,255,255,.35)'; ctx.font='10px Inter,sans-serif';
+    [400,300,200,100,0].forEach(v=>{ const y=H-8-(v/400)*(H-16); ctx.beginPath(); ctx.moveTo(28,y); ctx.lineTo(W,y); ctx.stroke(); ctx.fillText(v,4,y+3); });
+  };
+  const refill=()=>{
+    sel.innerHTML='';
+    const names=[...(games||[]).map(g=>g.name)];
+    try{ if(window._detectedCs2) names.unshift('Counter-Strike 2'); }catch{}
+    try{ if(window._detectedWow) names.unshift('World of Warcraft'); }catch{}
+    [...new Set(names)].slice(0,12).forEach(n=>{ const o=document.createElement('option'); o.textContent=n; sel.appendChild(o); });
+    if(!sel.options.length){ const o=document.createElement('option'); o.textContent='Sem jogos'; sel.appendChild(o); }
+  };
+  refill(); draw();
+  window._fpsRefill=refill;
+}
+// Jogos suportados: CS2/WoW com deteção real; restantes são atalhos
+function renderSupportedGames(){
+  const box=document.getElementById('supported-games'); if(!box) return;
+  box.innerHTML='';
+  const tiles=[
+    {name:'Counter-Strike 2', short:'CS2', cls:'cs2', page:'ingame', live:window._detectedCs2},
+    {name:'World of Warcraft', short:'WoW', cls:'wow', page:'ingame', live:window._detectedWow},
+    {name:'Valorant', short:'VAL', cls:'val', page:'jogos'},
+    {name:'Fortnite', short:'FORT', cls:'fort', page:'jogos'},
+    {name:'GTA V', short:'V', cls:'gta', page:'jogos'},
+  ];
+  tiles.forEach(t=>{
+    const d=document.createElement('div'); d.className='sup-game '+t.cls; d.title=t.name;
+    d.innerHTML=`<b>${t.short}</b><small>${t.name}</small>${t.live?'<span class="sup-live"></span>':''}`;
+    d.addEventListener('click',()=>go(t.page));
+    box.appendChild(d);
+  });
+  const add=document.createElement('div'); add.className='sup-game add'; add.title='Adicionar jogo';
+  add.innerHTML='<b>+</b><small>Adicionar Jogo</small>';
+  add.addEventListener('click',()=>document.getElementById('btn-add-game')?.click());
+  box.appendChild(add);
+}
 function bugsLocalLoad(){ try{ return JSON.parse(localStorage.getItem(LS('bugs'))||'[]'); }catch{ return []; } }
 function bugsLocalSave(l){ try{ localStorage.setItem(LS('bugs'), JSON.stringify(l.slice(-500))); }catch{} }
 function renderBugsList(list){
