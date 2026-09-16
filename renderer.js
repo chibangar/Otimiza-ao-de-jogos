@@ -387,7 +387,7 @@ async function initLogin(){
       (r.users||[]).forEach(u=>{
         const name=(u&&u.name)||u;
         const b=document.createElement('button');
-        b.innerHTML=(u&&u.avatar?`<img src="${u.avatar}" style="width:20px;height:20px;border-radius:50%;vertical-align:middle"> `:'👤 ')+name;
+        b.innerHTML=(u&&u.avatar?`<img src="${u.avatar}" onerror="this.style.display='none'" style="width:20px;height:20px;border-radius:50%;vertical-align:middle"> `:'👤 ')+name;
         b.addEventListener('click',()=>{ $('login-name').value=name; $('login-pass').focus(); });
         box.appendChild(b);
       });
@@ -397,8 +397,9 @@ async function initLogin(){
     try{
       const w=await window.midnightAPI.whoami?.();
       const img=document.getElementById('user-avatar');
+      img.onerror=()=>{ img.removeAttribute('src'); img.style.display='none'; };
       if(w && w.avatar){ img.src=w.avatar; img.style.display=''; }
-      else img.style.display='none';
+      else { img.removeAttribute('src'); img.style.display='none'; }
     }catch{}
   }
   window._setAvatar=setAvatar;

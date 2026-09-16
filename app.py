@@ -51,7 +51,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "1.8.6"
+APP_VERSION = "1.8.7"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -311,10 +311,29 @@ class Api:
 
     # ---------- CONTAS ----------
     def _avatar_url(self, path):
-        if path and os.path.isfile(path):
-            import urllib.request
-            return "file:///" + urllib.request.pathname2url(path).lstrip("/")
-        return ""
+        # data: URL (base64) em vez de file:// — o pywebview serve a pagina
+        # em http://localhost e o Chromium bloqueia imagens file:// dali.
+        try:
+            if not path or not os.path.isfile(path):
+                return ""
+            if os.path.getsize(path) > 512 * 1024:
+                return ""
+            with open(path, "rb") as f:
+                raw = f.read()
+            if raw[:4] == b"\x89PNG":
+                mime = "image/png"
+            elif raw[:2] == b"\xff\xd8":
+                mime = "image/jpeg"
+            elif raw[:6] in (b"GIF87a", b"GIF89a"):
+                mime = "image/gif"
+            elif raw[:4] == b"RIFF" and b"WEBP" in raw[:16]:
+                mime = "image/webp"
+            else:
+                return ""
+            import base64
+            return "data:" + mime + ";base64," + base64.b64encode(raw).decode()
+        except Exception:
+            return ""
 
     def users_list(self):
         try:
@@ -685,9 +704,7 @@ class Api:
         try:
             customs = accounts.custom_sounds(self._me())
             for c in customs:
-                if c.get("photo"):
-                    import urllib.request
-                    c["photo"] = "file:///" + urllib.request.pathname2url(c["photo"]).lstrip("/")
+                c["photo"] = self._avatar_url(c.get("photo", ""))
             return builtin + customs
         except Exception:
             return builtin
