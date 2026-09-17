@@ -1,5 +1,8 @@
 """Login social (Google + Discord) via OAuth2 com loopback local.
-Precisa de oauth_config.json (ver oauth_config.example.json).
+As chaves do Discord vêm EMBUTIDAS na app (fallback) para que QUALQUER
+pessoa consiga fazer login sem configurar nada. Um oauth_config.json
+(opcional, ao lado do .exe ou em %APPDATA%/MidnightOptimizer) sobrepõe-se
+às chaves embutidas — útil para desenvolvimento.
 Google: cliente tipo 'App para computador' (so client_id, com PKCE).
 Discord: Client ID + Client Secret, com redirect http://127.0.0.1:8742/callback
 registado no Portal de Programador.
@@ -19,6 +22,13 @@ import accounts
 GOOGLE_PORT = 8741
 DISCORD_PORT = 8742
 TIMEOUT = 180
+# Chaves embutidas: vêm compiladas no .exe para que qualquer pessoa que
+# descarregue a app consiga fazer "Login com Discord" sem colar chaves.
+# ATENÇÃO: isto torna o client_secret extraível do .exe/repo — usa esta
+# aplicação Discord SÓ para login (scopes identify+email), sem permissões
+# de bot nem URLs sensíveis.
+BUILTIN_DISCORD_CLIENT_ID = "1549458613549006959"
+BUILTIN_DISCORD_CLIENT_SECRET = "BB_TulZslPcNrnM7UwgIyst8TPRx-lzs"
 BROWSER_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
@@ -31,6 +41,12 @@ def _base_dir():
 
 
 def load_config():
+    # Começa com as chaves embutidas (funcionam em qualquer PC) e depois
+    # deixa um oauth_config.json opcional sobrepor (dev / rotação de chaves).
+    cfg = {}
+    if BUILTIN_DISCORD_CLIENT_ID and BUILTIN_DISCORD_CLIENT_SECRET:
+        cfg["discord"] = {"client_id": BUILTIN_DISCORD_CLIENT_ID,
+                          "client_secret": BUILTIN_DISCORD_CLIENT_SECRET}
     seen = []
     for p in [os.path.join(_base_dir(), "oauth_config.json"),
               os.path.join(accounts.data_root(), "oauth_config.json"),
@@ -41,10 +57,26 @@ def load_config():
         if os.path.isfile(p):
             try:
                 with open(p, encoding="utf-8") as f:
-                    return json.load(f)
+                    file_cfg = json.load(f)
+                if not isinstance(file_cfg, dict):
+                    continue
+                # merge raso por provider para não apagar o builtin à toa
+                for k, v in file_cfg.items():
+                    if isinstance(v, dict) and isinstance(cfg.get(k), dict):
+                        merged = dict(cfg[k])
+                        for kk, vv in v.items():
+                            if isinstance(vv, str) and vv.strip():
+                                merged[kk] = vv
+                            elif not isinstance(vv, str):
+                                merged[kk] = vv
+                        cfg[k] = merged
+                    elif isinstance(v, dict):
+                        cfg[k] = v
+                    else:
+                        cfg[k] = v
             except Exception:
                 pass
-    return {}
+    return cfg
 
 
 def save_discord_config(client_id, client_secret):
@@ -218,7 +250,7 @@ def login_discord():
     cid = (cfg.get("client_id") or "").strip()
     csec = (cfg.get("client_secret") or "").strip()
     if not (cid and csec):
-        return {"success": False, "output": "Discord nao configurado. Ve oauth_config.example.json."}
+        return {"success": False, "output": "Login Discord indisponível nesta build. Fala com o developer."}
     redirect = f"http://127.0.0.1:{DISCORD_PORT}/callback"
     # prompt=consent = mostra sempre o ecrã "Autorizar" (o mais fiável).
     # (prompt=none falhava logo se a pessoa não estivesse logada no browser.)

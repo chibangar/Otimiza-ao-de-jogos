@@ -52,12 +52,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.4.1"
+APP_VERSION = "2.4.2"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "℈ Login com Discord agora funciona para qualquer pessoa — sem colar chaves",
     "★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo",
     "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
     "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
