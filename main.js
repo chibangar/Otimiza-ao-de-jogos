@@ -219,6 +219,51 @@ ipcMain.handle('opt-system-extra', async (e, enable) => {
   return await runPS(`Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize' -Name 'StartupDelayInMSec' -Force -ErrorAction SilentlyContinue; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization' -Name 'NoLockScreen' -Value 0 -Force; 'Sistema restaurado'`);
 });
 
+ipcMain.handle('opt-privacy-extra', async (e, enable) => {
+  if (enable) return await runPS(`New-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Force | Out-Null; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Value 0 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 0 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 0 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 0 -Force; 'PRIVACIDADE+ OK'`);
+  return await runPS(`Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Value 1 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 1 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 1 -Force; 'Privacidade+ restaurada'`);
+});
+
+ipcMain.handle('opt-services', async (e, enable) => {
+  const v = enable ? 4 : 3;
+  return await runPS(`$svcs=@('DiagTrack','MapsBroker','RetailDemo','PhoneSvc','SmsRouter','Fax','PcaSvc','NfcSvc','dmwappushservice','lfsvc'); foreach($s in $svcs){ Set-ItemProperty -Path ('HKLM:\\SYSTEM\\CurrentControlSet\\Services\\' + $s) -Name 'Start' -Value ${v} -Force -ErrorAction SilentlyContinue }; '${enable ? 'SERVIÇOS OK' : 'Serviços restaurados'}'`);
+});
+
+ipcMain.handle('opt-schedtasks', async (e, enable) => {
+  const op = enable ? 'Disable' : 'Enable';
+  return await runPS(`$ts=@('\\Microsoft\\Windows\\Customer Experience Improvement Program\\Consolidator','\\Microsoft\\Windows\\Feedback\\Siuf\\DmClient','\\Microsoft\\Windows\\Application Experience\\Microsoft Compatibility Appraiser','\\Microsoft\\Windows\\Maps\\MapsUpdateTask'); foreach($t in $ts){ schtasks /Change /TN $t /${op} }; '${enable ? 'TAREFAS OK' : 'Tarefas restauradas'}'`);
+});
+
+ipcMain.handle('opt-updates', async (e, enable) => {
+  if (enable) return await runPS(`New-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Force | Out-Null; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoUpdate' -Value 1 -Force; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Value 1 -Force; 'UPDATES OK'`);
+  return await runPS(`Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoUpdate' -Value 0 -Force; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Value 0 -Force; 'Updates restaurados'`);
+});
+
+ipcMain.handle('opt-sound', async (e, enable) => {
+  const v = enable ? 1 : 0;
+  return await runPS(`Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Multimedia\\Audio' -Name 'UserDuckingPreference' -Value ${enable ? 3 : 1} -Force; '${enable ? 'SOM OK' : 'Som restaurado'}'`);
+});
+
+ipcMain.handle('opt-winnotify', async (e, enable) => {
+  const v = enable ? 1 : 0;
+  return await runPS(`Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Name 'ToastEnabled' -Value ${v} -Force; '${enable ? 'Notificações restauradas' : 'NOTIFICAÇÕES OFF'}'`);
+});
+
+ipcMain.handle('opt-customize', async (e, enable) => {
+  if (enable) return await runPS(`Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'SearchboxTaskbarMode' -Value 0 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarMn' -Value 0 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarEndTask' -Value 1 -Force; 'VISUAL OK'`);
+  return await runPS(`Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'SearchboxTaskbarMode' -Value 1 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarMn' -Value 1 -Force; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarEndTask' -Value 0 -Force; 'Personalização restaurada'`);
+});
+
+ipcMain.handle('opt-power-extra', async (e, enable) => {
+  const v = enable ? 0 : 1;
+  return await runPS(`Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name 'HibernateEnabled' -Value ${v} -Force; '${enable ? 'ENERGIA+ OK' : 'Energia+ restaurada'}'`);
+});
+
+ipcMain.handle('opt-perf-extra', async (e, enable) => {
+  if (enable) return await runPS(`Set-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '10' -Force; Set-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '0' -Force; Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 38 -Force; 'PERFORMANCE+ OK'`);
+  return await runPS(`Set-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '400' -Force; Set-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '400' -Force; Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 2 -Force; 'Performance+ restaurada'`);
+});
+
 // ---------- MODO COMPETITIVO ----------
 ipcMain.handle('competitive-on', async () => {
   const log = [];

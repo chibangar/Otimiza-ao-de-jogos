@@ -25,6 +25,15 @@ async function getBackend(){
       gpuPriority: ()=>a.gpu_priority(),
       privacyOn: ()=>a.privacy_on(),
       privacyOff: ()=>a.privacy_off(),
+      privacyExtra: (e)=>e ? a.privacy_extra_on() : a.privacy_extra_off(),
+      servicesGaming: (e)=>e ? a.services_gaming_on() : a.services_gaming_off(),
+      schedTasks: (e)=>e ? a.sched_tasks_off() : a.sched_tasks_on(),
+      updatesManual: (e)=>e ? a.updates_manual_on() : a.updates_manual_off(),
+      soundTweaks: (e)=>e ? a.sound_tweaks_on() : a.sound_tweaks_off(),
+      winNotify: (e)=>e ? a.win_notify_on() : a.win_notify_off(),
+      customize: (e)=>e ? a.customize_on() : a.customize_off(),
+      powerExtra: (e)=>e ? a.power_extra_on() : a.power_extra_off(),
+      perfExtra: (e)=>e ? a.perf_extra_on() : a.perf_extra_off(),
       gamingExtra: (e)=>e ? a.gaming_extra_on() : a.gaming_extra_off(),
       systemExtra: (e)=>e ? a.system_extra_on() : a.system_extra_off(),
       debloat: ()=>a.debloat(),
@@ -376,6 +385,15 @@ document.querySelectorAll('.switch').forEach(sw=>{
     if(action==='visual') r = await midnightAPI.visualEffects(willOn);
     if(action==='gpu') r = await midnightAPI.gpuPriority();
     if(action==='privacy') r = willOn ? await midnightAPI.privacyOn() : await midnightAPI.privacyOff();
+    if(action==='privacyx') r = willOn ? await midnightAPI.privacyExtra(true) : await midnightAPI.privacyExtra(false);
+    if(action==='services') r = willOn ? await midnightAPI.servicesGaming(true) : await midnightAPI.servicesGaming(false);
+    if(action==='schedtasks') r = willOn ? await midnightAPI.schedTasks(true) : await midnightAPI.schedTasks(false);
+    if(action==='updates') r = willOn ? await midnightAPI.updatesManual(true) : await midnightAPI.updatesManual(false);
+    if(action==='soundx') r = willOn ? await midnightAPI.soundTweaks(true) : await midnightAPI.soundTweaks(false);
+    if(action==='winnotify') r = willOn ? await midnightAPI.winNotify(false) : await midnightAPI.winNotify(true);
+    if(action==='customize') r = willOn ? await midnightAPI.customize(true) : await midnightAPI.customize(false);
+    if(action==='powerx') r = willOn ? await midnightAPI.powerExtra(true) : await midnightAPI.powerExtra(false);
+    if(action==='perfx') r = willOn ? await midnightAPI.perfExtra(true) : await midnightAPI.perfExtra(false);
     if(action==='gamingx') r = willOn ? await midnightAPI.gamingExtra(true) : await midnightAPI.gamingExtra(false);
     if(action==='systemx') r = willOn ? await midnightAPI.systemExtra(true) : await midnightAPI.systemExtra(false);
     log(`${willOn?'✔':'○'} ${action}: ${r.output||'OK'}`); toast(`${willOn?'Ativado':'Desativado'}: ${action}`);

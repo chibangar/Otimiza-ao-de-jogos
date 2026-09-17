@@ -52,12 +52,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.4.4"
+APP_VERSION = "2.4.5"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "🚀 Pack completo estilo Winhance: Privacidade+, Serviços, Tarefas, Updates, Som, Personalização, Energia+ e Performance+",
     "🔔 Novo: notificações de mensagens — toast + som + badge mesmo noutra página",
     "🛡️ Novas categorias: Privacidade, Debloat, Gaming Extra e Sistema nas Otimizações",
     "🔍 Novo: Analisar o meu PC — diagnóstico com score e recomendações à medida, em popout animado",
@@ -331,13 +332,256 @@ class Api:
             "'Privacidade restaurada'"
         )
 
+    # ---------- PRIVACIDADE PROFUNDA (sugestões, tracking, IA) ----------
+    def privacy_extra_on(self):
+        return run_ps(
+            "New-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContentEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Control Panel\\International\\User Profile' -Name 'HttpAcceptLanguageOptOut' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy' -Name 'HasAccepted' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings' -Name 'IsDeviceSearchHistoryEnabled' -Value 0 -Force; "
+            "New-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search' -Name 'AllowCortana' -Value 0 -Force; "
+            "New-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'AllowRecallEnablement' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'TurnOffSavingSnapshots' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1 -Force; "
+            "'PRIVACIDADE+ OK — sem sugestões, sem tracking, sem Recall/IA'"
+        )
+
+    def privacy_extra_off(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'ContentDeliveryAllowed' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContentEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search' -Name 'AllowCortana' -Value 1 -Force; "
+            "Remove-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI' -Recurse -Force -ErrorAction SilentlyContinue; "
+            "'Privacidade+ restaurada'"
+        )
+
+    # ---------- SERVIÇOS (desliga telemetria e tralha em 2º plano) ----------
+    _SVC_OFF = {"DiagTrack": 2, "MapsBroker": 3, "RetailDemo": 3, "PhoneSvc": 3,
+                "SmsRouter": 3, "Fax": 3, "PcaSvc": 3, "NfcSvc": 3, "TrkWks": 2,
+                "dmwappushservice": 3, "lfsvc": 3, "SensorService": 3,
+                "SensorDataService": 3}
+
+    def services_gaming_on(self):
+        parts = []
+        for svc in self._SVC_OFF:
+            parts.append(
+                f"Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\{svc}' "
+                f"-Name 'Start' -Value 4 -Force -ErrorAction SilentlyContinue")
+        return run_ps("; ".join(parts) + "; 'SERVIÇOS OK — telemetria e tralha desligadas'")
+
+    def services_gaming_off(self):
+        parts = []
+        for svc, default in self._SVC_OFF.items():
+            parts.append(
+                f"Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\{svc}' "
+                f"-Name 'Start' -Value {default} -Force -ErrorAction SilentlyContinue")
+        return run_ps("; ".join(parts) + "; 'Serviços restaurados'")
+
+    # ---------- TAREFAS AGENDADAS (corta telemetria do Task Scheduler) ----------
+    _TASKS_OFF = [
+        r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
+        r"\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
+        r"\Microsoft\Windows\Feedback\Siuf\DmClient",
+        r"\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload",
+        r"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
+        r"\Microsoft\Windows\Application Experience\ProgramDataUpdater",
+        r"\Microsoft\Windows\Autochk\Proxy",
+        r"\Microsoft\Windows\Maps\MapsUpdateTask",
+        r"\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem",
+        r"\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask",
+    ]
+
+    def sched_tasks_off(self):
+        parts = [f'schtasks /Change /TN "{t}" /Disable 2>$null' for t in self._TASKS_OFF]
+        return run_ps("; ".join(parts) + "; 'TAREFAS OK — telemetria agendada desligada'")
+
+    def sched_tasks_on(self):
+        return run_ps(
+            "; ".join([f'schtasks /Change /TN "{t}" /Enable 2>$null' for t in self._TASKS_OFF])
+            + "; 'Tarefas restauradas'")
+
+    # ---------- ATUALIZAÇÕES MANUAIS (sem reboot forçado, sem P2P) ----------
+    def updates_manual_on(self):
+        return run_ps(
+            "New-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoUpdate' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'AUOptions' -Value 2 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Value 1 -Force; "
+            "New-Item -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Name 'DODownloadMode' -Value 99 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings' -Name 'IsContinuousInnovationOptedIn' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings' -Name 'ExcludeWUDriversInQualityUpdate' -Value 1 -Force; "
+            "'UPDATES OK — tu decides quando atualizar, sem reboot a meio do jogo'"
+        )
+
+    def updates_manual_off(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoUpdate' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'AUOptions' -Value 4 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name 'NoAutoRebootWithLoggedOnUsers' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Name 'DODownloadMode' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings' -Name 'IsContinuousInnovationOptedIn' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings' -Name 'ExcludeWUDriversInQualityUpdate' -Value 0 -Force; "
+            "'Updates automáticos restaurados'"
+        )
+
+    # ---------- SOM (boot silencioso, sem ducking) ----------
+    def sound_tweaks_on(self):
+        return run_ps(
+            "New-Item -Path 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Name 'DisableStartupSound' -Value 1 -Force; "
+            "New-Item -Path 'HKCU:\\Software\\Microsoft\\Multimedia\\Audio' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Multimedia\\Audio' -Name 'UserDuckingPreference' -Value 3 -Force; "
+            "'SOM OK — boot silencioso, chamadas não baixam o jogo'"
+        )
+
+    def sound_tweaks_off(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Name 'DisableStartupSound' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Multimedia\\Audio' -Name 'UserDuckingPreference' -Value 1 -Force; "
+            "'Som restaurado'"
+        )
+
+    # ---------- NOTIFICAÇÕES DO WINDOWS (toasts e sino) ----------
+    def win_notify_off(self):
+        return run_ps(
+            "New-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Name 'ToastEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Name 'LockScreenToastEnabled' -Value 0 -Force; "
+            "New-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND' -Value 0 -Force; "
+            "'NOTIFICAÇÕES OFF — Windows calado enquanto jogas'"
+        )
+
+    def win_notify_on(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Name 'ToastEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications' -Name 'LockScreenToastEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings' -Name 'NOC_GLOBAL_SETTING_ALLOW_NOTIFICATION_SOUND' -Value 1 -Force; "
+            "'Notificações restauradas'"
+        )
+
+    # ---------- PERSONALIZAÇÃO (barra, Iniciar, Explorer) ----------
+    def customize_on(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'SearchboxTaskbarMode' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarMn' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'ShowCopilotButton' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarEndTask' -Value 1 -Force; "
+            "New-Item -Path 'HKLM:\\Software\\Policies\\Microsoft\\Dsh' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKLM:\\Software\\Policies\\Microsoft\\Dsh' -Name 'AllowNewsAndInterests' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackDocs' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_IrisRecommendations' -Value 0 -Force; "
+            "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Force | Out-Null; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Name '(default)' -Value '' -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name 'LongPathsEnabled' -Value 1 -Force; "
+            "'VISUAL OK — barra limpa, Iniciar sem tralha, menu clássico'"
+        )
+
+    def customize_off(self):
+        return run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'SearchboxTaskbarMode' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarMn' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'ShowCopilotButton' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarEndTask' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\Software\\Policies\\Microsoft\\Dsh' -Name 'AllowNewsAndInterests' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackDocs' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_IrisRecommendations' -Value 1 -Force; "
+            "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name 'LongPathsEnabled' -Value 0 -Force; "
+            "'Personalização restaurada'"
+        )
+
+    # ---------- ENERGIA EXTRA (hibernação, fast startup, USB) ----------
+    _PWR_USB = "2a737441-1930-4402-8d77-b2bebba308a3c"
+    _USB_SUSPEND = "48e6b7a6-50f6-478a-a5d4-53bb8fcc84df"
+
+    def power_extra_on(self):
+        r1 = run_ps(
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name 'HibernateEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\ControlSet001\\Control\\Session Manager\\Power' -Name 'HiberbootEnabled' -Value 0 -Force; "
+            "'OK'")
+        r2 = run_cmd(f"powercfg /setacvalueindex SCHEME_CURRENT {self._PWR_USB} {self._USB_SUSPEND} 0")
+        ok = r1.get("success") and r2.get("success")
+        return {"success": ok, "output": "ENERGIA+ OK — sem hibernação/fast startup, USB sempre ligado"}
+
+    def power_extra_off(self):
+        run_ps(
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name 'HibernateEnabled' -Value 1 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\ControlSet001\\Control\\Session Manager\\Power' -Name 'HiberbootEnabled' -Value 1 -Force; "
+            "'OK'")
+        run_cmd(f"powercfg /setacvalueindex SCHEME_CURRENT {self._PWR_USB} {self._USB_SUSPEND} 1")
+        return {"success": True, "output": "Energia+ restaurada"}
+
+    # ---------- PERFORMANCE EXTRA (resposta, CPU, latência) ----------
+    def perf_extra_on(self):
+        logs = []
+        logs.append(run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '10' -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '0' -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'MultiTaskingAltTabFilter' -Value 3 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 38 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'UseNexusForGameBarEnabled' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'ShowStartupPanel' -Value 0 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'ServicesPipeTimeout' -Value 30000 -Force; "
+            "'OK base'"))
+        # Nagle off em todas as NICs (menos latência TCP).
+        logs.append(run_ps(
+            "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { "
+            "Set-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -Value 1 -Force -ErrorAction SilentlyContinue; "
+            "Set-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -Value 1 -Force -ErrorAction SilentlyContinue }; "
+            "'OK nagle'"))
+        # SysMain + Prefetch off SÓ em SSD.
+        logs.append(run_ps(
+            "$ssd = (Get-PhysicalDisk -ErrorAction SilentlyContinue | Where-Object {$_.MediaType -eq 'SSD'} | Measure-Object).Count -gt 0; "
+            "if($ssd){ Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SysMain' -Name 'Start' -Value 4 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnablePrefetcher' -Value 0 -Force; 'OK ssd' } "
+            "else { 'HDD — SysMain mantido' }"))
+        ok = all(x.get("success") for x in logs)
+        return {"success": ok, "output": "PERFORMANCE+ OK — menus instantâneos, CPU no jogo, latência mínima"}
+
+    def perf_extra_off(self):
+        run_ps(
+            "Set-ItemProperty -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '400' -Force; "
+            "Set-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '400' -Force; "
+            "Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'MultiTaskingAltTabFilter' -Force -ErrorAction SilentlyContinue; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 2 -Force; "
+            "Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'UseNexusForGameBarEnabled' -Force -ErrorAction SilentlyContinue; "
+            "Remove-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'ServicesPipeTimeout' -Force -ErrorAction SilentlyContinue; "
+            "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { "
+            "Remove-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -Force -ErrorAction SilentlyContinue; "
+            "Remove-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -Force -ErrorAction SilentlyContinue }; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SysMain' -Name 'Start' -Value 2 -Force; "
+            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnablePrefetcher' -Value 3 -Force; "
+            "'Performance+ restaurada'")
+        return {"success": True, "output": "Performance+ restaurada"}
+
     # ---------- DEBLOAT (remove apps pré-instaladas inúteis, sem Xbox/Game Bar) ----------
     def debloat(self):
         return run_ps(
             "$apps=@('Microsoft.BingNews','Microsoft.BingWeather','Microsoft.GetHelp','Microsoft.Getstarted',"
             "'Microsoft.MicrosoftOfficeHub','Microsoft.MicrosoftSolitaireCollection','Microsoft.People','Microsoft.Todos',"
             "'Microsoft.WindowsFeedbackHub','Microsoft.YourPhone','Microsoft.ZuneMusic','Microsoft.ZuneVideo',"
-            "'Clipchamp.Clipchamp','Microsoft.549981C3F5F10'); "
+            "'Clipchamp.Clipchamp','Microsoft.549981C3F5F10',"
+            "'Microsoft.Microsoft3DViewer','Microsoft.MixedReality.Portal','Microsoft.SkypeApp',"
+            "'MSTeams','Microsoft.WindowsMaps','Microsoft.MSPaint','Microsoft.PowerAutomateDesktop',"
+            "'Microsoft.Copilot','microsoft.windowscommunicationsapps'); "
             "$n=0; foreach($a in $apps){ $p=Get-AppxPackage -Name $a -ErrorAction SilentlyContinue; "
             "if($p){ $p | Remove-AppxPackage -ErrorAction SilentlyContinue; $n++ } }; "
             "\"DEBLOAT OK — $n apps removidas (Xbox e Game Bar intactos)\""
