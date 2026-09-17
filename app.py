@@ -52,12 +52,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.4.2"
+APP_VERSION = "2.4.3"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "🔍 Novo: Analisar o meu PC — diagnóstico com score e recomendações à medida, em popout animado",
     "℈ Login com Discord agora funciona para qualquer pessoa — sem colar chaves",
     "★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo",
     "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
@@ -295,6 +296,140 @@ class Api:
             "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Priority' -Value 6 -Force; "
             "'GPU OK (reinicia para HAGS total)'"
         )
+
+    # ---------- DIAGNÓSTICO: qual a melhor otimização para ESTE pc ----------
+    def analyze_pc(self):
+        """Lê o estado real do PC e devolve score + recomendações ordenadas."""
+        recs = []
+        score = 100
+
+        def push(rid, icon, title, reason, impact, action, penalty):
+            recs.append({"id": rid, "icon": icon, "title": title,
+                         "reason": reason, "impact": impact, "action": action})
+            return penalty
+
+        # 1) Estado do registo (1 só chamada PowerShell -> JSON).
+        reg = {}
+        try:
+            r = run_ps(
+                "$j=@{}; "
+                "try{$j.gamemode=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\GameBar' -Name AllowAutoGameMode -ErrorAction Stop).AllowAutoGameMode}catch{$j.gamemode=$null}; "
+                "try{$j.capture=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR' -Name AppCaptureEnabled -ErrorAction Stop).AppCaptureEnabled}catch{$j.capture=$null}; "
+                "try{$j.dvr=(Get-ItemProperty 'HKCU:\\System\\GameConfigStore' -Name GameDVR_Enabled -ErrorAction Stop).GameDVR_Enabled}catch{$j.dvr=$null}; "
+                "try{$j.visual=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects' -Name VisualFXSetting -ErrorAction Stop).VisualFXSetting}catch{$j.visual=$null}; "
+                "try{$j.net=(Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name NetworkThrottlingIndex -ErrorAction Stop).NetworkThrottlingIndex}catch{$j.net=$null}; "
+                "try{$j.hags=(Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name HwSchMode -ErrorAction Stop).HwSchMode}catch{$j.hags=$null}; "
+                "$j | ConvertTo-Json -Compress",
+                timeout=30)
+            reg = json.loads(r.get("output") or "{}")
+        except Exception as e:
+            log_error("analyze_pc reg: " + str(e))
+
+        # 2) Plano de energia ativo.
+        power = run_cmd("powercfg /getactivescheme")
+        pout = (power.get("output") or "").lower()
+        if "e9a42b02" not in pout and "8c5e7fda" not in pout:
+            score -= push("power", "⚡", "Energia máxima",
+                          "O teu plano de energia está em modo económico/equilibrado — o CPU trava antes de dar o máximo nos jogos.",
+                          "ALTO", "power", 15)
+
+        # 3) Modo Jogo.
+        if str(reg.get("gamemode")) != "1":
+            score -= push("gamemode", "🎮", "Modo Jogo do Windows",
+                          "O Modo Jogo está desligado — o Windows não prioriza o jogo quando estás em ranked.",
+                          "ALTO", "gamemode", 10)
+
+        # 4) DVR / Game Bar a roubar FPS.
+        if str(reg.get("capture")) not in ("0",) or str(reg.get("dvr")) not in ("0",):
+            score -= push("gamebar", "📼", "Desligar DVR / Game Bar",
+                          "A captura em 2º plano (DVR) está ativa e rouba FPS e disco enquanto jogas.",
+                          "MÉDIO", "gamebar", 8)
+
+        # 5) Efeitos visuais.
+        if str(reg.get("visual")) != "2":
+            score -= push("visual", "✨", "Efeitos em modo desempenho",
+                          "Animações e sombras do Windows estão a gastar GPU/CPU que devia ir para o jogo.",
+                          "MÉDIO", "visual", 8)
+
+        # 6) Rede (throttling).
+        try:
+            if int(str(reg.get("net"))) != 4294967295:
+                raise ValueError
+        except Exception:
+            score -= push("net", "🌐", "Rede otimizada para jogos",
+                          "O Windows limita a rede para poupar CPU — isto aumenta ping e dá spikes em jogos online.",
+                          "ALTO", "net", 10)
+
+        # 7) GPU / HAGS.
+        if str(reg.get("hags")) != "2":
+            score -= push("gpu", "🖥️", "Prioridade GPU (HAGS)",
+                          "O agendamento de GPU acelerado por hardware está desligado — perdes latência e FPS (pede reinício).",
+                          "MÉDIO", "gpu", 8)
+
+        # 8) RAM total / livre.
+        try:
+            total = float((run_ps("[math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB,1)")["output"] or "16").split()[0].replace(",", "."))
+        except Exception:
+            total = 16
+        try:
+            free = float((run_ps("[math]::Round((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory/1024/1024,1)")["output"] or "8").split()[0].replace(",", "."))
+        except Exception:
+            free = 8
+        if total <= 8:
+            score -= push("kill", "🧹", "Limpar apps em 2º plano",
+                          f"Só tens {total:g} GB de RAM — browsers e launchers abertos comem a memória do jogo.",
+                          "ALTO", "kill", 12)
+        elif free < total * 0.25:
+            score -= push("kill", "🧹", "Limpar apps em 2º plano",
+                          f"Só tens {free:g} GB livres de {total:g} GB — há apps pesadas abertas agora.",
+                          "MÉDIO", "kill", 8)
+        else:
+            # mesmo com RAM livre, avisa se há comedores de RAM abertos
+            try:
+                tl = (run_cmd("tasklist", timeout=30).get("output") or "").lower()
+                heavy = [p for p in ["chrome.exe", "msedge.exe", "firefox.exe", "spotify.exe", "teams.exe", "onedrive.exe"] if p in tl]
+                if len(heavy) >= 2:
+                    score -= push("kill", "🧹", "Limpar apps em 2º plano",
+                                  f"Detetei {len(heavy)} apps pesadas abertas ({', '.join(heavy[:3])}) — fechá-las liberta FPS.",
+                                  "MÉDIO", "kill", 6)
+            except Exception:
+                pass
+
+        # 9) Disco C: cheio + TEMP.
+        try:
+            disk_free = float((run_ps("[math]::Round((Get-PSDrive C).Free/1GB,1)")["output"] or "50").split()[0].replace(",", "."))
+        except Exception:
+            disk_free = 50
+        if disk_free < 15:
+            score -= push("temp", "💽", "Limpeza de disco + TEMP",
+                          f"O disco C: só tem {disk_free:g} GB livres — jogos com pouco espaço têm stutter e updates falham.",
+                          "ALTO", "temp", 12)
+        else:
+            try:
+                tmp = run_ps("$s=(Get-ChildItem $env:TEMP -Recurse -Force -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum; [math]::Round($s/1MB,1)", timeout=60)
+                tmp_mb = float((tmp.get("output") or "0").split()[0].replace(",", "."))
+                if tmp_mb > 500:
+                    score -= push("temp", "🧺", "Limpeza da pasta TEMP",
+                                  f"A tua TEMP tem {tmp_mb:,.0f} MB de lixo — limpa e liberta espaço + DNS fresco.",
+                                  "MÉDIO", "temp", 6)
+            except Exception:
+                pass
+
+        score = max(0, min(100, score))
+        if score >= 85:
+            verdict = "Máquina de guerra! Só afinações finas. ⚔"
+        elif score >= 65:
+            verdict = "Bom, mas há FPS fácil por ganhar. 🎯"
+        elif score >= 40:
+            verdict = "A perder desempenho todos os dias. 🔧"
+        else:
+            verdict = "Modo tartaruga! Precisas disto urgente. 🚨"
+
+        specs = f"{total:g} GB RAM • C: {disk_free:g} GB livres"
+        order = {"ALTO": 0, "MÉDIO": 1}
+        recs.sort(key=lambda x: order.get(x["impact"], 2))
+        return {"success": True, "score": score, "verdict": verdict,
+                "specs": specs, "recs": recs}
 
     # ---------- COMPETITIVO ----------
     def competitive_on(self):

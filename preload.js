@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('midnightAPI', {
   visualEffects: (perf) => ipcRenderer.invoke('opt-visual-effects', perf),
   killBackground: () => ipcRenderer.invoke('opt-kill-background'),
   gpuPriority: () => ipcRenderer.invoke('opt-gpu-priority'),
+  analyzePc: () => ipcRenderer.invoke('analyze-pc'),
   competitiveOn: () => ipcRenderer.invoke('competitive-on'),
   competitiveOff: () => ipcRenderer.invoke('competitive-off'),
   launchGame: (p) => ipcRenderer.invoke('launch-game-boosted', p),

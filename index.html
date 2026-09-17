@@ -212,6 +212,7 @@
           <div class="comp-btns">
             <button class="btn gold big" id="btn-comp-on">⚔ ATIVAR COMPETITIVO</button>
             <button class="btn ghost" id="btn-comp-off">Restaurar Normal</button>
+            <button class="btn gold" id="btn-diag">🔍 Analisar o meu PC</button>
           </div>
         </div>
         <div class="comp-right">
@@ -454,6 +455,25 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="diag-overlay" id="diag-overlay" style="display:none">
+  <div class="diag-card">
+    <div class="diag-head">
+      <div class="diag-score" id="diag-score">–</div>
+      <div class="diag-title">
+        <span class="news-ver">DIAGNÓSTICO DO TEU PC</span>
+        <h2>🔍 O que o teu PC precisa</h2>
+        <p class="muted small" id="diag-verdict">A analisar…</p>
+        <p class="muted small" id="diag-specs"></p>
+      </div>
+      <button class="diag-close" id="btn-diag-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="diag-list" id="diag-list"></div>
+    <div class="news-actions">
+      <button class="btn gold" id="btn-diag-all">⚔ Aplicar tudo</button>
+      <button class="btn ghost" id="btn-diag-later">Depois</button>
+    </div>
+  </div>
+</div>
 <div class="news-overlay" id="news-overlay" style="display:none">
   <div class="news-card">
     <img class="news-banner" id="news-banner" src="assets/games/cod.jpg" alt="Novidades da app">

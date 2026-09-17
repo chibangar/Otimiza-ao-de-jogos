@@ -148,6 +148,49 @@ ipcMain.handle('opt-gpu-priority', async () => {
   return await runPS(cmd);
 });
 
+ipcMain.handle('analyze-pc', async () => {
+  // Diagnóstico do PC (paridade com app.py analyze_pc): lê estado real e recomenda.
+  const recs = [];
+  let score = 100;
+  const push = (id, icon, title, reason, impact, action, penalty) => {
+    recs.push({ id, icon, title, reason, impact, action });
+    score -= penalty;
+  };
+  let reg = {};
+  try {
+    const r = await runPS("$j=@{}; try{$j.gamemode=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\GameBar' -Name AllowAutoGameMode -ErrorAction Stop).AllowAutoGameMode}catch{$j.gamemode=$null}; try{$j.capture=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR' -Name AppCaptureEnabled -ErrorAction Stop).AppCaptureEnabled}catch{$j.capture=$null}; try{$j.dvr=(Get-ItemProperty 'HKCU:\\System\\GameConfigStore' -Name GameDVR_Enabled -ErrorAction Stop).GameDVR_Enabled}catch{$j.dvr=$null}; try{$j.visual=(Get-ItemProperty 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects' -Name VisualFXSetting -ErrorAction Stop).VisualFXSetting}catch{$j.visual=$null}; try{$j.net=(Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name NetworkThrottlingIndex -ErrorAction Stop).NetworkThrottlingIndex}catch{$j.net=$null}; try{$j.hags=(Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name HwSchMode -ErrorAction Stop).HwSchMode}catch{$j.hags=$null}; $j | ConvertTo-Json -Compress");
+    reg = JSON.parse(r.output || '{}');
+  } catch {}
+  const power = await runCMD('powercfg /getactivescheme');
+  const pout = (power.output || '').toLowerCase();
+  if (!pout.includes('e9a42b02') && !pout.includes('8c5e7fda'))
+    push('power', '⚡', 'Energia máxima', 'O teu plano de energia está em modo económico/equilibrado — o CPU trava antes de dar o máximo nos jogos.', 'ALTO', 'power', 15);
+  if (String(reg.gamemode) !== '1')
+    push('gamemode', '🎮', 'Modo Jogo do Windows', 'O Modo Jogo está desligado — o Windows não prioriza o jogo quando estás em ranked.', 'ALTO', 'gamemode', 10);
+  if (String(reg.capture) !== '0' || String(reg.dvr) !== '0')
+    push('gamebar', '📼', 'Desligar DVR / Game Bar', 'A captura em 2º plano (DVR) está ativa e rouba FPS e disco enquanto jogas.', 'MÉDIO', 'gamebar', 8);
+  if (String(reg.visual) !== '2')
+    push('visual', '✨', 'Efeitos em modo desempenho', 'Animações e sombras do Windows estão a gastar GPU/CPU que devia ir para o jogo.', 'MÉDIO', 'visual', 8);
+  if (String(reg.net) !== '4294967295')
+    push('net', '🌐', 'Rede otimizada para jogos', 'O Windows limita a rede para poupar CPU — isto aumenta ping e dá spikes em jogos online.', 'ALTO', 'net', 10);
+  if (String(reg.hags) !== '2')
+    push('gpu', '🖥️', 'Prioridade GPU (HAGS)', 'O agendamento de GPU acelerado por hardware está desligado — perdes latência e FPS (pede reinício).', 'MÉDIO', 'gpu', 8);
+  const total = parseFloat((await runPS('[math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory/1GB,1)')).output) || 16;
+  const free = parseFloat((await runPS('[math]::Round((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory/1024/1024,1)')).output) || 8;
+  if (total <= 8)
+    push('kill', '🧹', 'Limpar apps em 2º plano', `Só tens ${total} GB de RAM — browsers e launchers abertos comem a memória do jogo.`, 'ALTO', 'kill', 12);
+  else if (free < total * 0.25)
+    push('kill', '🧹', 'Limpar apps em 2º plano', `Só tens ${free} GB livres de ${total} GB — há apps pesadas abertas agora.`, 'MÉDIO', 'kill', 8);
+  const diskFree = parseFloat((await runPS('[math]::Round((Get-PSDrive C).Free/1GB,1)')).output) || 50;
+  if (diskFree < 15)
+    push('temp', '💽', 'Limpeza de disco + TEMP', `O disco C: só tem ${diskFree} GB livres — jogos com pouco espaço têm stutter e updates falham.`, 'ALTO', 'temp', 12);
+  score = Math.max(0, Math.min(100, score));
+  const verdict = score >= 85 ? 'Máquina de guerra! Só afinações finas. ⚔' : score >= 65 ? 'Bom, mas há FPS fácil por ganhar. 🎯' : score >= 40 ? 'A perder desempenho todos os dias. 🔧' : 'Modo tartaruga! Precisas disto urgente. 🚨';
+  const order = { ALTO: 0, 'MÉDIO': 1 };
+  recs.sort((a, b) => (order[a.impact] ?? 2) - (order[b.impact] ?? 2));
+  return { success: true, score, verdict, specs: `${total} GB RAM • C: ${diskFree} GB livres`, recs };
+});
+
 // ---------- MODO COMPETITIVO ----------
 ipcMain.handle('competitive-on', async () => {
   const log = [];

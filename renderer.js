@@ -23,6 +23,7 @@ async function getBackend(){
       visualEffects: (p)=>a.visual_effects(p),
       killBackground: ()=>a.kill_background(),
       gpuPriority: ()=>a.gpu_priority(),
+      analyzePc: ()=>a.analyze_pc(),
       competitiveOn: ()=>a.competitive_on(),
       competitiveOff: ()=>a.competitive_off(),
       launchGame: (p)=>a.launch_game(p),
@@ -238,6 +239,84 @@ document.getElementById('pm-goto')?.addEventListener('click',()=>{ document.getE
 document.getElementById('btn-profile-menu')?.addEventListener('click',(e)=>{ e.stopPropagation(); const m=document.getElementById('profile-menu'); m.style.display=m.style.display==='none'?'':'none'; });
 document.addEventListener('click',()=>{ const m=document.getElementById('profile-menu'); if(m) m.style.display='none'; });
 document.getElementById('btn-hist-toggle')?.addEventListener('click',()=>{ toast(histLoad().length+' ações no histórico desta conta.'); });
+
+// ---------- DIAGNÓSTICO: melhor otimização para ESTE pc (popout animado) ----------
+const DIAG_ACTIONS={
+  power:{run:()=>midnightAPI.powerHigh(),sw:'power',msg:'Energia máxima ativada! ⚡'},
+  gamemode:{run:()=>midnightAPI.gameMode(true),sw:'gamemode',msg:'Modo Jogo ligado! 🎮'},
+  gamebar:{run:()=>midnightAPI.gameBar(true),sw:'gamebar',msg:'DVR desligado, FPS livre! 📼'},
+  visual:{run:()=>midnightAPI.visualEffects(true),sw:'visual',msg:'Efeitos em desempenho! ✨'},
+  gpu:{run:()=>midnightAPI.gpuPriority(),sw:'gpu',msg:'GPU priorizada! 🖥️'},
+  kill:{run:()=>midnightAPI.killBackground(),msg:'Background limpo! 🧹'},
+  temp:{run:()=>midnightAPI.cleanTemp(),msg:'Disco limpo! 🧺'},
+  net:{run:()=>midnightAPI.network(),msg:'Rede otimizada! 🌐'},
+};
+async function runDiagAction(action){
+  const d=DIAG_ACTIONS[action];
+  if(!d) return {success:false};
+  const r=await d.run();
+  if(r && r.success!==false){
+    if(d.sw) document.querySelector(`.switch[data-action="${d.sw}"]`)?.classList.add('on');
+    histAdd('✓',d.msg);
+    log('🔍 '+(r.output||d.msg));
+  }
+  return r||{success:true};
+}
+function renderDiag(data){
+  const ov=document.getElementById('diag-overlay'), list=document.getElementById('diag-list');
+  document.getElementById('diag-score').textContent=(data.score??'–');
+  document.getElementById('diag-verdict').textContent=data.verdict||'';
+  document.getElementById('diag-specs').textContent=data.specs||'';
+  list.innerHTML='';
+  const recs=data.recs||[];
+  if(!recs.length){
+    list.innerHTML='<div class="diag-item" style="animation-delay:.1s"><span class="diag-ico">🏆</span><div class="diag-info"><b>Nada a fazer!</b><p>O teu PC já está no ponto. Boa ranked! ⚔</p></div></div>';
+  }
+  recs.forEach((rc,i)=>{
+    const el=document.createElement('div');
+    el.className='diag-item'; el.style.animationDelay=(0.08+i*0.12)+'s';
+    el.innerHTML=`<span class="diag-ico">${rc.icon||'🔧'}</span>
+      <div class="diag-info"><b>${rc.title} <span class="diag-badge ${rc.impact==='ALTO'?'alto':'medio'}">${rc.impact}</span></b><p>${rc.reason}</p></div>
+      <button class="btn gold small diag-apply">Aplicar</button>`;
+    el.querySelector('.diag-apply').addEventListener('click',async(ev)=>{
+      const btn=ev.target; btn.disabled=true; btn.textContent='A aplicar…';
+      const r=await runDiagAction(rc.action);
+      if(r.success!==false){ el.classList.add('done'); btn.textContent='✔'; toast(DIAG_ACTIONS[rc.action]?.msg||'Aplicado!'); }
+      else { btn.disabled=false; btn.textContent='Aplicar'; toast('Falha: '+(r.output||'tenta como Administrador')); }
+    });
+    list.appendChild(el);
+  });
+  document.getElementById('btn-diag-all').style.display=recs.length?'':'none';
+  ov.style.display='flex';
+}
+async function openDiag(){
+  const ov=document.getElementById('diag-overlay'), list=document.getElementById('diag-list');
+  ov.style.display='flex';
+  document.getElementById('diag-score').textContent='…';
+  document.getElementById('diag-verdict').textContent='A ler o teu PC (energia, registo, RAM, disco)…';
+  document.getElementById('diag-specs').textContent='';
+  list.innerHTML='<div class="diag-item" style="animation-delay:.05s"><span class="diag-ico">⏳</span><div class="diag-info"><b>A analisar…</b><p>Isto demora uns segundos.</p></div></div>';
+  try{
+    const data=await withTimeout(window.midnightAPI.analyzePc(),120000,'analyzePc');
+    if(data && data.success) renderDiag(data);
+    else { document.getElementById('diag-verdict').textContent='Falha: '+((data&&data.output)||'tenta outra vez'); list.innerHTML=''; }
+  }catch(e){ document.getElementById('diag-verdict').textContent='Falha: '+e.message; list.innerHTML=''; }
+}
+document.getElementById('btn-diag')?.addEventListener('click',openDiag);
+document.getElementById('btn-diag-close')?.addEventListener('click',()=>{ document.getElementById('diag-overlay').style.display='none'; });
+document.getElementById('btn-diag-later')?.addEventListener('click',()=>{ document.getElementById('diag-overlay').style.display='none'; });
+document.getElementById('diag-overlay')?.addEventListener('click',(e)=>{ if(e.target.id==='diag-overlay') e.target.style.display='none'; });
+document.getElementById('btn-diag-all')?.addEventListener('click',async()=>{
+  const btn=document.getElementById('btn-diag-all'); btn.disabled=true; btn.textContent='A aplicar…';
+  const items=[...document.querySelectorAll('#diag-list .diag-item:not(.done)')];
+  for(const el of items){
+    const b=el.querySelector('.diag-apply');
+    if(b) b.click();
+    await new Promise(r=>setTimeout(r,900));
+  }
+  btn.disabled=false; btn.textContent='⚔ Aplicar tudo';
+  toast('Tudo aplicado! Volta a analisar para confirmar. 🎯');
+});
 
 // ---------- DASHBOARD: perfil, histórico, pesquisa, janelas ----------
 function setCompetitiveUI(on){
