@@ -23,6 +23,11 @@ async function getBackend(){
       visualEffects: (p)=>a.visual_effects(p),
       killBackground: ()=>a.kill_background(),
       gpuPriority: ()=>a.gpu_priority(),
+      privacyOn: ()=>a.privacy_on(),
+      privacyOff: ()=>a.privacy_off(),
+      gamingExtra: (e)=>e ? a.gaming_extra_on() : a.gaming_extra_off(),
+      systemExtra: (e)=>e ? a.system_extra_on() : a.system_extra_off(),
+      debloat: ()=>a.debloat(),
       analyzePc: ()=>a.analyze_pc(),
       competitiveOn: ()=>a.competitive_on(),
       competitiveOff: ()=>a.competitive_off(),
@@ -370,12 +375,16 @@ document.querySelectorAll('.switch').forEach(sw=>{
     if(action==='gamebar') r = await midnightAPI.gameBar(willOn); // on = desativado
     if(action==='visual') r = await midnightAPI.visualEffects(willOn);
     if(action==='gpu') r = await midnightAPI.gpuPriority();
+    if(action==='privacy') r = willOn ? await midnightAPI.privacyOn() : await midnightAPI.privacyOff();
+    if(action==='gamingx') r = willOn ? await midnightAPI.gamingExtra(true) : await midnightAPI.gamingExtra(false);
+    if(action==='systemx') r = willOn ? await midnightAPI.systemExtra(true) : await midnightAPI.systemExtra(false);
     log(`${willOn?'✔':'○'} ${action}: ${r.output||'OK'}`); toast(`${willOn?'Ativado':'Desativado'}: ${action}`);
   });
 });
 document.querySelectorAll('[data-action="kill"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.killBackground(); log('⚔ '+r.output); toast('Apps em 2º plano encerradas.'); histAdd('✓','Apps em 2º plano encerradas'); }));
 document.querySelectorAll('[data-action="temp"]').forEach(b=>b.addEventListener('click', async ()=>{ toast('A limpar…'); const r=await midnightAPI.cleanTemp(); log('🧹 '+(r.output||'Limpo')); toast('Limpeza concluída!'); histAdd('✓','Limpeza de sistema concluída'); }));
 document.querySelectorAll('[data-action="net"]').forEach(b=>b.addEventListener('click', async ()=>{ const r=await midnightAPI.network(); log('◈ Rede:\n'+(r.output||'OK')); toast('Rede otimizada!'); histAdd('✓','DNS otimizado'); }));
+document.querySelectorAll('[data-action="debloat"]').forEach(b=>b.addEventListener('click', async ()=>{ toast('A remover bloatware…'); const r=await midnightAPI.debloat(); log('🧹 '+(r.output||'OK')); toast(r.output||'Debloat concluído!'); histAdd('✓','Bloatware removido'); }));
 
 // Jogos (por conta)
 let games=[];
@@ -691,6 +700,7 @@ async function initLogin(){
   $('btn-logout').addEventListener('click', async ()=>{
     try{ await window.midnightAPI.voiceStop(); await window.midnightAPI.monitorStop(); await window.midnightAPI.hotkeyClear(); await window.midnightAPI.accountLogout(); }catch{}
     voiceLiveOn=false; voiceMonOn=false; voiceRecOn=false; currentUser='';
+    try{ stopWatch(); }catch{}
     document.getElementById('vm-power')?.classList.remove('on');
     document.getElementById('vm-micbtn')?.classList.remove('on');
     $('login-name').value=''; $('login-pass').value=''; $('login-err').textContent='';
@@ -814,6 +824,10 @@ let chatCursor = 0;
 let chatThreads = [];
 let _onlineWired = false;
 let _onlineTimer = null;
+// ---------- Notificações de mensagens (vigia corre em qualquer página) ----------
+let _watchTimer = null, _watchInit = false;
+let _seenLobby = 0, _seenDM = {};
+let _unread = { lobby: 0, dms: {} };
 function chatPeer(){ return chatTab.startsWith('dm:') ? chatTab.slice(3) : ''; }
 function chatAppend(box, m){
   const d = document.createElement('div');
@@ -834,7 +848,7 @@ function renderChatTabs(){
     const b = document.createElement('button');
     b.className = 'vm-tab' + (chatTab === key ? ' active' : '');
     b.textContent = label;
-    b.addEventListener('click', ()=>{ chatTab = key; chatCursor = 0; renderChatTabs(); pollChat(true); });
+    b.addEventListener('click', ()=>{ chatTab = key; chatCursor = 0; clearUnread(key); renderChatTabs(); pollChat(true); });
     tabs.appendChild(b);
   };
   mk('lobby', '🌍 Geral');
@@ -870,7 +884,7 @@ async function pollOnline(){
         const b = document.createElement('b'); b.textContent = u.name;
         const btn = document.createElement('button'); btn.className = 'btn small gold'; btn.textContent = '💬';
         btn.title = 'Conversar com ' + u.name;
-        btn.addEventListener('click', ()=>{ chatTab = 'dm:' + u.id; chatCursor = 0; renderChatTabs(); pollChat(true); });
+        btn.addEventListener('click', ()=>{ chatTab = 'dm:' + u.id; chatCursor = 0; clearUnread('dm:' + u.id); renderChatTabs(); pollChat(true); });
         d.appendChild(dot); d.appendChild(b); d.appendChild(btn);
         list.appendChild(d);
       });
@@ -892,6 +906,10 @@ async function pollChat(reset){
       msgs = (r && r.msgs) || [];
     }
     msgs.forEach(m=>{ chatAppend(box, m); if(m.id > chatCursor) chatCursor = m.id; });
+    // estás a ver esta aba -> marca como lida (sincroniza o vigia, limpa badge)
+    if(!peer){ _seenLobby = Math.max(_seenLobby, chatCursor); _unread.lobby = 0; }
+    else { _seenDM[peer] = Math.max(_seenDM[peer] || 0, chatCursor); _unread.dms[peer] = 0; }
+    paintUnread();
     if(window.midnightAPI.dmThreads){
       const t = await window.midnightAPI.dmThreads();
       const ids = JSON.stringify(((t && t.threads) || []).map(x=>x.id));
@@ -912,6 +930,90 @@ async function sendChat(){
     else toast((r && r.output) || 'Falha a enviar.');
   }catch(e){ toast('Falha a enviar: ' + e); }
 }
+// ---------- NOTIFICAÇÕES de mensagens novas (vigia em 2º plano) ----------
+function unreadTotal(){
+  return (_unread.lobby || 0) + Object.values(_unread.dms || {}).reduce((a, b)=>a + b, 0);
+}
+function paintUnread(){
+  const n = unreadTotal();
+  const b = document.getElementById('online-badge');
+  if(b){ b.textContent = n > 99 ? '99+' : n; b.style.display = n ? '' : 'none'; }
+  const d = document.getElementById('notif-dot');
+  if(d) d.style.display = n ? '' : 'none';
+}
+function clearUnread(key){
+  if(key === 'lobby') _unread.lobby = 0;
+  else if(key.startsWith('dm:')) _unread.dms[key.slice(3)] = 0;
+  paintUnread();
+}
+function viewingTab(key){
+  return document.getElementById('page-online')?.classList.contains('active') && chatTab === key;
+}
+function notifyBeep(){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    const ctx = notifyBeep._c || (notifyBeep._c = new Ctx());
+    if(ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime;
+    [660, 880].forEach((f, i)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.25, t + i * 0.12 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.12 + 0.11);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + i * 0.12); o.stop(t + i * 0.12 + 0.13);
+    });
+  }catch{}
+}
+function notifyMessage(who, text){
+  toast(`${who}: ${(text || '').slice(0, 90)}`);
+  notifyBeep();
+  paintUnread();
+}
+async function watchMessages(){
+  // Corre em QUALQUER página. Na 1ª volta só marca a posição (sem barulho pelo histórico).
+  try{
+    if(!currentUser || !window.midnightAPI || !window.midnightAPI.lobbyFetch) return;
+    try{
+      const r = await window.midnightAPI.lobbyFetch(_seenLobby);
+      const msgs = (r && r.msgs) || [];
+      msgs.forEach(m=>{ if(m.id > _seenLobby) _seenLobby = m.id; });
+      if(_watchInit) msgs.filter(m=>!m.mine).forEach(m=>{
+        if(viewingTab('lobby')) return;
+        _unread.lobby = (_unread.lobby || 0) + 1;
+        notifyMessage('🌍 ' + (m.from || '?'), m.text);
+      });
+    }catch{}
+    try{
+      const t = await window.midnightAPI.dmThreads();
+      for(const th of ((t && t.threads) || [])){
+        let msgs = [];
+        try{
+          const r = await window.midnightAPI.dmFetch(th.id, _seenDM[th.id] || 0);
+          msgs = (r && r.msgs) || [];
+        }catch{ continue; }
+        msgs.forEach(m=>{ if(m.id > (_seenDM[th.id] || 0)) _seenDM[th.id] = m.id; });
+        if(!_watchInit) continue;
+        const key = 'dm:' + th.id;
+        msgs.filter(m=>!m.mine).forEach(m=>{
+          if(viewingTab(key)) return;
+          _unread.dms[th.id] = (_unread.dms[th.id] || 0) + 1;
+          notifyMessage('💬 ' + (th.name || m.from || m.from_name || '?'), m.text);
+        });
+      }
+    }catch{}
+    _watchInit = true;
+    paintUnread();
+  }catch{}
+}
+function stopWatch(){
+  try{ if(_watchTimer) clearInterval(_watchTimer); }catch{}
+  _watchTimer = null; _watchInit = false;
+  _seenLobby = 0; _seenDM = {}; _unread = { lobby: 0, dms: {} };
+  paintUnread();
+}
 async function initOnline(){
   if(!window.midnightAPI) return;
   if(!_onlineWired){
@@ -928,6 +1030,13 @@ async function initOnline(){
         pollOnline(); pollChat(false);
       }
     }, 3000);
+    // Vigia de mensagens novas: corre em qualquer página, de 5 em 5s.
+    if(_watchTimer) clearInterval(_watchTimer);
+    _watchTimer = setInterval(watchMessages, 5000);
+    // Abrir a página Online limpa as não-lidas da aba que estás a ver.
+    document.querySelector('.nav-btn[data-page="online"]')?.addEventListener('click', ()=>{
+      setTimeout(()=>clearUnread(chatTab), 400);
+    });
   }
   try{
     if(window.midnightAPI.onlineStart) await window.midnightAPI.onlineStart();

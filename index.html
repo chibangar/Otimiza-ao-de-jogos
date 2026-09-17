@@ -53,7 +53,7 @@
       <button class="nav-btn" data-page="competitivo"><i>⚔</i> Modo Competitivo</button>
       <button class="nav-btn" data-page="ingame"><i>◎</i> In-Game CS2 &amp; WoW</button>
       <button class="nav-btn" data-page="servers"><i>⌖</i> Servidores</button>
-      <button class="nav-btn" data-page="online"><i>💬</i> Online</button>
+      <button class="nav-btn" data-page="online"><i>💬</i> Online<span class="nav-badge" id="online-badge" style="display:none">0</span></button>
       <button class="nav-btn" data-page="voz"><i>♪</i> Estúdio de Voz</button>
       <button class="nav-btn" data-page="sound"><i>♫</i> Soundboard</button>
       <button class="nav-btn" data-page="otimizacoes"><i>✦</i> Otimizações Win</button>
@@ -312,6 +312,22 @@
         <div class="card opt" data-opt="kill"><div><h4>⚔ Encerrar 2º Plano</h4><p>Mata browsers, launchers parados e apps pesadas.</p></div><button class="btn small gold" data-action="kill">Executar</button></div>
         <div class="card opt" data-opt="temp"><div><h4>🧹 Limpar Temporários</h4><p>Limpa TEMP + flush DNS. Rápido e seguro.</p></div><button class="btn small gold" data-action="temp">Limpar</button></div>
         <div class="card opt" data-opt="net"><div><h4>◈ Otimizar Rede</h4><p>Anti-throttling + SystemResponsiveness 0.</p></div><button class="btn small gold" data-action="net">Otimizar</button></div>
+      </div>
+      <h3 class="opt-cat">🛡️ Privacidade</h3>
+      <div class="grid2">
+        <div class="card opt" data-opt="privacy"><div><h4>🛡️ Privacidade Total</h4><p>Telemetria, ads, histórico e Copilot OFF.</p></div><button class="switch" data-action="privacy"></button></div>
+      </div>
+      <h3 class="opt-cat">🧹 Debloat</h3>
+      <div class="grid2">
+        <div class="card opt" data-opt="debloat"><div><h4>🧹 Remover Bloatware</h4><p>Bing, Solitaire, Clipchamp e afins. Xbox intacto.</p></div><button class="btn small gold" data-action="debloat">Remover</button></div>
+      </div>
+      <h3 class="opt-cat">🎮 Gaming Extra</h3>
+      <div class="grid2">
+        <div class="card opt" data-opt="gamingx"><div><h4>🎯 Gaming Extra</h4><p>Sem aceleração do rato, fullscreen exclusivo, sem throttling.</p></div><button class="switch" data-action="gamingx"></button></div>
+      </div>
+      <h3 class="opt-cat">🖥️ Sistema</h3>
+      <div class="grid2">
+        <div class="card opt" data-opt="systemx"><div><h4>🖥️ Sistema Rápido</h4><p>Arranque sem atraso, sem lock screen, pesquisa limpa.</p></div><button class="switch" data-action="systemx"></button></div>
       </div>
       <div class="console"><div class="console-head">✦ Registo Arcano</div><pre id="log">Pronto. Escolhe uma otimização…</pre></div>
     </section>
