@@ -1,0 +1,29 @@
+# Este arquivo automatiza a criação de releases no GitHub
+# Para criar um release: git tag vX.Y.Z && git push origin vX.Y.Z
+
+name: Release Automático
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+      
+      - name: Criar Release no GitHub
+        run: |
+          # O GitHub cria automaticamente o release quando push da tag!
+          echo "Release v$(echo ${{ github.ref_name }}) criado automaticamente!"
+
+      - name: Upload de assets (opcional)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./installer/*.exe, ./installer/*.msi, ./installer/*.iso
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
