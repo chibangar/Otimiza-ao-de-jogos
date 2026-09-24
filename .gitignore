@@ -8,8 +8,8 @@ venv/
 # PyInstaller
 build/
 dist/
-*.spec
 *.exe
+!MidnightOptimizer.spec
 
 # Node / Electron (ficheiros pesados locais)
 node_modules/
