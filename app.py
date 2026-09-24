@@ -52,24 +52,19 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "2.4.5"
+APP_VERSION = "3.1.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
-    "🚀 Pack completo estilo Winhance: Privacidade+, Serviços, Tarefas, Updates, Som, Personalização, Energia+ e Performance+",
-    "🔔 Novo: notificações de mensagens — toast + som + badge mesmo noutra página",
-    "🛡️ Novas categorias: Privacidade, Debloat, Gaming Extra e Sistema nas Otimizações",
-    "🔍 Novo: Analisar o meu PC — diagnóstico com score e recomendações à medida, em popout animado",
-    "℈ Login com Discord agora funciona para qualquer pessoa — sem colar chaves",
-    "★ Novo tema Call of Duty — verde militar + ouro, com imagens do jogo",
-    "📰 Popup de novidades ao iniciar — vês sempre o que mudou na app",
-    "🎮 Tile Call of Duty no Dashboard + dicas de performance no In-Game",
-    "℈ Login Discord: o formulário de chaves esconde-se quando já está ativo",
-    "💬 Nova aba Online — vê quem está na app, chat geral e mensagens privadas",
-    "℈ Login com Discord a funcionar (ecrã de Autorizar + erros claros)",
-    "🛠️ Correções e melhorias de estabilidade",
+    "✨ Nova Interface Profissional: Design system Obsidian de alta precisão, ergonómico e sem distrações.",
+    "📊 Novo Centro de Controlo no Dashboard: Telemetria em tempo real para CPU, GPU, RAM e Disco.",
+    "⚡ Otimização de Latência: Agendamento prioritário e afinamento da pilha de rede TCP/IP.",
+    "🎯 Tweaks In-Game: Configurações de precisão para CS2, WoW Midnight e Call of Duty.",
+    "🛡️ Categorias de Otimização: Privacidade, Debloat, Energia e Serviços de Sistema afinados.",
+    "📦 Releases Automáticas: Compilação contínua de executáveis Windows via GitHub Actions.",
+    "🛠️ Melhorias profundas de estabilidade e consumo reduzido de memória.",
 ]
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)

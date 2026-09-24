@@ -1,85 +1,26 @@
-## 🎉 Midnight Optimizer v3.0 — Design Moderno!
+## 🚀 Midnight Optimizer v3.1.0 — Professional Gaming Suite
 
-### ✨ Novidades Principais
+### ✨ Destaques da Versão
 
-#### 🎨 Glassmorphism Premium
-- Efeitos de vidro fosco em todos os cards e painéis
-- Background animado com partículas interativas  
-- Transições fluidas e profissionais (300ms ease-out-expo)
+#### ⚡ Nova Interface Moderna e Profissional
+- Design System Dark Obsidian de alta precisão com micro-contraste apurado.
+- Iconografia vetorial SVG nativa em toda a navegação e controlos rápidos.
+- Centro de Controlo no Dashboard com telemetria de hardware (CPU, GPU, RAM, Disco) em tempo real.
+- Layout ergonómico e responsivo sem animações invasivas ou efeitos desfocados desnecessários.
+- 3 temas refinados: WoW Midnight (Índigo/Violeta), CS2 Tático (Âmbar) e Call of Duty (Dourado Militar).
 
-#### 💫 15+ Animações Novas
-- **Ripple effect** nos botões (onda expansiva ao clicar)
-- **Hover smooth** com física de mola (ease-bounce)
-- **Float animation** em ícones e badges
-- **Shimmer effect** no fundo gradient
-- **Glow pulses** em elementos ativos e selecionados
-- **Gradient shift** mudando cores dinamicamente
+#### 🎯 Otimização de Latência & Kernel
+- Agendamento de processos e prioridade em tempo real para jogos competitivos.
+- Otimização da pilha de rede TCP/IP e rotinas rápidas de flush DNS.
+- Gestão de temporários e suspensão de processos em segundo plano.
+- Configurações dedicadas para CS2, WoW e Call of Duty.
 
-#### 🚀 Performance Melhorada
-- Transições otimizadas de 300ms (antes: 180ms bruscas)
-- Focus rings acessíveis para navegação por teclado
-- High DPI optimizations (4K ready)
-- Memory footprint reduzido com lazy-loading
+#### 📦 Automatização de Releases
+- Compilação automática de executáveis Windows via GitHub Actions a cada tag/release.
+- Executável nativo autónomo `MidnightOptimizer.exe` pronto a correr.
 
 ---
 
-### 🔧 O que Mudou na Interface?
-
-| Antes (v2.x) | Depois (v3.0) |
-|-------------|---------------|
-| Cards sólidos com cores planas | Glassmorphism blur(20px) |
-| Botões estáticos sem animação | Ripple effect ao clicar |
-| Background fixo sem movimento | Partículas flutuando continuamente |
-| Transições de 180ms bruscas | Transições de 300ms suaves |
-
----
-
-### 📦 O que Está Incluído
-
-✅ `styles-modern.css` (~850 linhas de CSS premium)  
-✅ `CHANGELOG.md` - Histórico completo das versões  
-✅ `.claude-contributor.md` - Documentação do contribuinte AI  
-✅ `RELEASE_NOTES.md` - Notas desta release  
-✅ Installer atualizado com novos recursos  
-
----
-
-### ⚠️ Requisitos para v3.0
-
-**Necessário:**
-- Windows 10/11 (64-bit)
-- 8GB RAM mínimo, 16GB+ recomendado
-- GPU GTX 1050+ recomendado  
-- 2GB disponíveis no sistema
-
----
-
-### 📋 Changelog Completo
-
-Para ver TODAS as mudanças entre versões:
-```bash
-git log --oneline -20
-cat CHANGELOG.md
-```
-
----
-
-## 👥 Contribuintes
-
-Obrigado a todos que contribuíram para este projeto!
-
-- **chibangar** — Desenvolvedor principal ⭐
-- **Claude Code** (@noreply@anthropic.com) — Automação e melhorias visuais v3 🤖
-
----
-
-## 🔗 Links Úteis
-
-- [GitHub Repository](https://github.com/chibangar/Otimiza-ao-de-jogos)
-- [Contributors](https://github.com/chibangar/Otimiza-ao-de-jogos/graphs/contributors)  
-- [Issue Tracker](https://github.com/chibangar/Otimiza-ao-de-jogos/issues)
-
----
-
-> *"Good players play.<br>Great players optimize."*  
-> — **Midnight Optimizer v3.0** 🌙
+### 📋 Requisitos de Sistema
+- Windows 10 ou Windows 11 (64-bit)
+- Direitos de Administrador para otimizações de energia e registo
