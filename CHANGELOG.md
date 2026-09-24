@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.2.4] - 2026-09-24
+
+### 🚀 Motor de Atualização Interno Blindado (PowerShell In-App Updater)
+- **Substituição do Script Batch Frágil por PowerShell Nativo**: O processo de substituição e reinício do executável agora é gerido por um script PowerShell assíncrono que contorna bloqueios de ficheiro do Windows, elimina o bug do comando `timeout` em processos ocultos e aplica a atualização de forma infalível.
+- **Botão Dedicado 'Verificar Atualizações'**: Adicionado botão direto na barra lateral e na página de Sistema para procurar atualizações a qualquer momento sem ter de esperar pelo temporizador.
+- **Feedback em Tempo Real**: Mensagens claras via toast a informar se a app já está na versão mais recente ou se há nova versão pronta para instalar com 1 clique.
+- **Eliminação de Bloqueio por Erro Prévio**: O verificador de atualizações já não é interrompido caso uma atualização anterior tenha registado falha transitória.
+
 ## [v3.2.3] - 2026-09-24
 
 ### 🎮 Imagens Reais In-Game dos Bonecos & Armas do CS2 (Viewmodels)

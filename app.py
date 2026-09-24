@@ -89,7 +89,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "3.2.3"
+APP_VERSION = "3.2.4"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -1813,59 +1813,61 @@ class Api:
 
     def apply_update_and_restart(self):
         if not getattr(sys, "frozen", False):
-            return {"success": False, "output": "So no .exe final. Usa o .exe do GitHub."}
+            return {"success": False, "output": "So no .exe final compilado. Usa o .exe do GitHub."}
         new_exe = _UPDATE.get("path", "")
         if not new_exe or not os.path.isfile(new_exe):
             return {"success": False, "output": "Atualizacao ainda nao descarregada."}
         if os.path.getsize(new_exe) < 5 * 1024 * 1024:
-            return {"success": False, "output": "Ficheiro descarregado invalido. Descarrega de novo."}
+            return {"success": False, "output": "Ficheiro descarregado invalido. Tenta de novo."}
         cur = sys.executable
         logf = os.path.join(tempfile.gettempdir(), "midnight_update.log")
+        ps1 = os.path.join(tempfile.gettempdir(), "midnight_update.ps1")
         try:
             if os.path.isfile(logf):
                 os.remove(logf)
         except Exception:
             pass
-        bat = os.path.join(tempfile.gettempdir(), "midnight_update.bat")
+
+        # Script PowerShell profissional que lida com locks, retries e caminhos com espacos
+        ps_code = (
+            "$ErrorActionPreference = 'SilentlyContinue'\n"
+            f'$log = "{logf}"\n'
+            '"inicio" | Out-File -FilePath $log -Encoding utf8\n'
+            "Start-Sleep -Seconds 1\n"
+            f'$target = "{cur}"\n'
+            f'$source = "{new_exe}"\n'
+            "Get-Process | Where-Object { $_.Path -eq $target -or $_.ProcessName -like '*MidnightOptimizer*' } | Stop-Process -Force -ErrorAction SilentlyContinue\n"
+            "$done = $false\n"
+            "for ($i = 0; $i -lt 20; $i++) {\n"
+            "    try {\n"
+            "        Copy-Item -Path $source -Destination $target -Force -ErrorAction Stop\n"
+            "        $done = $true\n"
+            "        break\n"
+            "    } catch {\n"
+            "        Start-Sleep -Milliseconds 500\n"
+            "    }\n"
+            "}\n"
+            "if ($done) {\n"
+            '    "OK" | Out-File -FilePath $log -Encoding utf8\n'
+            "    Start-Process -FilePath $target\n"
+            "} else {\n"
+            '    "FALHOU" | Out-File -FilePath $log -Encoding utf8\n'
+            "}\n"
+            "Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue\n"
+        )
         try:
-            with open(bat, "w") as f:
-                f.write("@echo off\n")
-                f.write(f'echo inicio > "{logf}"\n')
-                f.write("timeout /t 2 /nobreak >nul\n")
-                f.write("set N=0\n:loop\n")
-                f.write(f'move /Y "{new_exe}" "{cur}" >nul 2>&1\n')
-                f.write("if not errorlevel 1 goto done\n")
-                f.write("set /a N+=1\n")
-                f.write(f'echo tentativa %N% falhou >> "{logf}"\n')
-                f.write("if %N% GEQ 20 goto fail\n")
-                f.write("timeout /t 1 /nobreak >nul\n")
-                f.write("goto loop\n:fail\n")
-                f.write(f'echo FALHOU sem permissao >> "{logf}"\n')
-                f.write("exit /b 1\n:done\n")
-                f.write(f'echo OK >> "{logf}"\n')
-                f.write(f'start "" "{cur}"\n')
-                f.write('del "%~f0"\n')
+            with open(ps1, "w", encoding="utf-8") as f:
+                f.write(ps_code)
         except Exception as e:
-            return {"success": False, "output": f"Nao consegui preparar o restart: {e}"}
+            return {"success": False, "output": f"Nao consegui preparar script de atualizacao: {e}"}
+
         try:
-            admin = False
-            try:
-                admin = bool(self.is_admin().get("admin"))
-            except Exception:
-                pass
-            if admin or self._dir_writable(cur):
-                subprocess.Popen(["cmd", "/c", bat], shell=False, **_hidden(),
-                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            else:
-                import ctypes
-                ctypes.windll.shell32.ShellExecuteW(None, "runas", "cmd.exe",
-                                                    f'/c "{bat}"', None, 0)
+            cmd = f'powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "{ps1}"'
+            subprocess.Popen(cmd, shell=False, **_hidden(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception as e:
             log_error("apply_update: " + str(e))
-            return {"success": False, "output": f"Falha a aplicar (usa o botao Manual): {e}"}
-        # Sai de imediato SEM tocar na janela: destroy() a partir da thread
-        # do JS pode bloquear e o restart nunca acontece. O .bat espera 2s,
-        # troca o .exe e volta a abrir a app sozinho.
+            return {"success": False, "output": f"Falha ao iniciar restart: {e}"}
+
         try:
             import time
             time.sleep(0.3)

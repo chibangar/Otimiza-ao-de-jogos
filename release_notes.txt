@@ -1,9 +1,10 @@
-🎯 Midnight Optimizer v3.2.3 — Imagens Reais In-Game CS2 (Viewmodels) & Bonecos
+🎯 Midnight Optimizer v3.2.4 — Motor de Auto-Update Blindado & CS2 Viewmodels Reais
 
-## ✨ Principais Novidades da Versão 3.2.3
-- Renders reais dos bonecos do CS2 (braços, luvas táticas e mangas) empunhando a AK-47 sob céu aberto nas cartas de viewmodels.
-- Representação idêntica ao mapa oficial crashz' Viewmodel Generator.
-- Novo preset alternativo Gangster Clássico.
+## ✨ Principais Novidades da Versão 3.2.4
+- Motor nativo de auto-update em PowerShell: substitui ficheiros bloqueados e reinicia automaticamente sem falhas.
+- Botão "Verificar Atualizações" na barra lateral e nas Definições de Sistema.
+- Renders reais dos bonecos e armas do CS2 (braços, luvas táticas e AK-47 sob céu aberto).
+- Novo preset Gangster Clássico.
 - Efeito dinâmico de zoom nas cartas de armas.
 - Empacotamento direto via MidnightOptimizer.spec garantindo todos os módulos no binário.
 - A aba de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.

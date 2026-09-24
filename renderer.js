@@ -1268,11 +1268,8 @@ async function checkForUpdate(silent){
 
     try{
       const last = await window.midnightAPI.updateLastResult();
-      if(last && last.success === false){
-        banner.style.display = 'flex';
-        document.getElementById('update-text').textContent = '⚠ ' + last.output;
-        if(!silent) toast('⚠ ' + last.output);
-        return;
+      if(last && last.success === false && !silent){
+        toast('⚠ ' + last.output);
       }
     }catch{}
 
@@ -1285,19 +1282,32 @@ async function checkForUpdate(silent){
       document.getElementById('btn-update-later').style.display = '';
       document.getElementById('btn-update-restart').style.display = 'none';
       document.getElementById('update-fill').style.width = '0%';
-      if(wasHidden && !silent) toast(`✦ Nova versão ${r.latest} disponível!`);
+      if(wasHidden || !silent) toast(`✦ Nova versão ${r.latest} disponível!`);
     } else {
-      // Quando a app já está na versão mais recente, a aba de atualização DESAPARECE
       banner.style.display = 'none';
+      if(!silent && r && r.success){
+        toast(`✔ Tens a versão mais recente instalada (${r.current || 'v3.2.4'})!`);
+      }
     }
   }catch(e){
     try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{}
+    if(!silent) toast('⚠ Falha ao verificar atualizações: ' + e);
   }
 }
 
 setInterval(()=>{
   checkForUpdate(true);
-}, 15*60*1000);
+}, 10*60*1000);
+
+document.getElementById('btn-check-update')?.addEventListener('click', async ()=>{
+  toast('🔍 A verificar atualizações no GitHub…');
+  await checkForUpdate(false);
+});
+
+document.getElementById('btn-check-update-sys')?.addEventListener('click', async ()=>{
+  toast('🔍 A verificar atualizações no GitHub…');
+  await checkForUpdate(false);
+});
 
 document.getElementById('btn-update-manual')?.addEventListener('click', async ()=>{
   toast('A abrir a página de Releases…');
