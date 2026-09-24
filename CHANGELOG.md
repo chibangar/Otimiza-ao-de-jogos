@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.2.3] - 2026-09-24
+
+### 🎮 Imagens Reais In-Game dos Bonecos & Armas do CS2 (Viewmodels)
+- **Renders Autênticos do CS2**: Substituição das ilustrações abstratas por capturas e renders reais do CS2 no mapa crashz' Viewmodel Generator com céu azul limpo, nuvens e os braços/luvas táticas dos agentes do jogo empunhando a AK-47.
+- **Visualização Fiel do Posicionamento**: Mostra com precisão fotográfica onde a arma e os braços do boneco ficam posicionados no ecrã para cada preset (Clássico Pro launders/crashz, Compacto Recuado, FOV Máximo Estendido, Centrado Quake/Doom, Padrão Valve Desktop e Minimalista).
+- **Novo Preset Gangster Clássico**: Adicionado o icónico preset da comunidade com arma inclinada e elevada no ecrã.
+- **Otimização de Imagens Ultraleves**: Imagens compactadas a ~100KB com nitidez total, mantendo o download rápido e leve.
+
 ## [v3.2.2] - 2026-09-24
 
 ### 🛠️ Correção de Sintaxe f-string para Python < 3.12 (pros.py)

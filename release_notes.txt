@@ -1,8 +1,10 @@
-🎯 Midnight Optimizer v3.2.2 — Correção de Executável & Auto-Update Inteligente
+🎯 Midnight Optimizer v3.2.3 — Imagens Reais In-Game CS2 (Viewmodels) & Bonecos
 
-## ✨ Principais Novidades da Versão 3.2.2
-- Correção de erro de sintaxe (SyntaxError no pros.py) em sistemas Windows / Python < 3.12.
-- Eliminação do erro ModuleNotFoundError: No module named 'pros' na inicialização do executável.
+## ✨ Principais Novidades da Versão 3.2.3
+- Renders reais dos bonecos do CS2 (braços, luvas táticas e mangas) empunhando a AK-47 sob céu aberto nas cartas de viewmodels.
+- Representação idêntica ao mapa oficial crashz' Viewmodel Generator.
+- Novo preset alternativo Gangster Clássico.
+- Efeito dinâmico de zoom nas cartas de armas.
 - Empacotamento direto via MidnightOptimizer.spec garantindo todos os módulos no binário.
 - A aba de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.
 - Reinicio automático após o download de nova versão dentro da app.

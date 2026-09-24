@@ -1,12 +1,11 @@
-## 🎯 Midnight Optimizer v3.2.2 — Correção de Executável & Auto-Update Inteligente
+## 🎯 Midnight Optimizer v3.2.3 — Imagens Reais In-Game CS2 (Viewmodels) & Bonecos
 
-### 🛠️ Correções da Versão 3.2.2
-- **Correção de Sintaxe (SyntaxError no pros.py)**: Resolvido o erro `SyntaxError: f-string expression part cannot include a backslash` em `pros.py`, garantindo execução impecável sem erros de script.
-- **Eliminação do Erro de Inicialização**: Corrigido o erro `ModuleNotFoundError: No module named 'pros'` na versão executável compilada para Windows.
-- **Compilação Determinística**: Empacotamento direto através do ficheiro de especificação `MidnightOptimizer.spec` com todos os módulos (`pros.py`, `game_tweaks.py`, `overlay.py`, etc.) incluídos no binário.
-- **Aba de Atualização Dinâmica**: A notificação de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.
-- **Reinicio Automático pós-Update**: Ao concluir o download de uma nova versão na app, a aplicação avisa e reinicia automaticamente em 1.5s aplicando o novo executável.
-- **Verificação Periódica**: Monitorização contínua a cada 15 minutos; se uma nova versão for publicada no GitHub, a aba reaparece de imediato.
+### ✨ Novidades da Versão 3.2.3
+- **Renders Reais dos Bonecos & Armas do CS2**: As cartas de viewmodels agora apresentam imagens reais in-game no mapa crashz' Viewmodel Generator, mostrando os braços, mangas e luvas táticas dos agentes do CS2 a empunhar a AK-47 sob céu azul limpo.
+- **Visualização Exata do Campo de Visão**: Permite comparar de relance o impacto visual de cada preset de posicionamento de arma no jogo real.
+- **Novo Preset Gangster Clássico**: Adicionado o posicionamento alternativo inclinado da comunidade.
+- **Transições e Efeitos Visuais**: Efeito suave de zoom ao passar o rato pelas cartas de armas.
+- **Executável 100% Livre de Falhas**: Integração total de módulos com `_safe_import` e empacotamento completo.
 
 ### ✨ Novidades Recentes da Linha v3.2
 

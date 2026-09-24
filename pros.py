@@ -117,15 +117,15 @@ BY_CROSSHAIR_ID = {c["id"]: c for c in PRO_CROSSHAIRS}
 
 
 # ---------- VIEWMODELS DOS PROS (POSICIONAMENTO DA ARMA) ----------
-# Imagens SVG demonstrativas em assets/viewmodels/<id>.svg
+# Imagens reais in-game do CS2 com boneco e armas em assets/viewmodels/<id>.jpg
 # Comandos de consola diretos (~) para posicionar a arma no CS2
 VIEWMODEL_PRESETS = [
     {
         "id": "classic_pro",
-        "name": "Clássico Competitivo Pro",
+        "name": "Clássico Competitivo Pro (launders / crashz)",
         "tag": "Mais Usado (m0NESY & NiKo)",
         "desc": "Arma rebaixada à direita com FOV 68. O padrão dos profissionais: liberta o centro do ecrã para uma linha de mira perfeitamente limpa sem perder a referência do cano.",
-        "image": "assets/viewmodels/classic_pro.svg",
+        "image": "assets/viewmodels/classic_pro.jpg",
         "fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2,
         "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 0; viewmodel_offset_z -1.5; viewmodel_presetpos 2",
     },
@@ -134,7 +134,7 @@ VIEWMODEL_PRESETS = [
         "name": "Compacto & Recuado",
         "tag": "Máxima Visão (FalleN / s1mple)",
         "desc": "Arma recuada e encostada ao canto inferior direito (z=-2). Reduz o volume aparente da arma no ecrã para não esconder nenhum inimigo que entre pelos flancos.",
-        "image": "assets/viewmodels/compact_recessed.svg",
+        "image": "assets/viewmodels/compact_recessed.jpg",
         "fov": 68, "x": 2.5, "y": 2, "z": -2, "preset": 0,
         "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 2; viewmodel_offset_z -2; viewmodel_presetpos 0",
     },
@@ -143,25 +143,34 @@ VIEWMODEL_PRESETS = [
         "name": "FOV Máximo / AWP Estendido",
         "tag": "Estilo Snipers (ZywOo & donk)",
         "desc": "Arma projetada para a frente exibindo as mãos e o cano completo. Proporciona excelente sensação de recoil e alinhamento tático com rifles e AWP.",
-        "image": "assets/viewmodels/max_fov.svg",
+        "image": "assets/viewmodels/max_fov.jpg",
         "fov": 68, "x": 2.5, "y": 2, "z": -1, "preset": 3,
         "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 2; viewmodel_offset_z -1; viewmodel_presetpos 3",
     },
     {
         "id": "centered_doom",
-        "name": "Centrado / Doom Simétrico",
+        "name": "Centrado / Doom Simétrico (Quake)",
         "tag": "Estilo Retro / Quake",
-        "desc": "Arma posicionada na base central do ecrã. Ideal para jogadores que preferem simetria absoluta e foco direto no eixo vertical de mira.",
-        "image": "assets/viewmodels/centered_doom.svg",
+        "desc": "Arma posicionada na base central do ecrã apontando para o céu. Ideal para jogadores que preferem simetria absoluta e foco direto no eixo vertical de mira.",
+        "image": "assets/viewmodels/centered_doom.jpg",
         "fov": 68, "x": -2, "y": 2, "z": -2, "preset": 0,
         "console_cmd": "viewmodel_fov 68; viewmodel_offset_x -2; viewmodel_offset_y 2; viewmodel_offset_z -2; viewmodel_presetpos 0",
+    },
+    {
+        "id": "gangster",
+        "name": "Gangster Clássico (crashz)",
+        "tag": "Comunidade / Gangster",
+        "desc": "Posicionamento icónico elevado e inclinado estilo gangster da oficina do CS:GO/CS2. A arma fica inclinada para máxima diversão e estilo tático.",
+        "image": "assets/viewmodels/gangster.jpg",
+        "fov": 68, "x": -2, "y": 2, "z": 2, "preset": 0,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x -2; viewmodel_offset_y 2; viewmodel_offset_z 2; viewmodel_presetpos 0",
     },
     {
         "id": "valve_default",
         "name": "Padrão Oficial CS2 (Desktop)",
         "tag": "Fábrica Valve",
         "desc": "Posicionamento padrão de fábrica da Valve (FOV 60, offset 1, 1, -1). Recomendado para quem prefere a estética original do jogo.",
-        "image": "assets/viewmodels/valve_default.svg",
+        "image": "assets/viewmodels/valve_default.jpg",
         "fov": 60, "x": 1, "y": 1, "z": -1, "preset": 1,
         "console_cmd": "viewmodel_fov 60; viewmodel_offset_x 1; viewmodel_offset_y 1; viewmodel_offset_z -1; viewmodel_presetpos 1",
     },
@@ -170,7 +179,7 @@ VIEWMODEL_PRESETS = [
         "name": "Minimalista Ultra Baixo",
         "tag": "Anti-Distração",
         "desc": "A arma quase desaparece da visão durante o movimento, proporcionando a menor área obstruída possível em combates caóticos.",
-        "image": "assets/viewmodels/minimalist_low.svg",
+        "image": "assets/viewmodels/minimalist_low.jpg",
         "fov": 68, "x": 2.5, "y": -2, "z": -2, "preset": 0,
         "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y -2; viewmodel_offset_z -2; viewmodel_presetpos 0",
     }
