@@ -16,11 +16,16 @@ import urllib.request
 import webview
 import game_tweaks
 import pros
+import overlay
 import voicefx
 import accounts
 import oauth_login
 import servers
 import online
+
+if len(sys.argv) > 1 and sys.argv[1] == "--overlay":
+    overlay.handle_cli(sys.argv[2:])
+    sys.exit(0)
 
 try:
     import sounddevice as sd
@@ -52,19 +57,19 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "3.1.0"
+APP_VERSION = "3.2.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
-    "✨ Nova Interface Profissional: Design system Obsidian de alta precisão, ergonómico e sem distrações.",
+    "🎯 Miras & Viewmodels CS2: Miras dos pros com códigos de partilha, comandos de consola (~) e imagens de posicionamento de arma sem alterar binds ou sensibilidade.",
+    "⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg): Otimização com 1 clique para tiros que não registam, limpeza de cache de shaders DirectX e buffer de rede em 0 ticks.",
+    "🔔 In-Game Notification Overlay: Overlay flutuante animado com popout sobre os jogos, 100% VAC-Safe e sem perda de foco.",
+    "🛡️ Otimizações Profissionais Seguras: Configuração não destrutiva que mantém 100% intactos os teus controlos, sensibilidades e vídeo.",
+    "✨ Nova Interface Obsidian Profissional: Design system ergonómico, moderno e sem distrações.",
     "📊 Novo Centro de Controlo no Dashboard: Telemetria em tempo real para CPU, GPU, RAM e Disco.",
-    "⚡ Otimização de Latência: Agendamento prioritário e afinamento da pilha de rede TCP/IP.",
-    "🎯 Tweaks In-Game: Configurações de precisão para CS2, WoW Midnight e Call of Duty.",
-    "🛡️ Categorias de Otimização: Privacidade, Debloat, Energia e Serviços de Sistema afinados.",
-    "📦 Releases Automáticas: Compilação contínua de executáveis Windows via GitHub Actions.",
-    "🛠️ Melhorias profundas de estabilidade e consumo reduzido de memória.",
+    "📦 Compilação e Releases Contínuas no GitHub Actions para Windows.",
 ]
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -857,6 +862,19 @@ class Api:
     def cs2_launch_options(self):
         return {"success": True, "output": game_tweaks.CS2_LAUNCH_COMPETITIVE}
 
+    def cs2_hitreg_fix(self):
+        return game_tweaks.fix_cs2_hitreg()
+
+    def test_in_game_overlay(self):
+        overlay.notify_process(
+            title="Overlay In-Game Ativo",
+            message="Notificação demonstrativa com animação de popout!",
+            badge="MIDNIGHT",
+            theme="emerald",
+            duration_sec=3.8
+        )
+        return {"success": True, "output": "Notificação overlay disparada no ecrã."}
+
     def wow_competitive(self):
         return game_tweaks.apply_wow("competitive")
 
@@ -1142,7 +1160,7 @@ class Api:
         except Exception as e:
             return {"success": False, "output": str(e)}
 
-    # ---------- PROS CS2 ----------
+    # ---------- PROS CS2: MIRAS & VIEWMODELS ----------
     def list_pros(self):
         try:
             return pros.list_pros()
@@ -1150,8 +1168,28 @@ class Api:
             log_error("list_pros: " + str(e))
             return []
 
+    def list_crosshairs(self):
+        try:
+            return pros.list_crosshairs()
+        except Exception as e:
+            log_error("list_crosshairs: " + str(e))
+            return []
+
+    def list_viewmodels(self):
+        try:
+            return pros.list_viewmodels()
+        except Exception as e:
+            log_error("list_viewmodels: " + str(e))
+            return []
+
+    def apply_crosshair(self, pro_id):
+        return pros.apply_crosshair_safe(pro_id)
+
+    def apply_viewmodel(self, preset_id):
+        return pros.apply_viewmodel_safe(preset_id)
+
     def apply_pro(self, pro_id):
-        return pros.apply_pro(pro_id)
+        return pros.apply_crosshair_safe(pro_id)
 
     # ---------- ESTUDIO DE VOZ ----------
     def voice_effects(self):

@@ -26,3 +26,4 @@ Thumbs.db
 oauth_config.json
 # Token para reportar bugs no GitHub (nunca commitar)
 bugs_config.json
+*.log

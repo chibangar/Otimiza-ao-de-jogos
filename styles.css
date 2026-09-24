@@ -1496,53 +1496,271 @@ nav {
   margin-bottom: 12px;
 }
 
-.pros-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-  margin-top: 12px;
+/* --------------------------------------------------------------------------
+   CS2 Miras (Crosshairs) & Viewmodels (Armas)
+   -------------------------------------------------------------------------- */
+.cs2-subtabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
 }
 
-.pro-card {
+.cs2-tab-btn {
   background: var(--bg-inset);
+  color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  padding: 14px;
-  text-align: center;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: all var(--t-fast);
 }
 
-.pro-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
+.cs2-tab-btn:hover {
+  color: var(--text-main);
+  border-color: var(--border-strong);
 }
 
-.pro-card img {
-  width: 72px;
-  height: 72px;
+.cs2-tab-btn.active {
+  background: var(--bg-surface-elevated);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.12);
+}
+
+.crosshair-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.crosshair-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all var(--t-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.crosshair-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.crosshair-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crosshair-header img {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border-strong);
-  margin: 0 auto 8px;
+  border: 1.5px solid var(--border-strong);
 }
 
-.pro-card h4 {
-  margin: 0 0 2px;
+.crosshair-player-info h4 {
+  margin: 0;
   font-size: 14px;
   font-weight: 700;
 }
 
-.pro-card .team {
+.crosshair-player-info .team {
   font-size: 11px;
-  font-weight: 700;
   color: var(--accent);
+  font-weight: 600;
 }
 
-.pro-card .specs {
+.crosshair-preview-box {
+  width: 100%;
+  height: 84px;
+  background: radial-gradient(circle at center, #1b202e 0%, #0a0c12 85%);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.crosshair-preview-box::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 1px dashed rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+}
+
+.crosshair-reticle {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crosshair-code-input {
+  font-family: var(--font-mono);
   font-size: 10.5px;
-  color: var(--text-faint);
-  margin: 8px 0;
-  line-height: 1.5;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  padding: 6px 8px;
+  color: var(--text-main);
+  width: 100%;
+  text-align: center;
+  user-select: all;
+  letter-spacing: 0.5px;
+}
+
+.crosshair-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.viewmodel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+
+.viewmodel-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all var(--t-fast);
+  overflow: hidden;
+}
+
+.viewmodel-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.viewmodel-img-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #0b0d14;
+}
+
+.viewmodel-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.viewmodel-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+.viewmodel-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.viewmodel-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.viewmodel-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* Hitreg Callout Box */
+.hitreg-box {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.04) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--r-md);
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hitreg-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hitreg-box-header h4 {
+  margin: 0;
+  color: #34d399;
+  font-size: 14.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hitreg-badge-safe {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.hitreg-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.hitreg-feat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hitreg-feat-item b {
+  color: #10b981;
 }
 
 /* --------------------------------------------------------------------------
@@ -1909,27 +2127,58 @@ nav {
   margin-top: 10px;
 }
 
+@keyframes toast-popout-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(14px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes toast-popout-out {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.88) translateY(10px);
+  }
+}
+
 .toast {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 150;
-  background: var(--bg-surface-elevated);
+  background: rgba(14, 16, 24, 0.95);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-strong);
+  border-left: 3.5px solid var(--accent);
   color: var(--text-main);
-  padding: 10px 16px;
+  padding: 12px 18px;
   border-radius: var(--r-sm);
-  box-shadow: var(--shadow-md);
-  font-size: 12.5px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 158, 11, 0.12);
+  font-size: 13px;
+  font-weight: 500;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
-  transition: all var(--t);
+  transform: scale(0.85) translateY(14px);
 }
 
 .toast.show {
-  opacity: 1;
-  transform: translateY(0);
+  animation: toast-popout-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast.hide {
+  animation: toast-popout-out 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* --------------------------------------------------------------------------

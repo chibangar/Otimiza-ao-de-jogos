@@ -423,25 +423,71 @@
     <section class="page" id="page-ingame">
       <div class="games-head">
         <div>
-          <h3>Otimização de Ficheiros de Jogo</h3>
-          <p class="muted small">Ajuste direto de ficheiros de configuração oficial (autoexec.cfg, cs2_video.txt, Config.wtf). Cópias de segurança automáticas antes de qualquer alteração.</p>
+          <h3>Otimização de Ficheiros de Jogo &amp; Sub-Tick</h3>
+          <p class="muted small">Ajuste profissional de desempenho e latência. Configurações 100% não destrutivas: as tuas binds, sensibilidades e resolução são preservadas intactas.</p>
         </div>
         <div><button class="btn ghost" id="btn-detect-games">↻ Detetar Jogos Instalados</button></div>
       </div>
 
+      <!-- SEÇÃO MIRAS & VIEWMODELS -->
       <div class="card wide" style="margin-bottom:14px">
-        <h4>Configurações de Jogadores Profissionais</h4>
-        <p class="muted small">Selecione uma configuração pré-definida de pro players: sensibilidade, mira, viewmodel e taxas de transmissão de rede sincronizadas.</p>
-        <div class="pros-grid" id="pros-grid"><div class="card">A carregar configurações…</div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <h4 style="margin:0">Miras &amp; Viewmodels Oficiais CS2</h4>
+          <span class="hitreg-badge-safe">🛡️ NÃO DESTRUTIVO</span>
+        </div>
+        <p class="muted small">Códigos de partilha do CS2 e comandos de consola (~) prontos a copiar com 1 clique. Visualiza a mira e a arma antes de usar.</p>
+
+        <!-- SUBTABS: MIRAS / VIEWMODELS -->
+        <div class="cs2-subtabs">
+          <button class="cs2-tab-btn active" id="tab-btn-crosshairs">
+            <i><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></i>
+            Miras dos Pros (Crosshairs)
+          </button>
+          <button class="cs2-tab-btn" id="tab-btn-viewmodels">
+            <i><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></i>
+            Posicionamento da Arma (Viewmodels)
+          </button>
+        </div>
+
+        <div id="tab-content-crosshairs">
+          <div class="crosshair-grid" id="crosshairs-grid"><div class="card">A carregar miras dos pros…</div></div>
+        </div>
+
+        <div id="tab-content-viewmodels" style="display:none">
+          <div class="viewmodel-grid" id="viewmodels-grid"><div class="card">A carregar presets de viewmodel…</div></div>
+        </div>
       </div>
 
       <div class="grid2">
         <div class="card wide">
           <img class="game-banner" src="assets/games/cs2.jpg" alt="Counter-Strike 2" loading="lazy">
-          <h4>Counter-Strike 2 — Competitivo</h4>
+          <h4>Counter-Strike 2 — Competitivo &amp; Sub-Tick</h4>
           <p class="muted small" id="cs2-status">A verificar instalação…</p>
           <p class="muted small" id="cs2-run"></p>
           <p class="muted small" id="cs2-path"></p>
+
+          <!-- BANNER HITREG / RESOLUÇÃO DE TIROS -->
+          <div class="hitreg-box">
+            <div class="hitreg-box-header">
+              <h4>
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+                Resolução de Registo de Tiros (Sub-Tick Hitreg)
+              </h4>
+              <span class="hitreg-badge-safe">🛡️ 100% VAC-SAFE</span>
+            </div>
+            <p class="muted small" style="margin:0">Se o CS2 não estiver a registar tiros ou sentires balas fantasma, clica no botão abaixo. Limpa o cache de shaders corrompido e sintoniza o buffer sub-tick sem estragar as tuas binds:</p>
+            <div class="hitreg-features">
+              <div class="hitreg-feat-item">✔ <b>0 Ticks</b> Buffer de Rede</div>
+              <div class="hitreg-feat-item">✔ <b>786432</b> Taxa Máxima (Rate)</div>
+              <div class="hitreg-feat-item">✔ <b>Limpeza</b> Shaders DirectX</div>
+              <div class="hitreg-feat-item">✔ <b>Pacing</b> Frame Sleep Ativo</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+              <button class="btn gold" id="btn-cs2-hitreg" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#059669">🎯 Corrigir Registo de Tiros (Hitreg)</button>
+              <button class="btn ghost" id="btn-cs2-overlay-test">🔔 Testar Overlay In-Game</button>
+            </div>
+          </div>
+
           <div class="comp-btns" style="margin-top:12px;flex-wrap:wrap">
             <button class="btn gold" id="btn-cs2-apply">Aplicar Otimização CS2</button>
             <button class="btn ghost" id="btn-cs2-kill" style="display:none">Terminar Processo CS2</button>

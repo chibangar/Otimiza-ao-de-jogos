@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.2.0] - 2026-09-24
+
+### 🎯 Miras dos Pros & Viewmodels CS2 (100% Não Destrutivo)
+- **Eliminação de Configurações Invasivas**: Remoção total do applier antigo que alterava sensibilidades, resoluções e binds de teclado dos utilizadores.
+- **Miras Oficiais com 1 Clique**: Galeria dos melhores pro players mundiais (m0NESY, donk, NiKo, ZywOo, s1mple, ropz, FalleN) com Código de Partilha oficial do CS2 (`CSGO-...`) e comandos diretos para a consola (`~`).
+- **Pré-visualização Gráfica da Retícula**: Renderização visual precisa da mira dentro de cada cartão (cor real, gap, espessura, tamanho e ponto central).
+- **Posicionamento da Arma (Viewmodels)**: Presets com imagens vetoriais ilustrativas demonstrando exatamente a colocação da arma no ecrã (Clássico Pro, Compacto Recuado, FOV Máximo, Centrado Retro Doom, Padrão Valve e Minimalista).
+- **Aplicação Segura e Isolada**: Modos automáticos gravam apenas em ficheiros dedicados (`midnight_crosshair.cfg` e `midnight_viewmodel.cfg`) sem nunca tocar nas tuas binds.
+
+### ⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg Fix)
+- **Botão com 1 Clique para Correção de Tiros**: Resolve o desfasamento sub-tick e tiros fantasma que não causam dano no CS2.
+- **Limpeza de Cache de Shaders DirectX/GPU**: Esvaziamento automático de ficheiros residuais de shader em NVIDIA DXCache, D3DSCache e AMD DxCache (elimina micro-stutters e quedas de FPS durante tiroteios).
+- **Latência Mínima de Rede (Buffer 0 Ticks)**: Configuração de `cl_net_buffer_ticks 0` para eliminar os 15ms-30ms de atraso artificial de interpolação.
+- **Taxa Máxima Sub-Tick**: `rate 786432` e alinhamento de frame pacing pós-tick (`engine_low_latency_sleep_after_client_tick true`).
+- **Desativação de Throttling Multimédia do Windows**: Prioridade total para pacotes de jogos na pilha de rede.
+
+### 🔔 In-Game Notification Overlay (Popout Animado)
+- **Overlay Flutuante dentro do Jogo**: Notificações visuais elegantes que surgem diretamente sobre jogos em ecrã inteiro ou janela borderless.
+- **Animação Popout Fluida**: Entrada deslizante e saída suave (popout-in / popout-out) com temporizador decrescente integrado.
+- **100% VAC-Safe**: Criado com tecnologia nativa de janelas de sistema (WS_EX_NOACTIVATE e WS_EX_TOOLWINDOW), sem injeção de DLLs, sem ganchos em memória e sem risco de banimento.
+- **Sem Perda de Foco**: Não minimiza o CS2 nem rouba cliques do rato durante rondas competitivas.
+- **Botão de Teste Integrado**: Testa o aspeto do overlay a qualquer momento na interface.
+
+---
+
 ## [v3.1.0] - 2026-09-24
 
 ### 🚀 Interface Moderna, Ergonómica e Profissional

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b0d14"/>
+      <stop offset="60%" stop-color="#121622"/>
+      <stop offset="100%" stop-color="#181d2c"/>
+    </linearGradient>
+    <linearGradient id="gun_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Viewport Background -->
+  <rect width="320" height="180" fill="url(#bg_grad)"/>
+  
+  <!-- Subtle Grid / Tactical Depth Lines -->
+  <line x1="0" y1="120" x2="320" y2="120" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="80" y1="180" x2="140" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+  <line x1="240" y1="180" x2="180" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+
+  <!-- Center Crosshair (Precision Reticle) -->
+  <g stroke="#10b981" stroke-width="1.5">
+    <line x1="160" y1="84" x2="160" y2="88"/>
+    <line x1="160" y1="92" x2="160" y2="96"/>
+    <line x1="154" y1="90" x2="158" y2="90"/>
+    <line x1="162" y1="90" x2="166" y2="90"/>
+  </g>
+
+  <!-- Weapon Model: Compact Recessed (Tucked Low Right, x=2.5, y=2, z=-2) -->
+  <g transform="translate(216, 118)">
+    <!-- Barrel & Receiver -->
+    <path d="M 0,22 L 35,20 L 48,18 L 68,14 L 72,21 L 62,25 L 45,30 L 10,36 Z" fill="url(#gun_grad)" stroke="#475569" stroke-width="1.1"/>
+    <!-- Sight / Rail -->
+    <rect x="18" y="14" width="24" height="6" rx="1" fill="#1e293b" stroke="#64748b" stroke-width="0.8"/>
+    <!-- Magazine -->
+    <path d="M 28,32 L 38,62 L 28,65 L 18,34 Z" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <!-- Handguard -->
+    <path d="M 40,19 L 58,17 L 55,30 L 38,32 Z" fill="#475569"/>
+    <!-- Player Arm & Sleeve (Lower Angle) -->
+    <path d="M 32,44 L 62,36 L 104,62 L 68,62 Z" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <!-- Hand -->
+    <ellipse cx="54" cy="38" rx="7" ry="5" fill="#64748b" transform="rotate(-15 54 38)"/>
+  </g>
+
+  <!-- Technical Spec Watermark -->
+  <rect x="12" y="12" width="138" height="20" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="18" y="25" fill="#10b981" font-family="Segoe UI, sans-serif" font-size="9" font-weight="bold">COMPACTO RECUADO</text>
+  <text x="108" y="25" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="8">MAX FOV</text>
+
+  <text x="308" y="168" fill="#475569" font-family="Segoe UI, monospace" font-size="8" text-anchor="end">x:2.5 y:2 z:-2</text>
+</svg>
