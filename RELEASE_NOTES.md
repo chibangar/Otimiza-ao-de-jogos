@@ -1,6 +1,7 @@
-## 🎯 Midnight Optimizer v3.2.1 — Correção de Executável & Auto-Update Inteligente
+## 🎯 Midnight Optimizer v3.2.2 — Correção de Executável & Auto-Update Inteligente
 
-### 🛠️ Correções Críticas da Versão 3.2.1
+### 🛠️ Correções da Versão 3.2.2
+- **Correção de Sintaxe (SyntaxError no pros.py)**: Resolvido o erro `SyntaxError: f-string expression part cannot include a backslash` em `pros.py`, garantindo execução impecável sem erros de script.
 - **Eliminação do Erro de Inicialização**: Corrigido o erro `ModuleNotFoundError: No module named 'pros'` na versão executável compilada para Windows.
 - **Compilação Determinística**: Empacotamento direto através do ficheiro de especificação `MidnightOptimizer.spec` com todos os módulos (`pros.py`, `game_tweaks.py`, `overlay.py`, etc.) incluídos no binário.
 - **Aba de Atualização Dinâmica**: A notificação de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.

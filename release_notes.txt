@@ -1,6 +1,7 @@
-🎯 Midnight Optimizer v3.2.1 — Correção de Executável & Auto-Update Inteligente
+🎯 Midnight Optimizer v3.2.2 — Correção de Executável & Auto-Update Inteligente
 
-## ✨ Principais Novidades da Versão 3.2.1
+## ✨ Principais Novidades da Versão 3.2.2
+- Correção de erro de sintaxe (SyntaxError no pros.py) em sistemas Windows / Python < 3.12.
 - Eliminação do erro ModuleNotFoundError: No module named 'pros' na inicialização do executável.
 - Empacotamento direto via MidnightOptimizer.spec garantindo todos os módulos no binário.
 - A aba de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.

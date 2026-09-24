@@ -1,5 +1,11 @@
 # Changelog
 
+## [v3.2.2] - 2026-09-24
+
+### 🛠️ Correção de Sintaxe f-string para Python < 3.12 (pros.py)
+- **Eliminação do Erro de Sintaxe**: Resolvido o erro `SyntaxError: f-string expression part cannot include a backslash` em `pros.py` nas funções `apply_crosshair_safe` e `apply_viewmodel_safe`.
+- **Compatibilidade Total**: Remoção de caracteres de escape (`\n`) de dentro das expressões `{...}` de interpolação f-string, garantindo compatibilidade universal com todas as versões do Python e ambientes Windows de utilizador.
+
 ## [v3.2.1] - 2026-09-24
 
 ### 🛠️ Correção Crítica de Executável (Bundling de Módulos)

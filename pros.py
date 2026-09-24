@@ -238,9 +238,10 @@ def apply_crosshair_safe(pro_id):
     target = os.path.join(cfg_dir, "midnight_crosshair.cfg")
     game_tweaks.backup_file(target)
 
+    cmd_lines = c['console_cmd'].replace('; ', '\n')
     cfg_content = f"""// Midnight Optimizer — Mira de {c['name']} ({c['team']})
 // 100% Seguro: Nao altera binds, sensibilidade ou resolucao
-{c['console_cmd'].replace('; ', '\n')}
+{cmd_lines}
 host_writeconfig
 echo "MIDNIGHT: Mira de {c['name']} Carregada"
 """
@@ -289,9 +290,10 @@ def apply_viewmodel_safe(preset_id):
     target = os.path.join(cfg_dir, "midnight_viewmodel.cfg")
     game_tweaks.backup_file(target)
 
+    vm_lines = v['console_cmd'].replace('; ', '\n')
     cfg_content = f"""// Midnight Optimizer — Viewmodel {v['name']}
 // 100% Seguro: Nao mexe em binds, sensibilidade ou graficos
-{v['console_cmd'].replace('; ', '\n')}
+{vm_lines}
 host_writeconfig
 echo "MIDNIGHT: Viewmodel {v['name']} Carregado"
 """
