@@ -5,6 +5,16 @@ Backend Python + WebView2 (Edge) — gera .exe único
 """
 import os
 import sys
+
+# Garante que o diretorio atual e o diretorio temporario do PyInstaller (_MEIPASS) estao no sys.path
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE and _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+
+_MEIPASS = getattr(sys, "_MEIPASS", None)
+if _MEIPASS and _MEIPASS not in sys.path:
+    sys.path.insert(0, _MEIPASS)
+
 import json
 import re
 import subprocess
@@ -14,18 +24,40 @@ import tempfile
 import threading
 import urllib.request
 import webview
-import game_tweaks
-import pros
-import overlay
-import voicefx
-import accounts
-import oauth_login
-import servers
-import online
+
+def _safe_import(mod_name):
+    try:
+        return __import__(mod_name)
+    except ImportError:
+        import importlib.util
+        for d in [_MEIPASS, _HERE]:
+            if d:
+                candidate = os.path.join(d, f"{mod_name}.py")
+                if os.path.isfile(candidate):
+                    try:
+                        spec = importlib.util.spec_from_file_location(mod_name, candidate)
+                        mod = importlib.util.module_from_spec(spec)
+                        sys.modules[mod_name] = mod
+                        spec.loader.exec_module(mod)
+                        return mod
+                    except Exception:
+                        pass
+        return None
+
+game_tweaks = _safe_import("game_tweaks")
+pros = _safe_import("pros")
+overlay = _safe_import("overlay")
+voicefx = _safe_import("voicefx")
+accounts = _safe_import("accounts")
+oauth_login = _safe_import("oauth_login")
+servers = _safe_import("servers")
+online = _safe_import("online")
 
 if len(sys.argv) > 1 and sys.argv[1] == "--overlay":
-    overlay.handle_cli(sys.argv[2:])
+    if overlay and hasattr(overlay, "handle_cli"):
+        overlay.handle_cli(sys.argv[2:])
     sys.exit(0)
+
 
 try:
     import sounddevice as sd
@@ -57,7 +89,7 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "3.2.0"
+APP_VERSION = "3.2.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

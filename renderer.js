@@ -1263,65 +1263,110 @@ document.getElementById('vm-ear')?.addEventListener('click', async ()=>{
 async function checkForUpdate(silent){
   try{
     if(!window.midnightAPI || !window.midnightAPI.checkUpdate) return;
+    const banner = document.getElementById('update-banner');
+    if(!banner) return;
+
     try{
-      const last=await window.midnightAPI.updateLastResult();
-      if(last && last.success===false){
-        document.getElementById('update-banner').style.display='flex';
-        document.getElementById('update-text').textContent='⚠ '+last.output;
-        toast('⚠ '+last.output);
+      const last = await window.midnightAPI.updateLastResult();
+      if(last && last.success === false){
+        banner.style.display = 'flex';
+        document.getElementById('update-text').textContent = '⚠ ' + last.output;
+        if(!silent) toast('⚠ ' + last.output);
         return;
       }
     }catch{}
+
     const r = await window.midnightAPI.checkUpdate();
-    if(!(r && r.success)){
-      try{ await window.midnightAPI.logError('checkUpdate falhou: '+((r&&r.output)||'desconhecido')); }catch{}
-      return;
-    }
     if(r && r.success && r.available){
-      const banner=document.getElementById('update-banner');
-      const wasHidden=banner.style.display==='none';
-      banner.style.display='flex';
-      document.getElementById('update-text').textContent=`Nova versão ${r.latest} disponível — atualiza sem sair da app!`;
-      if(wasHidden) toast(`✦ Nova versão ${r.latest} disponível!`);
+      const wasHidden = banner.style.display === 'none';
+      banner.style.display = 'flex';
+      document.getElementById('update-text').textContent = `Nova versão ${r.latest} disponível — atualiza com 1 clique!`;
+      document.getElementById('btn-update-now').style.display = '';
+      document.getElementById('btn-update-later').style.display = '';
+      document.getElementById('btn-update-restart').style.display = 'none';
+      document.getElementById('update-fill').style.width = '0%';
+      if(wasHidden && !silent) toast(`✦ Nova versão ${r.latest} disponível!`);
+    } else {
+      // Quando a app já está na versão mais recente, a aba de atualização DESAPARECE
+      banner.style.display = 'none';
     }
-  }catch(e){ try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{} }
+  }catch(e){
+    try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{}
+  }
 }
-setInterval(()=>{ const b=document.getElementById('update-banner'); if(b && b.style.display==='none') checkForUpdate(true); }, 30*60*1000);
+
+setInterval(()=>{
+  checkForUpdate(true);
+}, 15*60*1000);
+
 document.getElementById('btn-update-manual')?.addEventListener('click', async ()=>{
   toast('A abrir a página de Releases…');
   await window.midnightAPI.openReleasesPage();
 });
+
 document.getElementById('btn-update-later')?.addEventListener('click',()=>{
-  document.getElementById('update-banner').style.display='none';
+  document.getElementById('update-banner').style.display = 'none';
 });
+
 document.getElementById('btn-update-now')?.addEventListener('click', async ()=>{
-  document.getElementById('btn-update-now').style.display='none';
-  document.getElementById('btn-update-later').style.display='none';
+  const btnNow = document.getElementById('btn-update-now');
+  const btnLater = document.getElementById('btn-update-later');
+  if(btnNow) btnNow.style.display = 'none';
+  if(btnLater) btnLater.style.display = 'none';
+
+  toast('⬇ A descarregar atualização oficial do GitHub…');
   await window.midnightAPI.startUpdate();
-  const fill=document.getElementById('update-fill'), txt=document.getElementById('update-text');
-  const h=setInterval(async ()=>{
-    const p=await window.midnightAPI.updateProgress();
-    fill.style.width=(p.pct||0)+'%';
-    txt.textContent=`A descarregar atualização… ${p.pct||0}%`;
-    if(p.status==='ready'){ clearInterval(h); txt.textContent=`Versão ${p.version} pronta!`; document.getElementById('btn-update-restart').style.display=''; }
-    if(p.status==='error'){ clearInterval(h); txt.textContent='Falha: '+p.error; }
-  },500);
+
+  const fill = document.getElementById('update-fill');
+  const txt = document.getElementById('update-text');
+
+  const h = setInterval(async ()=>{
+    const p = await window.midnightAPI.updateProgress();
+    const pct = p.pct || 0;
+    if(fill) fill.style.width = pct + '%';
+    if(txt) txt.textContent = `A descarregar atualização… ${pct}%`;
+
+    if(p.status === 'ready'){
+      clearInterval(h);
+      if(fill) fill.style.width = '100%';
+      if(txt) txt.textContent = `Versão ${p.version} pronta! A reiniciar…`;
+      toast(`✔ Versão ${p.version} pronta! A reiniciar a app…`);
+      const rBtn = document.getElementById('btn-update-restart');
+      if(rBtn) rBtn.style.display = '';
+
+      // Reinicia automaticamente após 1.5 segundos
+      setTimeout(async ()=>{
+        try {
+          await window.midnightAPI.applyUpdate();
+        } catch(e) {
+          toast('Falha ao reiniciar: ' + e);
+        }
+      }, 1500);
+    }
+    if(p.status === 'error'){
+      clearInterval(h);
+      if(txt) txt.textContent = 'Falha no download: ' + (p.error || 'Erro');
+      toast('Falha no download: ' + p.error);
+      if(btnNow) btnNow.style.display = '';
+    }
+  }, 500);
 });
+
 document.getElementById('btn-update-restart')?.addEventListener('click', async ()=>{
-  const btn=document.getElementById('btn-update-restart');
-  btn.disabled=true; btn.textContent='A reiniciar…';
+  const btn = document.getElementById('btn-update-restart');
+  btn.disabled = true;
+  btn.textContent = 'A reiniciar…';
   toast('A aplicar atualização e a reiniciar…');
   try{
-    const r=await window.midnightAPI.applyUpdate();
-    // Se chegámos aqui, o restart falhou (o sucesso fecha o processo).
-    btn.disabled=false; btn.textContent='Reiniciar agora';
-    const msg=(r && r.output) || 'Falha desconhecida no restart.';
-    toast('⚠ '+msg);
-    try{ await window.midnightAPI.logError('applyUpdate falhou: '+msg); }catch{}
+    const r = await window.midnightAPI.applyUpdate();
+    btn.disabled = false;
+    btn.textContent = 'Reiniciar agora';
+    const msg = (r && r.output) || 'Falha no restart.';
+    toast('⚠ ' + msg);
   }catch(e){
-    btn.disabled=false; btn.textContent='Reiniciar agora';
-    toast('⚠ Falha no restart: '+e);
-    try{ await window.midnightAPI.logError('applyUpdate excecao: '+(e&&e.stack||e)); }catch{}
+    btn.disabled = false;
+    btn.textContent = 'Reiniciar agora';
+    toast('⚠ Falha no restart: ' + e);
   }
 });
 

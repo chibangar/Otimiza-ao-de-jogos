@@ -1,6 +1,11 @@
-🎯 Midnight Optimizer v3.2.0 — Miras, Viewmodels, Sub-Tick Hitreg & In-Game Overlay
+🎯 Midnight Optimizer v3.2.1 — Correção de Executável & Auto-Update Inteligente
 
-## ✨ Principais Novidades da Versão 3.2.0
+## ✨ Principais Novidades da Versão 3.2.1
+- Eliminação do erro ModuleNotFoundError: No module named 'pros' na inicialização do executável.
+- Empacotamento direto via MidnightOptimizer.spec garantindo todos os módulos no binário.
+- A aba de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.
+- Reinicio automático após o download de nova versão dentro da app.
+- Deteção contínua em segundo plano a cada 15 minutos: quando houver nova versão no GitHub, a aba volta a aparecer.
 
 ### 🎯 Miras dos Pros Oficiais CS2 (100% Não Destrutivo)
 - Galeria completa dos melhores pro players do mundo: m0NESY, donk, NiKo, ZywOo, s1mple, ropz e FalleN.

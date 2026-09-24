@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.2.1] - 2026-09-24
+
+### 🛠️ Correção Crítica de Executável (Bundling de Módulos)
+- **Correção de Crash de Inicialização**: Resolvido o erro `ModuleNotFoundError: No module named 'pros'` na versão compilada `MidnightOptimizer.exe`.
+- **Compilação Determinística via Spec File**: O fluxo de compilação agora utiliza `MidnightOptimizer.spec` com inclusão explícita de todos os módulos (`pros.py`, `game_tweaks.py`, `overlay.py`, `voicefx.py`, `accounts.py`, `oauth_login.py`, `servers.py`, `online.py`) e caminhos dinâmicos `sys._MEIPASS`.
+- **Mecanismo de Carregamento Seguro (_safe_import)**: Adicionado fallback dinâmico em `app.py` que pesquisa no diretório executável e em pacotes extraídos, prevenindo qualquer falha por dependência ausente.
+
+### 🔄 Sistema de Atualização Integrado Inteligente (Auto-Restart & Dynamic Banner)
+- **Ocultação Automática da Aba de Atualização**: Quando a aplicação já se encontra na versão mais recente, a barra e aba de notificação de atualização desaparecem automaticamente.
+- **Deteção Contínua em Segundo Plano**: A aplicação verifica periodicamente novas versões no GitHub a cada 15 minutos; caso uma nova versão seja publicada, a aba volta a surgir de imediato.
+- **Reinicio Automático Concluído**: Ao descarregar uma nova versão dentro da app, o processo avisa o utilizador e reinicia automaticamente em 1.5 segundos, aplicando o novo executável de forma transparente.
+
 ## [v3.2.0] - 2026-09-24
 
 ### 🎯 Miras dos Pros & Viewmodels CS2 (100% Não Destrutivo)
