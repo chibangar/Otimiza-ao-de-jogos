@@ -21,6 +21,7 @@ a = Analysis(
         ('servers.py', '.'),
         ('online.py', '.'),
         ('voicemod_importer.py', '.'),
+        ('voicemod_sounds.json', '.'),
     ],
     hiddenimports=[
         'pros',
@@ -32,6 +33,10 @@ a = Analysis(
         'servers',
         'online',
         'voicemod_importer',
+        'soundfile',
+        '_soundfile',
+        'cffi',
+        '_cffi_backend',
         'tkinter',
         'webview',
         'webview.platforms.winforms',

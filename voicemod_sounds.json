@@ -1,0 +1,532 @@
+[
+  {
+    "id": "63d14794-ae5a-4473-a546-0e4ef790c14d",
+    "name": "Jouissement (copy)",
+    "audio_url": "https://content-storage.voicemod.net/c90a2695616c91ae082ec62758ff1dead30aa411116a6ce2cd3bbb7bede627c7",
+    "audio_name": "1754000967505-66862253-4f45-42de-97e0-0f095bb7bdf7-1753869501151.ogg",
+    "icon_url": "https://content-storage.voicemod.net/37764c04aa2703671e5a5c2949caa52667f07ac0c274c9d01cacbc9071b5c352",
+    "icon_name": "1754000967505-66862253-4f45-42de-97e0-0f095bb7bdf7-1753869501151-thumbnailM.webp",
+    "duration": 6.375737190246582,
+    "volume": 0.47
+  },
+  {
+    "id": "991c9dc1-9e77-4834-b4e4-591983afd449",
+    "name": "Kalinka mix (russia)",
+    "audio_url": "https://content-storage.voicemod.net/900ea9456dd43a6f6ed6dcb90806143a4c58ca3e1bffe64af5bddb320358c432",
+    "audio_name": "1754006858398-77c3eb25-6172-4ab1-a9d8-081b6e46a3b4-1681957662900.ogg",
+    "icon_url": "https://content-storage.voicemod.net/e80f43c140f0608e543c6c38ad12505296738509278af1297c9b838a2b181252",
+    "icon_name": "1754006858398-77c3eb25-6172-4ab1-a9d8-081b6e46a3b4-1681957662900-thumbnailM.jpg",
+    "duration": 25.152000427246094,
+    "volume": 1
+  },
+  {
+    "id": "1eb72a75-3207-44a3-8849-1d347ad5c4ea",
+    "name": "Driving in my car right after a beer",
+    "audio_url": "https://content-storage.voicemod.net/853f544c7053c411c7079eed4aaabcf6f306b95cbb5b586a2238af9b0d47da9c",
+    "audio_name": "1754006964994-2196391a-b93d-42ef-b289-3a6dbe8cc7d4-1753636095029.ogg",
+    "icon_url": "https://content-storage.voicemod.net/b54f06f720ed56e2c97438ac7929ae6fd024618e603d149d082ba69654c5cd84",
+    "icon_name": "1754006964994-2196391a-b93d-42ef-b289-3a6dbe8cc7d4-1753636095029-thumbnailM.webp",
+    "duration": 16.092458724975586,
+    "volume": 1
+  },
+  {
+    "id": "673838e4-0687-400d-af9c-0d3655441bd3",
+    "name": "OMG WOW",
+    "audio_url": "https://content-storage.voicemod.net/38c3bd29a144ede342056f232d8ac55e866dc2df4d7a94c2aa073f84040d25fc",
+    "audio_name": "1754007049714-0917fac3-fad4-4442-a70d-6c95d434797a-1674922096625.ogg",
+    "icon_url": "https://content-storage.voicemod.net/e526989936d2088dd888014401e259ac7f1dee5e5ba1863bf7bb8f162129e884",
+    "icon_name": "1754007049714-0917fac3-fad4-4442-a70d-6c95d434797a-1674922096625-thumbnailM.jpg",
+    "duration": 3.9119999408721924,
+    "volume": 1
+  },
+  {
+    "id": "939158bb-7b01-46d5-8b99-10a2b867b1c9",
+    "name": "Mario64 - Jump",
+    "audio_url": "https://content-storage.voicemod.net/d1fdb16f1e4baaea9a79321543922e1649491ffefafbe7cd3bc253a70d2690e8",
+    "audio_name": "1754088004871-d01fde79-9060-4015-84a3-573d217dd043-1695631608740.ogg",
+    "icon_url": "https://content-storage.voicemod.net/84717345356b67d21701eb1208b76b5d8ed7dd1f256d5761f9f7c117195aefd7",
+    "icon_name": "1754088004871-d01fde79-9060-4015-84a3-573d217dd043-1695631608740-thumbnailM.png",
+    "duration": 1.3680000305175781,
+    "volume": 1
+  },
+  {
+    "id": "d35fa53e-18c4-4392-9c20-45fb40b97095",
+    "name": "mario",
+    "audio_url": "https://content-storage.voicemod.net/158dcf833543b594019a0b273c390f75afa4a8e96c80bd45e30ff4cafe621a02",
+    "audio_name": "1754088417877-ffe2358b-1043-4d06-9168-1a745f061e12-1693084254161.ogg",
+    "icon_url": "https://content-storage.voicemod.net/0d9b4b0fa895f47130a5bf236cec5c279465903202da31a99631b926b938249c",
+    "icon_name": "1754088417877-ffe2358b-1043-4d06-9168-1a745f061e12-1693084254161-thumbnailM.png",
+    "duration": 4.294000148773193,
+    "volume": 1
+  },
+  {
+    "id": "5dabb93b-ce64-4643-86c4-86c96e81c98a",
+    "name": "Super Mario Death",
+    "audio_url": "https://content-storage.voicemod.net/4a42290b39d734ac802e7553786e267b0732d05c630a9afa45b0092a95d26ef0",
+    "audio_name": "1754088826976-dc458367-9900-4415-b483-fd1de0a709e8-1669580655113.ogg",
+    "icon_url": "https://content-storage.voicemod.net/c55fcde383919a909a350ef9ee06b49c21970998573a89d68946b9c7b1c74290",
+    "icon_name": "1754088826976-dc458367-9900-4415-b483-fd1de0a709e8-1669580655113-thumbnailM.png",
+    "duration": 2.6640000343322754,
+    "volume": 1
+  },
+  {
+    "id": "a7bb1763-5445-42a3-88c7-bef25ac5fcb6",
+    "name": "Squid Game Doll",
+    "audio_url": "https://content-storage.voicemod.net/8d649d64052c4c42b4d94c301b9e13a6ee1222f7c7ca99773b54fde6dbdf0c34",
+    "audio_name": "1754089957654-324f2493-2a39-493e-8f8b-533002bf76a2-1751994899019.ogg",
+    "icon_url": "https://content-storage.voicemod.net/1e089b7ebb3cbd86b9b4fc39b5b03bc72792ffade95d0dd42e3d332e5a59de91",
+    "icon_name": "1754089957654-324f2493-2a39-493e-8f8b-533002bf76a2-1751994899019-thumbnailM.webp",
+    "duration": 5.3878960609436035,
+    "volume": 1
+  },
+  {
+    "id": "042df340-84e6-43db-b264-7c49fa82c7f7",
+    "name": "Valorant Cypher Get me a corpse",
+    "audio_url": "https://content-storage.voicemod.net/6eb314b33cabd3df912fc0e5646eda88dcd1fdb8aa8554219d84e77d109eee18",
+    "audio_name": "1754090267555-771cb8fd-b089-4e2e-bf1f-8a92c9194f8d-1705367781733.ogg",
+    "icon_url": "https://content-storage.voicemod.net/d9631300ee8722f2b5018e3f6923dc2f2b96194e1775d3a624499ae611f0de40",
+    "icon_name": "1754090267555-771cb8fd-b089-4e2e-bf1f-8a92c9194f8d-1705367781733-thumbnailM.jpg",
+    "duration": 0.9665416479110718,
+    "volume": 1
+  },
+  {
+    "id": "59c13626-2ec9-4159-b35a-789e5e08dc13",
+    "name": "Family Frost Hang",
+    "audio_url": "https://content-storage.voicemod.net/cc64276938fec706ff45e6c514ac7da802233f4413c28651749c7a2772f7eeff",
+    "audio_name": "1754144920576-40bd9154-1969-423b-930f-bacb7f7d2504-1661377322876.ogg",
+    "icon_url": "https://content-storage.voicemod.net/4ef5fe6f592ccb449fd12646c7dc914ff4449c543e8459f40ba685f88e3802df",
+    "icon_name": "1754144920576-40bd9154-1969-423b-930f-bacb7f7d2504-1661377322876-thumbnailM.png",
+    "duration": 3.4560000896453857,
+    "volume": 1
+  },
+  {
+    "id": "50c2d7fd-8e41-4832-8abb-cff1608d7517",
+    "name": "Oliver e Benji 1ª Abertura Portugal",
+    "audio_url": "https://content-storage.voicemod.net/18ff401484f1b3354f5c95a2ede270f3a725bf9db35cd94442ec16fe599c76d6",
+    "audio_name": "1754146536147-ea9e3e0c-fc60-4c32-b282-5c1110be1834-1705065237672.ogg",
+    "icon_url": "https://content-storage.voicemod.net/8645f02adbd554d5906c9cbbe0cf41617f2b1fb0c89188acc32fe228e79b37f6",
+    "icon_name": "1754146536147-ea9e3e0c-fc60-4c32-b282-5c1110be1834-1705065237672-thumbnailM.jpeg",
+    "duration": 44.784000396728516,
+    "volume": 1
+  },
+  {
+    "id": "589b21d9-a02d-47bd-915d-f6bb243439b3",
+    "name": "pij wojanka bass",
+    "audio_url": "https://content-storage.voicemod.net/6f26b6a9d9a20382baef1dbf5df62f19c2ce41882fb7f162a3483e5b8f81ab85",
+    "audio_name": "1755901313342-50cb750f-ca5f-448e-99fd-cda547a14e46-1755288441623.ogg",
+    "icon_url": "https://content-storage.voicemod.net/1b4373b5b0019f9de2724384d4ed1b9b712e8e5db6b86ca6fff139e3c66ad837",
+    "icon_name": "1755901313342-50cb750f-ca5f-448e-99fd-cda547a14e46-1755288441623-thumbnailM.webp",
+    "duration": 18.024478912353516,
+    "volume": 1
+  },
+  {
+    "id": "2435efa0-f286-4469-aa22-9bea8111458c",
+    "name": "acelerada",
+    "audio_url": "https://content-storage.voicemod.net/8e396ef77f1a641b910d779d28adf9c8dc4d5dffb9ce2c801cac1a064a03f9ec",
+    "audio_name": "1756047028415-4bde42b9-962b-4529-97ad-5b14448ccfbb-1753916459535.ogg",
+    "icon_url": "https://content-storage.voicemod.net/e9550a9efa4892c1df7208abb1fbb78ea2d7a1ef4493a025b4d099a75b62288a",
+    "icon_name": "1756047028415-4bde42b9-962b-4529-97ad-5b14448ccfbb-1753916459535-thumbnailM.webp",
+    "duration": 44.91754913330078,
+    "volume": 1
+  },
+  {
+    "id": "cfb20e17-4c4a-4587-930e-8ca9675995dd",
+    "name": "Dua Lipa & Jungkook – Crimson Haze (Official Music Video) [joTNxIJWj7U]",
+    "audio_url": "https://content-storage.voicemod.net/3595fe5ce01230b99e3d813ac0ca9147d827fde310e6c8bbd898314b2cd7476f",
+    "audio_name": "3847ae9bf05b25dadd59e562cc5f543929eb9116f109a220f880e5a345f470ff.ogg",
+    "icon_url": null,
+    "icon_name": null,
+    "duration": 230.15618896484375,
+    "volume": 1
+  },
+  {
+    "id": "2156568d-a7fb-48a6-8322-55b4550fa718",
+    "name": "tri poloski",
+    "audio_url": "https://content-storage.voicemod.net/b9f40b51968af87f2df714a79f3452fa1f957d5fbb525eb58f10698bbb49cd18",
+    "audio_name": "1756048402719-4ab23bff-3287-45ef-b5e6-bb8fd49de8b4-1677450355166.ogg",
+    "icon_url": "https://content-storage.voicemod.net/8c93fe4ebd5fd0cc3fc71cc348dcf24c1c59d539704d3b1e8e634aea15d6bf86",
+    "icon_name": "1756048402719-4ab23bff-3287-45ef-b5e6-bb8fd49de8b4-1677450355166-thumbnailM.jpg",
+    "duration": 45.02399826049805,
+    "volume": 1
+  },
+  {
+    "id": "3fbe2e26-2839-4c65-aea8-a758b7a4fc16",
+    "name": "pokemon",
+    "audio_url": "https://content-storage.voicemod.net/928a2f090b03ecdb42caa10031ecc72914b83d15ca336a20103f3dad1a9f3336",
+    "audio_name": "1756048461165-c45a5a45-2bdc-4a09-9c83-deb29f02a831-1656108264765.ogg",
+    "icon_url": "https://content-storage.voicemod.net/9977c095c8eb05336ec338669e476fa6c4a1f3a61c710fe6dbb64c4fe94e0213",
+    "icon_name": "1756048461165-c45a5a45-2bdc-4a09-9c83-deb29f02a831-1656108264765-thumbnailM.png",
+    "duration": 39.672000885009766,
+    "volume": 1
+  },
+  {
+    "id": "a4df851b-e5e7-48e8-9570-710ca57dbd3d",
+    "name": "Musica Triste Toguro",
+    "audio_url": "https://content-storage.voicemod.net/b34fdc8e076b86135a9ee7fa62c6ef82fc2f517991cacaf18d422f363b22f576",
+    "audio_name": "1756048875869-5aae6fce-7b3b-4937-9a48-355a327aa4d6-1691781875660.ogg",
+    "icon_url": "https://content-storage.voicemod.net/b863da24b16b88df22204b506cbbbd4de1f951fe09a1686ddeb93414c64504ef",
+    "icon_name": "1756048875869-5aae6fce-7b3b-4937-9a48-355a327aa4d6-1691781875660-thumbnailM.jpg",
+    "duration": 28.107770919799805,
+    "volume": 1
+  },
+  {
+    "id": "175bc747-a224-4bb6-bc9e-2268a2ad814e",
+    "name": "Musica triste Edivaldo",
+    "audio_url": "https://content-storage.voicemod.net/7277b1feca408dc5336cd91453355be4d8508336964505823dd62b93f1a9640e",
+    "audio_name": "1756049111666-b0a1ed33-b6f8-470b-896a-31a0b83e4f43-1657059946228.ogg",
+    "icon_url": "https://content-storage.voicemod.net/df86a78e10eb641909080f3df6adc7c7de9066c03bb527c102f7157cd2936c0e",
+    "icon_name": "1756049111666-b0a1ed33-b6f8-470b-896a-31a0b83e4f43-1657059946228-thumbnailM.png",
+    "duration": 9.600000381469727,
+    "volume": 1
+  },
+  {
+    "id": "b943e37d-b1f8-43dd-8429-51167e4c9700",
+    "name": "portugal goal",
+    "audio_url": "https://content-storage.voicemod.net/55c600deb3d8ee523729884b7987caebb401362a21ca80d32406cdb34ad5bf76",
+    "audio_name": "1756049403709-a3dcee0d-f790-48a4-a9f4-fd25a9aa6efc-1662090828425.ogg",
+    "icon_url": "https://content-storage.voicemod.net/2c29e57b443a1ace3268debc1b9505b6a7ae126ceaab0ee68d8f2ecb690b7ce3",
+    "icon_name": "1756049403709-a3dcee0d-f790-48a4-a9f4-fd25a9aa6efc-1662090828425-thumbnailM.jpg",
+    "duration": 28.72800064086914,
+    "volume": 1
+  },
+  {
+    "id": "1f1d7090-68c9-470c-9d47-cb10274c36e1",
+    "name": "ei oh mano olha aí oh mano olha aí por favor",
+    "audio_url": "https://content-storage.voicemod.net/28755072c6581ebfe82f447458b19a32a15c4ad6c43d1c962256fade9b92a5d2",
+    "audio_name": "1756049440175-2956c0be-173c-4ba5-8f96-bd3c2c9e245b-1727125155023.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ac7779284630f8d9f0fd4d7198a620252cb78203cd3216c28a93a3c6583d087c",
+    "icon_name": "1756049440175-2956c0be-173c-4ba5-8f96-bd3c2c9e245b-1727125155023-thumbnailM.jpeg",
+    "duration": 6.6479997634887695,
+    "volume": 1
+  },
+  {
+    "id": "1d9a0448-89f7-41ff-9a8e-03a63e844e8c",
+    "name": "Hardbass Russia",
+    "audio_url": "https://content-storage.voicemod.net/dc3c9edf0bfc014109f8d0c8d51a7d88444464d93efe230ade73e30c6c053417",
+    "audio_name": "1756067786662-e6dfb69c-a011-43e5-b2ba-1bc477431492-1705088584418.ogg",
+    "icon_url": "https://content-storage.voicemod.net/7295265f826836c9d0b3c5438cb2e3e086459dddd980c890ff1a4655c6268998",
+    "icon_name": "1756067786662-e6dfb69c-a011-43e5-b2ba-1bc477431492-1705088584418-thumbnailM.jpg",
+    "duration": 45.02399826049805,
+    "volume": 1
+  },
+  {
+    "id": "9bf62e71-2c9b-4103-ac95-c5232fb572c3",
+    "name": "angry russia kid",
+    "audio_url": "https://content-storage.voicemod.net/5c270d500753a5586cdba1d6a2f51a277f96b01f71b1b4484a0089f604c3d604",
+    "audio_name": "1756067789327-8d61414e-4b5d-41d4-9aaf-766e0c7edcfb-1690962152149.ogg",
+    "icon_url": "https://content-storage.voicemod.net/71819ab96a8c885871e322c5cccc07f7e665e8e5d8d996dae91f2c4b5c7d0a15",
+    "icon_name": "1756067789327-8d61414e-4b5d-41d4-9aaf-766e0c7edcfb-1690962152149-thumbnailM.jpg",
+    "duration": 39.81062316894531,
+    "volume": 1
+  },
+  {
+    "id": "3e0317c4-8767-45d3-806f-4b307af3a5b1",
+    "name": "random russia",
+    "audio_url": "https://content-storage.voicemod.net/a7d1d95bea9b537fe3b0030d49242f4d2186974ed17ecf0b4e386367d787cc91",
+    "audio_name": "1756068166869-b5278729-43d2-4d09-9d7c-d1bcaeb1b7c1-1704534583541.ogg",
+    "icon_url": "https://content-storage.voicemod.net/c7427a64b64d37ab688242b7ec65a06516a5333c96f77b636bed28c5ccdff141",
+    "icon_name": "1756068166869-b5278729-43d2-4d09-9d7c-d1bcaeb1b7c1-1704534583541-thumbnailM.jpg",
+    "duration": 40.14324951171875,
+    "volume": 1
+  },
+  {
+    "id": "a9759cb2-032b-4947-bc48-be95d32d59ac",
+    "name": "Trance music",
+    "audio_url": "https://content-storage.voicemod.net/4534619263300b47b7856010fb032f6a37840a86145c768b2ebc067f414d6908",
+    "audio_name": "1759613982320-5d88f7ea-c0fa-492e-b885-33bf463cfd9b-1705266380914.ogg",
+    "icon_url": "https://content-storage.voicemod.net/a737d990685740a0e781f913f2c9dfe308998330c28901761f9a63d8b503169b",
+    "icon_name": "1759613982320-5d88f7ea-c0fa-492e-b885-33bf463cfd9b-1705266380914-thumbnailM.jpg",
+    "duration": 45.04800033569336,
+    "volume": 1
+  },
+  {
+    "id": "9ec1188b-2919-4c6a-bbca-79e838d1e0a8",
+    "name": "here with me - d4vd (slowed)",
+    "audio_url": "https://content-storage.voicemod.net/30bbb6954ee44985a63aa33ecea0d29fc6b4767131289ce2cb909a9368f79dc3",
+    "audio_name": "1759614207967-6c14a0fc-41a6-44bc-9e79-3ed5fc2e6db5-1724445517421.ogg",
+    "icon_url": "https://content-storage.voicemod.net/1aa4d6f585b056fdab9005df488f0ab0f3dbc78288c173fc000812513c318e46",
+    "icon_name": "1759614207967-6c14a0fc-41a6-44bc-9e79-3ed5fc2e6db5-1724445517421-thumbnailM.png",
+    "duration": 45.02399826049805,
+    "volume": 1
+  },
+  {
+    "id": "33ac2fa5-32f7-4529-bedd-1e1c23d7b0b2",
+    "name": "MENTE MA (Slowed)",
+    "audio_url": "https://content-storage.voicemod.net/dce9da76fb65c5c9170813c6bbba97f953412c114f27b9615097aa6836ad7535",
+    "audio_name": "1759614320720-77277bd8-a68d-423a-a579-e4eab778762a-1749853368652.ogg",
+    "icon_url": "https://content-storage.voicemod.net/7c54d824e64fe18650d27d2495e88c0e0f1b1c914cc827df60069655a4ceeab4",
+    "icon_name": "1759614320720-77277bd8-a68d-423a-a579-e4eab778762a-1749853368652-thumbnailM.png",
+    "duration": 45.04800033569336,
+    "volume": 1
+  },
+  {
+    "id": "59af0e65-a66c-4a4c-a23c-072eb084590f",
+    "name": "Noli YAAI chase theme 1",
+    "audio_url": "https://content-storage.voicemod.net/5621b720b35574f2ade72cd4704fd915531dbf2370dfdfc64bdb7894ba83c0fe",
+    "audio_name": "1759614363362-a467ffe5-5e18-4e14-a671-25f37e5bfe38-1753194056794.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ffb35fb541d803cfa9ccfb93d3b950d4104054ae2b406ab20b864fc8716ca3e1",
+    "icon_name": "1759614363362-a467ffe5-5e18-4e14-a671-25f37e5bfe38-1753194056794-thumbnailM.webp",
+    "duration": 44.92993927001953,
+    "volume": 1
+  },
+  {
+    "id": "8fbc00ec-a6ce-496e-b01a-e28d5d403b4a",
+    "name": "Pink Panther Theme",
+    "audio_url": "https://content-storage.voicemod.net/46a2b13ebcaf96c27da726cc63303680f8228dd9cc023a48f1ca23f8bf1d7ae4",
+    "audio_name": "1759614477056-b5f1cfd0-ae96-47b4-ad1e-6067edbf6f85-1757957880529.ogg",
+    "icon_url": "https://content-storage.voicemod.net/97f001d571da5c5304a9b17eb51b7fde3b5bb1d9c989fe99d1915a1dc2eb37fa",
+    "icon_name": "1759614477056-b5f1cfd0-ae96-47b4-ad1e-6067edbf6f85-1757957880529-thumbnailM.png",
+    "duration": 16.58066749572754,
+    "volume": 1
+  },
+  {
+    "id": "16176357-c05a-42fb-aeb5-06e9a0bef384",
+    "name": "Titanic Flute",
+    "audio_url": "https://content-storage.voicemod.net/8a198d6fb21de5f36a33b068d797a856dcc47984c20495d8965f375355e75c9a",
+    "audio_name": "1759614567926-ba527db8-390f-478c-a32c-872ad5db56b2-1640249290470.ogg",
+    "icon_url": "https://content-storage.voicemod.net/042784f1cfcc319cbd8169242bb18b1c8a1808c0d4666d8cce2077ed6864cd4a",
+    "icon_name": "1759614567926-ba527db8-390f-478c-a32c-872ad5db56b2-1640249290470-thumbnailM.jpg",
+    "duration": 11.337145805358887,
+    "volume": 1
+  },
+  {
+    "id": "bffaffee-55f6-4a7f-84e6-bc3d7ad97fef",
+    "name": "Lovely sad (tiktok original)",
+    "audio_url": "https://content-storage.voicemod.net/12e69785d52eb8ab3c767ac4f124ca5337e2b6513cac93e7f703390d9ac49b9c",
+    "audio_name": "1759617203310-a292d554-2893-4233-9053-2e2b1619792b-1758010742262.ogg",
+    "icon_url": "https://content-storage.voicemod.net/1b5ed152e4f02a7645e053fda275683c0e38d2aa9a63dd54156e6e682af58b1f",
+    "icon_name": "1759617203310-a292d554-2893-4233-9053-2e2b1619792b-1758010742262-thumbnailM.jpg",
+    "duration": 44.42399978637695,
+    "volume": 1
+  },
+  {
+    "id": "b0d456cd-f4fd-452f-adc3-242a15282a37",
+    "name": "L4D2 Hunter Scream",
+    "audio_url": "https://content-storage.voicemod.net/36f987f360b5d4ac5a3a1565f3ac51848fae144976cca142f757d6b6bd6898e0",
+    "audio_name": "1761427591401-f463ae50-b667-413f-b95b-2d27b78d812c-1718656380193.ogg",
+    "icon_url": "https://content-storage.voicemod.net/a538295cf9c60298f53394977d65ababb50db8c0b3cc0793da265e74cc7a3772",
+    "icon_name": "1761427591401-f463ae50-b667-413f-b95b-2d27b78d812c-1718656380193-thumbnailM.jpg",
+    "duration": 2.3519999980926514,
+    "volume": 1
+  },
+  {
+    "id": "0afbe87f-b7c6-4267-af73-efd837b00216",
+    "name": "ESTA NOCHE",
+    "audio_url": "https://content-storage.voicemod.net/7fc41eb6681f56b82438eb47342fc93ce4c2f6bfb0ccffb35974ac47e160f64d",
+    "audio_name": "1761478769425-b1ecc0a3-c3b1-4aca-9283-7b8180746e30-1752575087129.ogg",
+    "icon_url": "https://content-storage.voicemod.net/225329515ecc99972f781e87c91897ff779d39c9714ae02cc2fab3586b5282ce",
+    "icon_name": "1761478769425-b1ecc0a3-c3b1-4aca-9283-7b8180746e30-1752575087129-thumbnailM.webp",
+    "duration": 42.01902389526367,
+    "volume": 1
+  },
+  {
+    "id": "4b1505b0-f0b1-4554-b662-d1c0f0480645",
+    "name": "Yo soy frances por eso vengo a vengo a cantarte los n romanos",
+    "audio_url": "https://content-storage.voicemod.net/fc051f73319acfdf3f2cbafbc227173e37e1ae558e3c1d51706691ceb22ec60a",
+    "audio_name": "1761478961640-cdebdad7-43c9-4dcd-91bb-28c7c9802ebf-1718434572422.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ed8ba6f05e9b0ea9c57c3e56cd324765bb0adfedef696a1abcb75ee2df1c64f7",
+    "icon_name": "1761478961640-cdebdad7-43c9-4dcd-91bb-28c7c9802ebf-1718434572422-thumbnailM.jpg",
+    "duration": 43.91999816894531,
+    "volume": 1
+  },
+  {
+    "id": "2fe12b34-bbcf-4f01-b8b0-5f2c14763c0e",
+    "name": "uwu",
+    "audio_url": "https://content-storage.voicemod.net/c9e67e5c942859a9bc09d27760a1b873982985552967270ad392c91fd0a201e5",
+    "audio_name": "1761498907311-cbca10a5-5f2d-4c49-92dd-a0b84215c2bb-1691686777283.ogg",
+    "icon_url": "https://content-storage.voicemod.net/f411ce76dd939aa8496007a75656d9b7c20ef4254941e801c18b82d00317c669",
+    "icon_name": "1761498907311-cbca10a5-5f2d-4c49-92dd-a0b84215c2bb-1691686777283-thumbnailM.png",
+    "duration": 1.437999963760376,
+    "volume": 1
+  },
+  {
+    "id": "78cf9705-7cc7-4745-906a-62ee9b28c813",
+    "name": "Flight Laugh",
+    "audio_url": "https://content-storage.voicemod.net/156873758920864cec8f7951f730f27a7bb1248b29af5942be044ad5dc2b2ebe",
+    "audio_name": "1761515637649-5a75f152-f604-4a94-8934-5e7b1db62c19-1670278400250.ogg",
+    "icon_url": "https://content-storage.voicemod.net/56508ce9a6e16f7d362b3a75a111261baebe3371a540fea93ab7516a93920258",
+    "icon_name": "1761515637649-5a75f152-f604-4a94-8934-5e7b1db62c19-1670278400250-thumbnailM.jpg",
+    "duration": 4.464000225067139,
+    "volume": 1
+  },
+  {
+    "id": "3bf6e073-1a55-4b72-9214-cfe9e0b7b7f7",
+    "name": "Kick my uncle in the balls im batman",
+    "audio_url": "https://content-storage.voicemod.net/2127e9ed8fdd5b5c2ec02466bad2194793c9fffd236ffcd0e4365b2cf13b2943",
+    "audio_name": "1762884835459-9643d030-504e-4598-84ca-772fb6c3fb2f-1758916125902.ogg",
+    "icon_url": "https://content-storage.voicemod.net/322c8ab58bf51e154ee0b728c21a474a44a46ef0ce53187d0accf15d56a3f9ea",
+    "icon_name": "1762884835459-9643d030-504e-4598-84ca-772fb6c3fb2f-1758916125902-thumbnailM.webp",
+    "duration": 6.092645645141602,
+    "volume": 1
+  },
+  {
+    "id": "a893f27d-45fe-4c0a-b133-4f78cb021787",
+    "name": "Alarm",
+    "audio_url": "https://content-storage.voicemod.net/0bd357d2cfad8f3d1f0622af39a5b58d8ea6b202db1863acf8e690c6776460be",
+    "audio_name": "a893f27d-45fe-4c0a-b133-4f78cb021787-1667326564647.ogg",
+    "icon_url": "https://content-storage.voicemod.net/6788b97e83332bc1940ba8a76c1d88129329e359092fe5138d58a71a8423f56a",
+    "icon_name": "a893f27d-45fe-4c0a-b133-4f78cb021787-1667326564647.png",
+    "duration": 6.4079999923706055,
+    "volume": 1
+  },
+  {
+    "id": "e4d03a17-566c-4ac0-8b28-e24246432346",
+    "name": "romantic",
+    "audio_url": "https://content-storage.voicemod.net/66b930b25429176b26b95bd64e4d5d99b88fbb0b5974f83bed0e5e06d68c6602",
+    "audio_name": "e4d03a17-566c-4ac0-8b28-e24246432346-1764969333977.ogg",
+    "icon_url": "https://content-storage.voicemod.net/b18cd3c3fc0f5802b17a25ecbfb5f64d0c542e5da368a04db99a6e2f5c05b72d",
+    "icon_name": "e4d03a17-566c-4ac0-8b28-e24246432346-1764969333977.webp",
+    "duration": 16.31999969482422,
+    "volume": 1
+  },
+  {
+    "id": "fe2bc478-bc50-4c3d-90dd-4dddb1016d33",
+    "name": "thats la peace",
+    "audio_url": "https://content-storage.voicemod.net/45bf9b9bd1c43e0e088388468629336ebf0373393bd0306da8e58f889773e6b7",
+    "audio_name": "fe2bc478-bc50-4c3d-90dd-4dddb1016d33-1787823885551.ogg",
+    "icon_url": "https://content-storage.voicemod.net/978b6143e220dbea68eeb3feab96040da7fab85a655e12f0df9912176f5c0ead",
+    "icon_name": "fe2bc478-bc50-4c3d-90dd-4dddb1016d33-1787823885551.webp",
+    "duration": 17.923999786376953,
+    "volume": 1
+  },
+  {
+    "id": "7e332242-627f-499e-b479-d2089b2e5c50",
+    "name": "Wombo Combo!",
+    "audio_url": "https://content-storage.voicemod.net/7b77fef85e8e73f82ff401ef0eb2991b05d3040c393564f2c957abfba1b546b0",
+    "audio_name": "7e332242-627f-499e-b479-d2089b2e5c50.ogg",
+    "icon_url": "https://content-storage.voicemod.net/0fe9d7371199f7a6024298af494a0d18c2463c5453f90b1d12350037cbc27c76",
+    "icon_name": "7e332242-627f-499e-b479-d2089b2e5c50.jpg",
+    "duration": 11.02400016784668,
+    "volume": 1
+  },
+  {
+    "id": "41b4e370-a467-4a30-a384-0fe38123810e",
+    "name": "Porn 4",
+    "audio_url": "https://content-storage.voicemod.net/61a6889b9e2ca977b8e6fe405678c4771d013b350da564433a59ab261521b01e",
+    "audio_name": "41b4e370-a467-4a30-a384-0fe38123810e-1776333452581.ogg",
+    "icon_url": "https://content-storage.voicemod.net/53262f5ebbd378c1d00e8901f3f9d714309dad3df82e8ddb151ca27de00c5825",
+    "icon_name": "41b4e370-a467-4a30-a384-0fe38123810e-1776336680157.webp",
+    "duration": 8.711999893188477,
+    "volume": 1
+  },
+  {
+    "id": "b10fd4df-861d-4ae8-8e3a-1c8025c5218b",
+    "name": "apt",
+    "audio_url": "https://content-storage.voicemod.net/657b5fd966c53ba3bc54e09895ed3d3edfeb6c9102ee1a68a72af5792077e2ea",
+    "audio_name": "b10fd4df-861d-4ae8-8e3a-1c8025c5218b-1731542540230.ogg",
+    "icon_url": "https://content-storage.voicemod.net/92dce6cb8b60fdd466a1f76b4e11e04dade86101e4d128291b463f4e3041eaaf",
+    "icon_name": "b10fd4df-861d-4ae8-8e3a-1c8025c5218b-1731542540230.jpg",
+    "duration": 26.18400001525879,
+    "volume": 1
+  },
+  {
+    "id": "98ab4932-9f38-4bf3-ae3c-345047d9178f",
+    "name": "gubby this gubby that funk",
+    "audio_url": "https://content-storage.voicemod.net/45f6bc0c7f22d03cdd0cf45d427356935c38296c2c4ccd387b2d2925569b5881",
+    "audio_name": "98ab4932-9f38-4bf3-ae3c-345047d9178f-1788380185364.ogg",
+    "icon_url": "https://content-storage.voicemod.net/c43a8c968621af63c799b1203671936e5e8eb7105f60624c1725cba1d5ac0385",
+    "icon_name": "98ab4932-9f38-4bf3-ae3c-345047d9178f-1788380185364.webp",
+    "duration": 31.45800018310547,
+    "volume": 1
+  },
+  {
+    "id": "2bfa1474-4584-4a23-90ac-6f546ae4a153",
+    "name": "reverb fart",
+    "audio_url": "https://content-storage.voicemod.net/48a05501218b5a6064099d1aa90e6493ac01d03417256cfb0d969de6cfe07314",
+    "audio_name": "2bfa1474-4584-4a23-90ac-6f546ae4a153-1700070188245.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ee178ffe468b2bf15ac8eadee6dbf226a4a6eccbfd5d2de422252c76fc88e4fc",
+    "icon_name": "2bfa1474-4584-4a23-90ac-6f546ae4a153-1700070188245.jpeg",
+    "duration": 6.935999870300293,
+    "volume": 1
+  },
+  {
+    "id": "4ee98301-b626-4719-9217-80781985252f",
+    "name": "aiii aiii aiii scream guy meme sound effect",
+    "audio_url": "https://content-storage.voicemod.net/c544918f34867d3f493a5b9ca9fefc14ad8b505b21116ffafdb7a3463cbfb4d8",
+    "audio_name": "4ee98301-b626-4719-9217-80781985252f-1777081743781.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ddec353b48ead5bc7d6db5e777f10111b775c0048ab39bd6655de05bbbf3809a",
+    "icon_name": "4ee98301-b626-4719-9217-80781985252f-1777081743781.jpg",
+    "duration": 13.295999526977539,
+    "volume": 1
+  },
+  {
+    "id": "bedbb639-08ca-4cab-9cd3-1490c7f1087b",
+    "name": "RUSSIA",
+    "audio_url": "https://content-storage.voicemod.net/fc1fe0b302206cf35908b754b7ae07cd8241bbda00617a9adf30d9be2e0e6213",
+    "audio_name": "bedbb639-08ca-4cab-9cd3-1490c7f1087b-1714224121297.ogg",
+    "icon_url": "https://content-storage.voicemod.net/d74d3e6ad2183c4bb36bc1aaf0132570d599e22a15a77332cd90a7b052d97725",
+    "icon_name": "bedbb639-08ca-4cab-9cd3-1490c7f1087b-1714224121297.png",
+    "duration": 15.552000045776367,
+    "volume": 1
+  },
+  {
+    "id": "40f5adbd-af99-48f5-b39b-a6279e026fb7",
+    "name": "Cat Laughing At You",
+    "audio_url": "https://content-storage.voicemod.net/d947a67737b0379f15a5f939fac10c70a7df70efeada62bfc8c2aa177cd51bed",
+    "audio_name": "40f5adbd-af99-48f5-b39b-a6279e026fb7-1712216484342.ogg",
+    "icon_url": "https://content-storage.voicemod.net/e75dbfc79d763b69b33bdf7e406a0db3ba10944d2efc0769c7bf3648667b8adf",
+    "icon_name": "40f5adbd-af99-48f5-b39b-a6279e026fb7-1712216484342.png",
+    "duration": 3.2909998893737793,
+    "volume": 1
+  },
+  {
+    "id": "6d18a8c6-3b2c-48bd-8fd0-f52b9fe24662",
+    "name": "SPEED LADRANDO",
+    "audio_url": "https://content-storage.voicemod.net/797f442ffed12e8bb841acca6ab112a8a73565030d0d2cb3d6de3b5ad25d2f35",
+    "audio_name": "6d18a8c6-3b2c-48bd-8fd0-f52b9fe24662-1710192384953.ogg",
+    "icon_url": "https://content-storage.voicemod.net/97095fe40cc17f3edb0513d3b5be5f7302e6252a1486417d496e2aa3ee04fdb8",
+    "icon_name": "6d18a8c6-3b2c-48bd-8fd0-f52b9fe24662-1710192384953.jpg",
+    "duration": 5.664000034332275,
+    "volume": 1
+  },
+  {
+    "id": "49fe530e-d8fe-418e-ab40-afbdb4f39cc7",
+    "name": "We'll drive a funky ehh",
+    "audio_url": "https://content-storage.voicemod.net/d42cadb25bf655bc9f0bd0a6154c357712e9ec74f8dacd6896cda4639d5ed450",
+    "audio_name": "49fe530e-d8fe-418e-ab40-afbdb4f39cc7-1783538248049.ogg",
+    "icon_url": "https://content-storage.voicemod.net/ae91d98a949dddc2b979c037696fa01807db3c371113dd47634e9e3177b10431",
+    "icon_name": "49fe530e-d8fe-418e-ab40-afbdb4f39cc7-1783538248049.webp",
+    "duration": 31.579999923706055,
+    "volume": 1
+  },
+  {
+    "id": "c80adafe-b9b6-4751-b8d3-42a1dd7e3d0d",
+    "name": "Outro theme, but with the freedom motif",
+    "audio_url": "https://content-storage.voicemod.net/46243a4e360efce4e96768d684c2d08387fc309ed28d7713ebc35957b4d557e2",
+    "audio_name": "c80adafe-b9b6-4751-b8d3-42a1dd7e3d0d-1756426487647.ogg",
+    "icon_url": "https://content-storage.voicemod.net/12f20d77d77c339f239d99d534286bb7973d072f08625ea2fb8cedee27dd2dc7",
+    "icon_name": "c80adafe-b9b6-4751-b8d3-42a1dd7e3d0d-1756426487647.webp",
+    "duration": 34.65399932861328,
+    "volume": 1
+  },
+  {
+    "id": "fc6eb65c-a727-434f-9b25-fc3bbd84b38b",
+    "name": "E quê filho tas a olhar",
+    "audio_url": "https://content-storage.voicemod.net/b31c8fd7182f2a66ea5e92f2933e4ba5486bdfa259f8510b6c3c4eeac9acef2d",
+    "audio_name": "fc6eb65c-a727-434f-9b25-fc3bbd84b38b-1742683068638.ogg",
+    "icon_url": "https://content-storage.voicemod.net/b52b57529d5fe787aa44038e0ec7d3ed9ebd527ca1133d60178896e7aa1b3d2c",
+    "icon_name": "fc6eb65c-a727-434f-9b25-fc3bbd84b38b-1742683068638.png",
+    "duration": 12.288000106811523,
+    "volume": 1
+  },
+  {
+    "id": "2a395de1-03b8-4415-a853-d9662d007390",
+    "name": "Wet Fart",
+    "audio_url": "https://content-storage.voicemod.net/c2f4efcabbba3fdfaa472c095f80b1e9e061894a6242bd43ec33a966290d658d",
+    "audio_name": "2a395de1-03b8-4415-a853-d9662d007390-1692979696569.ogg",
+    "icon_url": "https://content-storage.voicemod.net/8f2c74d114a8e167f5f3742c52360e6b22da9b56e2a67378c3fd11dc2cd6b722",
+    "icon_name": "2a395de1-03b8-4415-a853-d9662d007390-1692979696569.png",
+    "duration": 15.86400032043457,
+    "volume": 1
+  },
+  {
+    "id": "e8a63e9c-6935-43db-81a7-f1f92cb157f2",
+    "name": "Metal Bat Hit Sound Effect",
+    "audio_url": "https://content-storage.voicemod.net/4e448bc6d479539858970565dcb47fe8b255868c664408c703ebf9a91df609f2",
+    "audio_name": "e8a63e9c-6935-43db-81a7-f1f92cb157f2-1739308799180.ogg",
+    "icon_url": "https://content-storage.voicemod.net/c7ef0702386b6c4918a5f2ac01059064c07c9f1a6edc485aaab0b506e1746256",
+    "icon_name": "e8a63e9c-6935-43db-81a7-f1f92cb157f2-1739308799180.jpg",
+    "duration": 1.0440000295639038,
+    "volume": 1
+  }
+]

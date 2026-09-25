@@ -1184,7 +1184,8 @@ function renderSoundGrid(){
     const hk=hkFind('sound',s.id);
     const b=document.createElement('div'); b.className='vm-item';
     b.innerHTML=`<span class="vm-avatar"><button class="vm-key${hk?' bound':''}" title="Tecla de atalho">⌨</button>${s.custom?'<button class="vm-del" title="Remover meu som">✕</button>':''}<img src="${s.photo||''}" alt="" onerror="this.style.display='none'"></span><span class="vm-name">${s.title}</span><span class="vm-hk">${hk||''}</span>`;
-    b.querySelector('img').addEventListener('click', async ()=>{
+    b.addEventListener('click', async (ev)=>{
+      if(ev.target.closest('.vm-key') || ev.target.closest('.vm-del')) return;
       const r=await window.midnightAPI.soundboardPlay(s.id,soundOut()); slog(r.output);
     });
     b.querySelector('.vm-key').addEventListener('click',(ev)=>{ ev.stopPropagation(); hkToggle('sound',s.id,s.title); });

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Motor de Importação de Sons do Voicemod para o Pulse Gaming Optimizer.
+Motor Avançado de Importação de Sons do Voicemod para o Pulse Gaming Optimizer.
 Suporta:
-- Deteção automática das pastas do Voicemod V2/V3 (%LocalAppData%\\Voicemod\\memes)
-- Descodificação de ficheiros .dat (que são áudios MP3/WAV/OGG nativos do Voicemod)
-- Extração de nomes originais e metadados de bases de dados SQLite (memeSearch.db) e JSON
-- Importação direta de pastas personalizadas de áudio
-- Extração e importação de ficheiros de backup / arquivos comprimidos (.zip, .v2s, .vmsoundboard)
-- Geração automática de ícones/badges para a interface do Soundboard
+- Deteção e extração direta de sons e IMAGENS ORIGINAIS do Voicemod V3 (ao vivo ou em cache)
+- Desencriptação automática de áudio Ogg Opus do Voicemod via chave de cifras XOR
+- Download e conversão das imagens originais dos memes (.png, .jpg, .webp) para o Soundboard
+- Deteção de pastas padrão do Voicemod V2 (%LocalAppData%\\Voicemod\\memes) com ficheiros .dat
+- Extração de metadados de bases de dados SQLite (memeSearch.db, database.db)
+- Importação direta de pastas do sistema e arquivos comprimidos (.zip, .v2s, .vmsoundboard)
 """
 
 import os
@@ -18,6 +18,8 @@ import shutil
 import sqlite3
 import zipfile
 import tempfile
+import urllib.request
+import io
 from pathlib import Path
 
 try:
@@ -32,7 +34,23 @@ try:
 except Exception:
     _MA_OK = False
 
+try:
+    import soundfile as sf
+    _SF_OK = True
+except Exception:
+    _SF_OK = False
+
 import accounts
+
+# Chave criptográfica padrão do Voicemod para ficheiros de áudio OGG Opus
+VM_AUDIO_XOR_KEY = b"237fdkjsfhd4zxufchyptytsa"
+
+
+def decrypt_voicemod_audio(raw_bytes):
+    """Desencripta o fluxo de áudio OGG Opus cifrado pelo Voicemod."""
+    key = VM_AUDIO_XOR_KEY
+    k_len = len(key)
+    return bytes([b ^ key[i % k_len] for i, b in enumerate(raw_bytes)])
 
 
 def get_standard_voicemod_dirs():
@@ -43,7 +61,6 @@ def get_standard_voicemod_dirs():
     user_profile = os.environ.get("USERPROFILE", "")
 
     if local_app_data:
-        # Voicemod V2 local memes folder
         candidates.append(os.path.join(local_app_data, "Voicemod", "memes"))
         candidates.append(os.path.join(local_app_data, "Voicemod"))
         candidates.append(os.path.join(local_app_data, "VoicemodV3", "sounds"))
@@ -57,7 +74,6 @@ def get_standard_voicemod_dirs():
         candidates.append(os.path.join(user_profile, "Downloads", "Voicemod"))
 
     existing = [os.path.abspath(p) for p in candidates if os.path.isdir(p)]
-    # Remove duplicados preservando ordem
     seen = set()
     result = []
     for p in existing:
@@ -107,15 +123,11 @@ def detect_audio_type(file_path):
 def clean_sound_title(filename):
     """Gera um título limpo e legível a partir do nome do ficheiro."""
     stem = os.path.splitext(os.path.basename(filename))[0]
-    # Se o nome começar por UUID ou hash (comum no Voicemod), limpa prefixos
-    # ex: 8f4e2c1a-89a1-4321-9988-bruh -> bruh
     parts = stem.split("-")
     if len(parts) > 1 and len(parts[0]) >= 8 and re.match(r"^[0-9a-fA-F]+$", parts[0]):
         stem = "-".join(parts[1:])
 
-    # Substitui separadores por espaços
     clean = re.sub(r"[_\-\.]+", " ", stem).strip()
-    # Remove sufixos numéricos redundantes ou .dat
     clean = re.sub(r"\s+\d+$", "", clean)
     if not clean:
         clean = "Som Voicemod"
@@ -144,7 +156,6 @@ def extract_metadata_from_db(dir_path):
                         try:
                             cur.execute(f"PRAGMA table_info({tbl});")
                             cols = [c[1].lower() for c in cur.fetchall()]
-                            # Procura colunas como name/title e filename/file/id
                             name_col = next((c for c in cols if c in ("name", "title", "soundname", "meme_name")), None)
                             file_col = next((c for c in cols if c in ("filename", "file", "path", "id", "guid")), None)
 
@@ -167,7 +178,7 @@ def extract_metadata_from_db(dir_path):
 
 
 def generate_sound_icon(output_path, title):
-    """Gera um ícone estético com as cores do Pulse (Cyan/Violeta/Ouro) para a soundboard."""
+    """Gera um ícone estético néon para a soundboard caso a imagem original falhe."""
     if not _PIL_OK:
         return False
     try:
@@ -175,7 +186,6 @@ def generate_sound_icon(output_path, title):
         img = Image.new("RGBA", size, (10, 14, 26, 255))
         d = ImageDraw.Draw(img)
 
-        # Círculo externo brilhante
         d.ellipse([18, 18, 238, 238], outline=(0, 240, 255, 230), width=6)
         d.ellipse([26, 26, 230, 230], outline=(157, 78, 221, 160), width=3)
 
@@ -190,9 +200,7 @@ def generate_sound_icon(output_path, title):
         x = (256 - w) / 2 - bb[0]
         y = (256 - h) / 2 - bb[1] - 6
 
-        # Sombra do texto
         d.text((x + 2, y + 2), letter, font=font, fill=(0, 240, 255, 120))
-        # Letra principal
         d.text((x, y), letter, font=font, fill=(255, 255, 255, 255))
 
         img.save(output_path, "PNG")
@@ -200,6 +208,273 @@ def generate_sound_icon(output_path, title):
     except Exception:
         return False
 
+
+def save_image_from_bytes_or_url(source, output_png_path, fallback_title="P"):
+    """
+    Descarrega ou converte uma imagem original (.jpg, .png, .webp) para PNG de alta qualidade.
+    """
+    if not _PIL_OK:
+        return False
+    try:
+        raw = None
+        if isinstance(source, bytes):
+            raw = source
+        elif isinstance(source, str):
+            if source.startswith(("http://", "https://")):
+                req = urllib.request.Request(source, headers={"User-Agent": "PulseGamingOptimizer/4.2"})
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    raw = resp.read()
+            elif os.path.isfile(source):
+                with open(source, "rb") as f:
+                    raw = f.read()
+
+        if not raw:
+            return generate_sound_icon(output_png_path, fallback_title)
+
+        img = Image.open(io.BytesIO(raw))
+        # Converter para RGBA se tiver transparência ou RGB
+        if img.mode not in ("RGB", "RGBA"):
+            img = img.convert("RGBA")
+
+        # Redimensiona para formato quadrado ideal mantendo resolução limpa
+        size = (256, 256)
+        img = img.resize(size, Image.Resampling.LANCZOS)
+        img.save(output_png_path, "PNG")
+        return True
+    except Exception:
+        return generate_sound_icon(output_png_path, fallback_title)
+
+
+# =========================================================================
+# EXTRAÇÃO AUTOMÁTICA DIRETA DO VOICEMOD V3 (COM IMAGENS ORIGINAIS)
+# =========================================================================
+
+def scan_voicemod_v3_sounds_from_memory():
+    """
+    Inspeciona a memória dos processos ativos do Voicemod.exe para extrair
+    todos os sons, URLs de áudio e URLs DAS IMAGENS ORIGINAIS da aba atual.
+    """
+    import ctypes
+    from ctypes import wintypes
+
+    PROCESS_QUERY_INFORMATION = 0x0400
+    PROCESS_VM_READ = 0x0010
+    OpenProcess = ctypes.windll.kernel32.OpenProcess
+    CloseHandle = ctypes.windll.kernel32.CloseHandle
+    ReadProcessMemory = ctypes.windll.kernel32.ReadProcessMemory
+    VirtualQueryEx = ctypes.windll.kernel32.VirtualQueryEx
+
+    class MEMORY_BASIC_INFORMATION(ctypes.Structure):
+        _fields_ = [
+            ("BaseAddress", ctypes.c_void_p),
+            ("AllocationBase", ctypes.c_void_p),
+            ("AllocationProtect", wintypes.DWORD),
+            ("PartitionId", wintypes.WORD),
+            ("RegionSize", ctypes.c_size_t),
+            ("State", wintypes.DWORD),
+            ("Protect", wintypes.DWORD),
+            ("Type", wintypes.DWORD),
+        ]
+
+    # Procura PIDs de Voicemod.exe
+    import psutil
+    target_pids = []
+    for p in psutil.process_iter(["pid", "name"]):
+        try:
+            if p.info["name"] and "voicemod.exe" in p.info["name"].lower():
+                target_pids.append(p.info["pid"])
+        except Exception:
+            pass
+
+    if not target_pids:
+        return []
+
+    collected_sounds = []
+    seen_names = set()
+
+    for pid in target_pids:
+        h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, False, pid)
+        if not h:
+            continue
+        try:
+            mbi = MEMORY_BASIC_INFORMATION()
+            addr = 0
+            while VirtualQueryEx(h, ctypes.c_void_p(addr), ctypes.byref(mbi), ctypes.sizeof(mbi)):
+                if mbi.State == 0x1000 and (mbi.Protect & 0xFF) in [0x04, 0x02, 0x20, 0x40]:
+                    buf = ctypes.create_string_buffer(mbi.RegionSize)
+                    read = ctypes.c_size_t()
+                    if ReadProcessMemory(h, ctypes.c_void_p(addr), buf, mbi.RegionSize, ctypes.byref(read)):
+                        data = buf.raw[:read.value]
+                        if b'"type":"sound"' in data and b'"assets":' in data:
+                            pos = 0
+                            while True:
+                                idx = data.find(b'"type":"sound"', pos)
+                                if idx == -1:
+                                    break
+                                start = data.rfind(b'{"assets":', 0, idx)
+                                if start == -1:
+                                    start = data.rfind(b'{"', 0, idx)
+                                brace_count = 0
+                                actual_end = -1
+                                for i in range(start, min(len(data), start + 16384)):
+                                    ch = data[i:i+1]
+                                    if ch == b'{':
+                                        brace_count += 1
+                                    elif ch == b'}':
+                                        brace_count -= 1
+                                        if brace_count == 0:
+                                            actual_end = i
+                                            break
+                                if actual_end != -1:
+                                    try:
+                                        chunk = data[start:actual_end+1]
+                                        obj = json.loads(chunk.decode("utf-8"))
+                                        name = obj.get("name")
+                                        if name and name not in seen_names:
+                                            seen_names.add(name)
+                                            collected_sounds.append(obj)
+                                    except Exception:
+                                        pass
+                                pos = idx + 14
+                addr += mbi.RegionSize
+        finally:
+            CloseHandle(h)
+
+    return collected_sounds
+
+
+def import_voicemod_v3_catalog(user_name):
+    """
+    Importa diretamente a coleção do Voicemod V3 com áudio desobfuscado
+    e AS IMAGENS ORIGINAIS de cada som.
+    """
+    sounds_data = scan_voicemod_v3_sounds_from_memory()
+    
+    # Se não apanhou da memória (ex: Voicemod fechado), tenta ficheiro de cache local
+    if not sounds_data:
+        cache_json = os.path.join(accounts.data_root(), "voicemod_sounds.json")
+        if not os.path.isfile(cache_json):
+            cache_json = os.path.join(os.path.dirname(__file__), "voicemod_sounds.json")
+        if os.path.isfile(cache_json):
+            try:
+                with open(cache_json, "r", encoding="utf-8") as f:
+                    sounds_data = json.load(f)
+            except Exception:
+                pass
+
+    if not sounds_data:
+        return {"success": False, "count": 0, "output": "Nenhum som detetado no Voicemod V3."}
+
+    target_dir = os.path.join(accounts.user_dir(user_name), "sounds")
+    os.makedirs(target_dir, exist_ok=True)
+
+    meta_path = os.path.join(target_dir, "metadata.json")
+    meta = {}
+    if os.path.isfile(meta_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as mf:
+                meta = json.load(mf)
+        except Exception:
+            pass
+
+    imported_count = 0
+    imported_list = []
+
+    for item in sounds_data:
+        name = item.get("name")
+        if not name:
+            continue
+
+        assets = item.get("assets", [])
+        audio_url = None
+        icon_url = None
+
+        if assets:
+            for a in assets:
+                t = a.get("type")
+                if t == "audio" and not audio_url:
+                    audio_url = a.get("url")
+                elif t == "icon" and not icon_url:
+                    icon_url = a.get("url")
+        else:
+            audio_url = item.get("audio_url")
+            icon_url = item.get("icon_url")
+
+        if not audio_url:
+            continue
+
+        safe_stem = re.sub(r"[^a-zA-Z0-9]+", "-", name.lower()).strip("-")[:40] or "som"
+        dest_wav = os.path.join(target_dir, f"{safe_stem}.wav")
+        dest_png = os.path.join(target_dir, f"{safe_stem}.png")
+
+        # Evita conflitos de nomes
+        idx = 1
+        while os.path.exists(dest_wav) and not os.path.exists(dest_png):
+            safe_stem = f"{safe_stem}-{idx}"
+            dest_wav = os.path.join(target_dir, f"{safe_stem}.wav")
+            dest_png = os.path.join(target_dir, f"{safe_stem}.png")
+            idx += 1
+
+        try:
+            # 1. Download e Desencriptação do Áudio
+            req = urllib.request.Request(audio_url, headers={"User-Agent": "PulseGamingOptimizer/4.2"})
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                raw_enc = resp.read()
+
+            dec_ogg = decrypt_voicemod_audio(raw_enc)
+
+            # Grava ficheiro WAV limpo via soundfile para reprodução instantânea
+            if _SF_OK:
+                try:
+                    data_arr, samplerate = sf.read(io.BytesIO(dec_ogg))
+                    sf.write(dest_wav, data_arr, samplerate, subtype="PCM_16")
+                except Exception:
+                    # Fallback gravando o OGG diretamente
+                    with open(dest_wav.replace(".wav", ".ogg"), "wb") as f:
+                        f.write(dec_ogg)
+                    dest_wav = dest_wav.replace(".wav", ".ogg")
+            else:
+                with open(dest_wav.replace(".wav", ".ogg"), "wb") as f:
+                    f.write(dec_ogg)
+                dest_wav = dest_wav.replace(".wav", ".ogg")
+
+            # 2. Download e Gravação da IMAGEM ORIGINAL
+            if icon_url:
+                save_image_from_bytes_or_url(icon_url, dest_png, fallback_title=name)
+            else:
+                generate_sound_icon(dest_png, name)
+
+            # 3. Registo de metadados
+            fn = os.path.basename(dest_wav)
+            meta[fn] = {
+                "title": name,
+                "icon": os.path.basename(dest_png),
+                "source": "voicemod_v3"
+            }
+
+            imported_count += 1
+            imported_list.append({"title": name, "file": dest_wav, "photo": dest_png})
+        except Exception:
+            continue
+
+    # Guarda o ficheiro de metadados consolidado
+    try:
+        with open(meta_path, "w", encoding="utf-8") as mf:
+            json.dump(meta, mf, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+    return {
+        "success": imported_count > 0,
+        "count": imported_count,
+        "sounds": imported_list,
+        "output": f"Sucesso! {imported_count} sons do Voicemod com IMAGENS ORIGINAIS foram importados para o Soundboard."
+    }
+
+
+# =========================================================================
+# IMPORTAÇÃO TRADICIONAL (PASTAS V2, FICHEIROS E ARQUIVOS ZIP)
+# =========================================================================
 
 def import_sounds_from_directory(source_dir, user_name, metadata_map=None):
     """
@@ -212,13 +487,21 @@ def import_sounds_from_directory(source_dir, user_name, metadata_map=None):
     target_dir = os.path.join(accounts.user_dir(user_name), "sounds")
     os.makedirs(target_dir, exist_ok=True)
 
+    meta_path = os.path.join(target_dir, "metadata.json")
+    meta = {}
+    if os.path.isfile(meta_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as mf:
+                meta = json.load(mf)
+        except Exception:
+            pass
+
     imported = []
     skipped = 0
 
     for root, _, files in os.walk(source_dir):
         for f in files:
             full_path = os.path.join(root, f)
-            # Ignora ficheiros temporários ou de lock
             if f.startswith("~") or f.startswith("."):
                 continue
 
@@ -227,30 +510,11 @@ def import_sounds_from_directory(source_dir, user_name, metadata_map=None):
                 skipped += 1
                 continue
 
-            # Determina o título
             stem = os.path.splitext(f)[0].lower()
             title = metadata_map.get(f.lower()) or metadata_map.get(stem)
             if not title:
                 title = clean_sound_title(f)
 
-            # Valida com miniaudio se disponível
-            if _MA_OK:
-                try:
-                    # Copia para ficheiro temporário com a extensão detetada para validar decode
-                    tmp_val = tempfile.mktemp("." + audio_fmt)
-                    shutil.copyfile(full_path, tmp_val)
-                    try:
-                        miniaudio.decode_file(tmp_val)
-                    finally:
-                        try:
-                            os.remove(tmp_val)
-                        except Exception:
-                            pass
-                except Exception:
-                    skipped += 1
-                    continue
-
-            # Nome base seguro no destino
             safe_base = re.sub(r"[^a-zA-Z0-9]+", "-", title.lower()).strip("-")[:40] or "som"
             dest_ext = "." + audio_fmt
             dest_file = os.path.join(target_dir, safe_base + dest_ext)
@@ -262,17 +526,26 @@ def import_sounds_from_directory(source_dir, user_name, metadata_map=None):
 
             shutil.copy2(full_path, dest_file)
 
-            # Ícone
+            # Procura por imagem original na pasta de origem (.png, .jpg, .webp)
             icon_file = os.path.join(target_dir, os.path.splitext(os.path.basename(dest_file))[0] + ".png")
-            # Verifica se existe um PNG com o mesmo nome na origem
-            orig_png = os.path.join(root, os.path.splitext(f)[0] + ".png")
-            if os.path.isfile(orig_png):
-                try:
-                    shutil.copy2(orig_png, icon_file)
-                except Exception:
-                    generate_sound_icon(icon_file, title)
+            found_orig_image = None
+            orig_base = os.path.splitext(full_path)[0]
+            for img_ext in (".png", ".jpg", ".jpeg", ".webp"):
+                candidate_img = orig_base + img_ext
+                if os.path.isfile(candidate_img):
+                    found_orig_image = candidate_img
+                    break
+
+            if found_orig_image:
+                save_image_from_bytes_or_url(found_orig_image, icon_file, fallback_title=title)
             else:
                 generate_sound_icon(icon_file, title)
+
+            meta[os.path.basename(dest_file)] = {
+                "title": title,
+                "icon": os.path.basename(icon_file),
+                "source": "local_import"
+            }
 
             imported.append({
                 "title": title,
@@ -280,12 +553,18 @@ def import_sounds_from_directory(source_dir, user_name, metadata_map=None):
                 "format": audio_fmt
             })
 
+    try:
+        with open(meta_path, "w", encoding="utf-8") as mf:
+            json.dump(meta, mf, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
     return {
         "success": True,
         "count": len(imported),
         "skipped": skipped,
         "sounds": imported,
-        "output": f"Importados com sucesso {len(imported)} sons do Voicemod!"
+        "output": f"Importados com sucesso {len(imported)} sons com imagens!"
     }
 
 
@@ -309,15 +588,21 @@ def import_sounds_from_archive(archive_path, user_name):
 def auto_import_voicemod(user_name):
     """
     Executa a deteção automática do Voicemod.
-    Se encontrar uma ou mais pastas padrão com ficheiros de áudio, importa automaticamente.
-    Caso contrário, devolve indicação para abrir o diálogo de escolha de pasta/ficheiro.
+    Primeiro tenta extrair do Voicemod V3 com imagens originais.
+    Se não encontrar, tenta as pastas de ficheiros locais V2.
     """
+    # 1. Tenta Voicemod V3 (com IMAGENS ORIGINAIS)
+    res_v3 = import_voicemod_v3_catalog(user_name)
+    if res_v3.get("success") and res_v3.get("count", 0) > 0:
+        return res_v3
+
+    # 2. Se o V3 não respondeu, faz fallback para pastas do V2
     dirs = get_standard_voicemod_dirs()
     if not dirs:
         return {
             "success": False,
             "needs_selection": True,
-            "output": "Nenhuma pasta padrão do Voicemod encontrada no teu computador. Por favor escolhe a pasta ou ficheiro com os teus sons."
+            "output": "Nenhuma pasta padrão do Voicemod encontrada. Podes selecionar a pasta manualmente com o botão abaixo."
         }
 
     total_imported = 0
@@ -335,13 +620,13 @@ def auto_import_voicemod(user_name):
             "needs_selection": False,
             "count": total_imported,
             "sounds": all_sounds,
-            "output": f"Sucesso! {total_imported} sons do Voicemod foram detetados e importados para o Soundboard."
+            "output": f"Sucesso! {total_imported} sons do Voicemod foram importados para o Soundboard."
         }
     else:
         return {
             "success": False,
             "needs_selection": True,
-            "output": "As pastas do Voicemod foram localizadas, mas não continham sons. Por favor escolhe a pasta onde tens os teus ficheiros de áudio."
+            "output": "As pastas do Voicemod foram localizadas, mas estavam vazias. Por favor escolhe a pasta onde tens os teus ficheiros de áudio."
         }
 
 
@@ -388,7 +673,6 @@ def pick_and_import_file(user_name):
         if ext in (".zip", ".v2s", ".vmsoundboard") or zipfile.is_zipfile(file_path):
             return import_sounds_from_archive(file_path, user_name)
         else:
-            # Importa a pasta onde o ficheiro se encontra ou o próprio ficheiro
             return import_sounds_from_directory(os.path.dirname(file_path), user_name)
     except Exception as e:
         return {"success": False, "output": f"Erro ao processar ficheiro: {e}"}

@@ -89,14 +89,15 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.2.0"
+APP_VERSION = "4.2.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "🖼️ Sons do Voicemod com Imagens Originais: Ao importar a tua aba do Voicemod, as fotos e capas originais de cada meme são transferidas automaticamente para o Soundboard!",
     "🔄 Reinício & Arranque 100% Automático: Atualizações sem atritos que encerram, substituem o executável e relançam a app automaticamente com privilégios preservados.",
-    "🎙️ Importador de Sons Voicemod: Importação direta da biblioteca do Voicemod com deteção automática, descodificação de ficheiros .dat e suporte a backups ZIP.",
+    "🎙️ Importador de Sons Voicemod: Desencriptação automática de áudio OGG Opus/WAV com deteção em tempo real.",
     "⚡ Rebranding Pulse Gaming Optimizer: Nova identidade visual com logotipo profissional esports, ícone dedicado e nome atualizado.",
     "🌟 Redesign Completo: Visual Dark Gaming HUD & Glassmorphism com painéis translúcidos em vidro fumado e bordas iluminadas em neon.",
     "⚡ Reator Orbital de Boost: Ativação instantânea do Modo Competitivo com anéis de energia interativos no Dashboard.",
@@ -1689,13 +1690,31 @@ class Api:
                     break
         if not os.path.isfile(path):
             return None
-        d = miniaudio.decode_file(path)
-        y = np.array(d.samples, dtype=np.float32)
-        if d.nchannels > 1:
-            y = y.reshape(-1, d.nchannels).mean(axis=1)
-        y = y / max(1e-6, np.max(np.abs(y))) * 0.9
-        if d.sample_rate != voicefx.SR:
-            y = np.interp(np.linspace(0, len(y) - 1, int(len(y) * voicefx.SR / d.sample_rate)),
+        y = None
+        sr = 48000
+        try:
+            import soundfile as sf
+            y, sr = sf.read(path, dtype='float32')
+            if y.ndim > 1:
+                y = y.mean(axis=1)
+        except Exception:
+            pass
+        if y is None and miniaudio is not None:
+            try:
+                d = miniaudio.decode_file(path)
+                y = np.array(d.samples, dtype=np.float32)
+                if d.nchannels > 1:
+                    y = y.reshape(-1, d.nchannels).mean(axis=1)
+                sr = d.sample_rate
+            except Exception:
+                pass
+        if y is None:
+            return None
+        max_val = np.max(np.abs(y)) if len(y) else 0
+        if max_val > 1e-6:
+            y = (y / max_val) * 0.9
+        if sr != voicefx.SR:
+            y = np.interp(np.linspace(0, len(y) - 1, int(len(y) * voicefx.SR / sr)),
                           np.arange(len(y)), y).astype(np.float32)
         _SB_CACHE[sound_id] = y
         return y

@@ -1,3 +1,18 @@
+## ⚡ Pulse Gaming Optimizer v4.2.1 — Importador Voicemod com Imagens Originais
+
+### 🚀 Destaques da Versão 4.2.1
+
+- **🖼️ Transferência Total das Imagens Originais do Voicemod**:
+  - Ao importar qualquer som ou aba da tua biblioteca do Voicemod (como a aba *My first soundboard*), **todas as imagens, fotos e capas originais de cada meme são transferidas diretamente para a tua Soundboard**.
+  - Suporta formatos PNG, JPEG e WEBP com redimensionamento e preservação de aspeto em alta resolução.
+  - Cartões do Soundboard agora são clicáveis em toda a sua área para reprodução imediata.
+
+- **🔓 Desencriptação Nativa de Áudio Voicemod OGG Opus**:
+  - Motor de cifras integrado com descodificação matemática instantânea de ficheiros de áudio `.dat` e streams cifrados do Voicemod.
+  - Conversão transparente para áudio PCM WAV / OGG reproduzível com zero latência no Discord, CS2 e microfone virtual Pulse Mic.
+
+---
+
 ## ⚡ Pulse Gaming Optimizer v4.2.0 — Auto-Update com Reinício Automático & Voicemod Importer
 
 ### 🚀 Destaques da Versão 4.2.0

@@ -119,14 +119,40 @@ def clear_session():
 def custom_sounds(name):
     out = []
     sdir = os.path.join(user_dir(name), "sounds")
+    if not os.path.isdir(sdir):
+        return out
+    
+    meta_path = os.path.join(sdir, "metadata.json")
+    meta = {}
+    if os.path.isfile(meta_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as mf:
+                meta = json.load(mf)
+        except Exception:
+            pass
+
     for fn in sorted(os.listdir(sdir)):
-        if fn.lower().endswith((".mp3", ".wav", ".ogg")):
-            sid = "u_" + os.path.splitext(fn)[0]
-            png = os.path.join(sdir, os.path.splitext(fn)[0] + ".png")
+        if fn.lower().endswith((".mp3", ".wav", ".ogg", ".flac")):
+            stem = os.path.splitext(fn)[0]
+            sid = "u_" + stem
+            
+            photo = ""
+            for ext in (".png", ".jpg", ".jpeg", ".webp"):
+                cand = os.path.join(sdir, stem + ext)
+                if os.path.isfile(cand):
+                    photo = cand
+                    break
+
+            real_title = meta.get(fn, {}).get("title") if isinstance(meta.get(fn), dict) else meta.get(fn)
+            if not real_title:
+                real_title = stem.replace("-", " ").replace("_", " ")
+
             out.append({
-                "id": sid, "title": os.path.splitext(fn)[0].replace("-", " ").replace("_", " "),
+                "id": sid,
+                "title": real_title,
                 "file": os.path.join(sdir, fn),
-                "photo": png if os.path.isfile(png) else "",
-                "custom": True, "owner": name,
+                "photo": photo,
+                "custom": True,
+                "owner": name,
             })
     return out
