@@ -89,12 +89,14 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.1.0"
+APP_VERSION = "4.2.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "🔄 Reinício & Arranque 100% Automático: Atualizações sem atritos que encerram, substituem o executável e relançam a app automaticamente com privilégios preservados.",
+    "🎙️ Importador de Sons Voicemod: Importação direta da biblioteca do Voicemod com deteção automática, descodificação de ficheiros .dat e suporte a backups ZIP.",
     "⚡ Rebranding Pulse Gaming Optimizer: Nova identidade visual com logotipo profissional esports, ícone dedicado e nome atualizado.",
     "🌟 Redesign Completo: Visual Dark Gaming HUD & Glassmorphism com painéis translúcidos em vidro fumado e bordas iluminadas em neon.",
     "⚡ Reator Orbital de Boost: Ativação instantânea do Modo Competitivo com anéis de energia interativos no Dashboard.",

@@ -1,3 +1,22 @@
+## ⚡ Pulse Gaming Optimizer v4.2.0 — Auto-Update com Reinício Automático & Voicemod Importer
+
+### 🚀 Destaques da Versão 4.2.0
+
+- **🔄 Reinício & Arranque 100% Automático de Atualizações**:
+  - Atualização completamente autónoma e sem atrito.
+  - Ao descarregar a nova versão, a app encerra a versão antiga, realiza a substituição atómica do executável (técnica Chrome/VSCode com libertação imediata de ficheiros travados) e relança a nova versão automaticamente.
+  - Preserva privilégios de **Administrador** (`RunAs`) de forma transparente.
+  - Overlay visual com contador e aviso de transição instantânea.
+
+- **🎙️ Importador Completo de Sons do Voicemod**:
+  - Deteção instantânea das pastas padrão do Voicemod (`%LocalAppData%\Voicemod\memes`).
+  - Descodificação de ficheiros binários `.dat` em áudio puro (WAV, MP3, OGG, FLAC) através de deteção de *magic bytes*.
+  - Recuperação de nomes originais através das bases de dados SQLite do Voicemod (`memeSearch.db`).
+  - Importação de qualquer pasta do Windows ou ficheiros compactados de backup (`.zip` / `.v2s`).
+  - Geração automática de badges neon com inicial para o Soundboard.
+
+---
+
 ## ⚡ Pulse Gaming Optimizer v4.1.0 — Nova Marca Oficial & Logótipo Esports
 
 ### 🚀 Destaques da Versão 4.1.0
