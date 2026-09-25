@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b0d14"/>
+      <stop offset="60%" stop-color="#121622"/>
+      <stop offset="100%" stop-color="#181d2c"/>
+    </linearGradient>
+    <linearGradient id="gun_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="40%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Viewport Background -->
+  <rect width="320" height="180" fill="url(#bg_grad)"/>
+  
+  <!-- Subtle Grid / Tactical Depth Lines -->
+  <line x1="0" y1="120" x2="320" y2="120" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="80" y1="180" x2="140" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+  <line x1="240" y1="180" x2="180" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+
+  <!-- Center Crosshair (Precision Reticle) -->
+  <g stroke="#10b981" stroke-width="1.5">
+    <line x1="160" y1="84" x2="160" y2="88"/>
+    <line x1="160" y1="92" x2="160" y2="96"/>
+    <line x1="154" y1="90" x2="158" y2="90"/>
+    <line x1="162" y1="90" x2="166" y2="90"/>
+  </g>
+
+  <!-- Weapon Model: Minimalist Low (Almost Completely Offscreen in Bottom Right Corner) -->
+  <g transform="translate(235, 134)">
+    <!-- Small tip of barrel / receiver -->
+    <path d="M 0,16 L 25,14 L 38,12 L 52,9 L 55,14 L 46,18 L 32,22 L 8,26 Z" fill="url(#gun_grad)" stroke="#c084fc" stroke-width="1"/>
+    <!-- Sight tip -->
+    <rect x="14" y="10" width="18" height="4" rx="1" fill="#1e293b" stroke="#e9d5ff" stroke-width="0.7"/>
+    <!-- Arm edge -->
+    <path d="M 22,26 L 46,20 L 85,46 L 50,46 Z" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+  </g>
+
+  <!-- Technical Spec Watermark -->
+  <rect x="12" y="12" width="138" height="20" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="18" y="25" fill="#c084fc" font-family="Segoe UI, sans-serif" font-size="9" font-weight="bold">MINIMALISTA</text>
+  <text x="96" y="25" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="8">ULTRA VISÃO</text>
+
+  <text x="308" y="168" fill="#475569" font-family="Segoe UI, monospace" font-size="8" text-anchor="end">x:2.5 y:-2 z:-2</text>
+</svg>

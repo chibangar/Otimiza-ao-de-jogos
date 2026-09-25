@@ -1,85 +1,41 @@
-## 🎉 Midnight Optimizer v3.0 — Design Moderno!
+## 🎯 Midnight Optimizer v3.2.4 — Motor de Auto-Update Blindado & CS2 Viewmodels Reais
 
-### ✨ Novidades Principais
+### 🚀 Novidades da Versão 3.2.4
+- **Novo Motor de Auto-Update em PowerShell**: Substituição do processo legado por rotina nativa PowerShell com gestão inteligente de locks de ficheiro, retentativas e reinício garantido.
+- **Botão Dedicado 'Verificar Atualizações'**: Presente na barra lateral e na página de Sistema para procurar novidades a qualquer momento.
+- **Renders Reais dos Bonecos & Armas do CS2**: Cartas de viewmodels com capturas autênticas in-game estilo crashz' Viewmodel Generator (braços, luvas táticas e AK-47 sob céu aberto).
+- **Novo Preset Gangster Clássico**: Adicionado o posicionamento icónico com a arma inclinada.
+- **Executável 100% Livre de Falhas**: Integração determinística de todos os módulos e total compatibilidade de sintaxe.
 
-#### 🎨 Glassmorphism Premium
-- Efeitos de vidro fosco em todos os cards e painéis
-- Background animado com partículas interativas  
-- Transições fluidas e profissionais (300ms ease-out-expo)
+### ✨ Novidades Recentes da Linha v3.2
 
-#### 💫 15+ Animações Novas
-- **Ripple effect** nos botões (onda expansiva ao clicar)
-- **Hover smooth** com física de mola (ease-bounce)
-- **Float animation** em ícones e badges
-- **Shimmer effect** no fundo gradient
-- **Glow pulses** em elementos ativos e selecionados
-- **Gradient shift** mudando cores dinamicamente
+#### 🎯 Miras dos Pros com 1 Clique (CS2)
+- Galeria completa dos melhores pro players do mundo: **m0NESY, donk, NiKo, ZywOo, s1mple, ropz e FalleN**.
+- Códigos de Partilha Oficiais do CS2 (`CSGO-...`) para importar diretamente nas Definições do jogo.
+- Comandos prontos para a Consola (`~`).
+- Pré-visualização gráfica interativa da mira com a cor real, espessura e abertura da retícula.
+- **100% Não Destrutivo**: Não altera a sensibilidade do rato, DPI nem resolução do jogador.
 
-#### 🚀 Performance Melhorada
-- Transições otimizadas de 300ms (antes: 180ms bruscas)
-- Focus rings acessíveis para navegação por teclado
-- High DPI optimizations (4K ready)
-- Memory footprint reduzido com lazy-loading
+#### 🔫 Viewmodels com Imagens Demonstrativas
+- 6 presets de posicionamento da arma no ecrã: **Clássico Pro, Compacto Recuado, FOV Máximo, Centrado Retro Doom, Padrão Valve e Minimalista**.
+- Imagens vetoriais dentro da app mostrando exatamente onde a arma fica posicionada e o espaço de mira libertado.
+- Botão para copiar comandos da consola ou aplicar de forma isolada (`midnight_viewmodel.cfg`).
 
----
+#### ⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg Fix)
+- Botão de 1 clique para resolver desfasamento sub-tick e balas fantasma que não registam no CS2.
+- Limpeza automática de caches de shaders DirectX/GPU (elimina micro-stutters e quedas de FPS em duelos).
+- Buffer de rede em `0 ticks` (`cl_net_buffer_ticks 0`) para eliminar 15ms-30ms de atraso de interpolação.
+- Taxa máxima `rate 786432` e alinhamento de frame pacing (`engine_low_latency_sleep_after_client_tick true`).
+- Binds e sensibilidades 100% intactas!
 
-### 🔧 O que Mudou na Interface?
+#### 🔔 In-Game Notification Overlay (Popout Animado)
+- Notificações transparentes e flutuantes sobre o ecrã do jogo com animação suave de popout de entrada e saída.
+- 100% VAC-Safe: Não injeta DLLs nem mexe na memória do CS2.
+- Não minimiza o jogo nem perde o foco do rato durante o combate competitivo.
 
-| Antes (v2.x) | Depois (v3.0) |
-|-------------|---------------|
-| Cards sólidos com cores planas | Glassmorphism blur(20px) |
-| Botões estáticos sem animação | Ripple effect ao clicar |
-| Background fixo sem movimento | Partículas flutuando continuamente |
-| Transições de 180ms bruscas | Transições de 300ms suaves |
-
----
-
-### 📦 O que Está Incluído
-
-✅ `styles-modern.css` (~850 linhas de CSS premium)  
-✅ `CHANGELOG.md` - Histórico completo das versões  
-✅ `.claude-contributor.md` - Documentação do contribuinte AI  
-✅ `RELEASE_NOTES.md` - Notas desta release  
-✅ Installer atualizado com novos recursos  
 
 ---
 
-### ⚠️ Requisitos para v3.0
-
-**Necessário:**
-- Windows 10/11 (64-bit)
-- 8GB RAM mínimo, 16GB+ recomendado
-- GPU GTX 1050+ recomendado  
-- 2GB disponíveis no sistema
-
----
-
-### 📋 Changelog Completo
-
-Para ver TODAS as mudanças entre versões:
-```bash
-git log --oneline -20
-cat CHANGELOG.md
-```
-
----
-
-## 👥 Contribuintes
-
-Obrigado a todos que contribuíram para este projeto!
-
-- **chibangar** — Desenvolvedor principal ⭐
-- **Claude Code** (@noreply@anthropic.com) — Automação e melhorias visuais v3 🤖
-
----
-
-## 🔗 Links Úteis
-
-- [GitHub Repository](https://github.com/chibangar/Otimiza-ao-de-jogos)
-- [Contributors](https://github.com/chibangar/Otimiza-ao-de-jogos/graphs/contributors)  
-- [Issue Tracker](https://github.com/chibangar/Otimiza-ao-de-jogos/issues)
-
----
-
-> *"Good players play.<br>Great players optimize."*  
-> — **Midnight Optimizer v3.0** 🌙
+### 📋 Requisitos de Sistema
+- Windows 10 ou Windows 11 (64-bit)
+- Direitos de Administrador para otimizações de energia e registo

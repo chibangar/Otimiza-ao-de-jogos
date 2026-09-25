@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b0d14"/>
+      <stop offset="60%" stop-color="#121622"/>
+      <stop offset="100%" stop-color="#181d2c"/>
+    </linearGradient>
+    <linearGradient id="gun_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Viewport Background -->
+  <rect width="320" height="180" fill="url(#bg_grad)"/>
+  
+  <!-- Subtle Grid / Tactical Depth Lines -->
+  <line x1="0" y1="120" x2="320" y2="120" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="80" y1="180" x2="140" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+  <line x1="240" y1="180" x2="180" y2="120" stroke="#1e293b" stroke-width="0.7"/>
+
+  <!-- Center Crosshair (Precision Reticle) -->
+  <g stroke="#10b981" stroke-width="1.5">
+    <line x1="160" y1="84" x2="160" y2="88"/>
+    <line x1="160" y1="92" x2="160" y2="96"/>
+    <line x1="154" y1="90" x2="158" y2="90"/>
+    <line x1="162" y1="90" x2="166" y2="90"/>
+  </g>
+
+  <!-- Weapon Model: Valve Default Desktop (Bulkier, Closer to Center, x=1, y=1, z=-1, FOV 60) -->
+  <g transform="translate(165, 84)">
+    <!-- Barrel & Main Body -->
+    <path d="M 0,32 L 46,28 L 64,24 L 92,18 L 96,28 L 82,34 L 58,42 L 14,52 Z" fill="url(#gun_grad)" stroke="#94a3b8" stroke-width="1.2"/>
+    <!-- Iron Sight -->
+    <rect x="26" y="20" width="34" height="8" rx="2" fill="#1e293b" stroke="#cbd5e1" stroke-width="1"/>
+    <!-- Magazine -->
+    <path d="M 36,44 L 48,82 L 34,86 L 24,46 Z" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <!-- Front Handguard -->
+    <path d="M 54,26 L 78,24 L 74,44 L 50,46 Z" fill="#64748b"/>
+    <!-- Massive Arm / Sleeve in View -->
+    <path d="M 44,62 L 86,48 L 145,96 L 90,96 Z" fill="#334155" stroke="#475569" stroke-width="1"/>
+    <!-- Hand -->
+    <ellipse cx="72" cy="54" rx="11" ry="8" fill="#64748b" transform="rotate(-15 72 54)"/>
+  </g>
+
+  <!-- Technical Spec Watermark -->
+  <rect x="12" y="12" width="138" height="20" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="18" y="25" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="9" font-weight="bold">PADRÃO VALVE</text>
+  <text x="96" y="25" fill="#64748b" font-family="Segoe UI, sans-serif" font-size="8">DESKTOP (60)</text>
+
+  <text x="308" y="168" fill="#475569" font-family="Segoe UI, monospace" font-size="8" text-anchor="end">x:1 y:1 z:-1</text>
+</svg>

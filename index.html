@@ -157,6 +157,7 @@
           <span class="dot"></span>
           <span id="connection-label">Pronto</span>
         </div>
+        <button class="btn small ghost" id="btn-check-update" title="Verificar atualizações">↻ Updates</button>
         <button class="icon-btn" id="motion-toggle" title="Alternar animações" aria-pressed="false" data-icon="eye"></button>
         <button class="icon-btn" id="notif-btn" title="Notificações" data-icon="bell">
           <span class="notif-dot" id="notif-dot" style="display:none"></span>
@@ -429,13 +430,43 @@
           <h3>🎯 Otimização Dentro do Jogo</h3>
           <p class="muted">Configurações diretas nos ficheiros de autoexec, vídeo e engine com backup automático.</p>
         </div>
-        <div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn gold" id="btn-cs2-hitreg" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-color:#059669">⚡ Corrigir Registo de Tiros (Hitreg)</button>
+          <button class="btn ghost" id="btn-cs2-overlay-test">🔔 Testar Overlay In-Game</button>
           <button class="btn ghost" id="btn-detect-games">↻ Detetar Jogos</button>
         </div>
       </div>
 
+      <!-- SEÇÃO MIRAS & VIEWMODELS -->
       <div class="card wide" style="margin-bottom:18px">
-        <h4>⭐ Configurações dos Pros — 1 Clique</h4>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+          <h4 style="margin:0">Miras &amp; Viewmodels Oficiais CS2</h4>
+          <span style="font-family:var(--font-mono);font-size:9.5px;color:var(--ok);background:var(--ok-soft);border:1px solid rgba(34,197,94,0.3);padding:3px 8px;border-radius:var(--r-pill)">🛡️ NÃO DESTRUTIVO</span>
+        </div>
+        <p class="muted small">Códigos de partilha do CS2 e comandos de consola (~) prontos a copiar com 1 clique. Visualiza a mira e a arma antes de usar.</p>
+
+        <!-- SUBTABS: MIRAS / VIEWMODELS -->
+        <div class="vm-tabs" style="margin-top:12px">
+          <button class="vm-tab active" id="tab-btn-crosshairs">
+            Miras dos Pros (Crosshairs)
+          </button>
+          <button class="vm-tab" id="tab-btn-viewmodels">
+            Posicionamento da Arma (Viewmodels)
+          </button>
+        </div>
+
+        <div id="tab-content-crosshairs">
+          <div class="pros-grid" id="crosshairs-grid"><div class="card">A carregar miras dos pros…</div></div>
+        </div>
+
+        <div id="tab-content-viewmodels" style="display:none">
+          <div class="pros-grid" id="viewmodels-grid"><div class="card">A carregar presets de viewmodel…</div></div>
+        </div>
+      </div>
+
+      <!-- CONFIGS DOS PROS -->
+      <div class="card wide" style="margin-bottom:18px">
+        <h4>⭐ Configurações Completas dos Pros — 1 Clique</h4>
         <p class="muted small">Aplica sensibilidade, mira, viewmodel, rates e resolução testadas por atletas de e-Sports.</p>
         <div class="pros-grid" id="pros-grid">
           <div class="card">A carregar configurações dos profissionais…</div>

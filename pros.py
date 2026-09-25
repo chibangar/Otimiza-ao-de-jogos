@@ -1,246 +1,334 @@
-"""Base de dados de pros CS2 + apply com 1 clique.
-Fontes: ProSettings.net / setup.gg / csdb.gg (set 2026).
-Fotos em assets/pros/<id>.png
+"""
+Midnight Optimizer — Miras (Crosshairs) e Viewmodels dos Pros para CS2.
+Substitui configs invasivas por códigos de partilha e comandos de consola (~)
+prontos a copiar e colar sem estragar NENHUMA bind, sensibilidade ou vídeo do utilizador.
+100% Não destrutivo e VAC-Safe.
 """
 import os
 import re
-
 import game_tweaks
+import overlay
 
-# id, nome, nome real, equipa, pais, role, foto
-PROS = [
+# ---------- MIRAS DOS PROS (CROSSHAIRS) ----------
+# Códigos de partilha oficiais do CS2 (Settings -> Crosshair -> Share/Import)
+# Comandos diretos de consola (~) para colar com 1 clique
+PRO_CROSSHAIRS = [
     {
-        "id": "donk", "name": "donk", "real": "Danil Kryshkovets",
-        "team": "Team Spirit", "country": "RU", "role": "Rifler",
-        "photo": "assets/pros/donk.png",
-        "dpi": 800, "sens": 1.25, "zoom": 1.0, "hz": 1000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 1, "thick": 1.5, "gap": -4, "dot": 0,
-                  "color": 5, "r": 0, "g": 255, "b": 165, "alpha": 255},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2},
-        "bob": {"lower": 5, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
-        "fps": 600, "radar": 0.7, "launch": "",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "8", "aniso": "0"},
-    },
-    {
-        "id": "monesy", "name": "m0NESY", "real": "Ilya Osipov",
-        "team": "Falcons", "country": "RU", "role": "AWPer",
+        "id": "monesy",
+        "name": "m0NESY",
+        "real": "Ilya Osipov",
+        "team": "Falcons",
+        "country": "RU",
+        "role": "AWPer",
         "photo": "assets/pros/monesy.png",
-        "dpi": 400, "sens": 2.3, "zoom": 1.0, "hz": 2000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 1, "thick": 1, "gap": -4, "dot": 0,
-                  "color": 4, "r": 0, "g": 255, "b": 255, "alpha": 255},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 3},
-        "bob": {"lower": 5, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
-        "fps": 999, "radar": 0.91, "launch": "",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "8", "aniso": "0"},
+        "share_code": "CSGO-3u26R-VODmS-Pmn2a-Y26sR-a8W7B",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 1; cl_crosshairthickness 1; cl_crosshairgap -4; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 4; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 255; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#00ffff",
+        "desc": "Mira cyan compacta e precisa de m0NESY, referência mundial de rapidez e precisão com AWP e Deagle.",
+        "params": {"size": 1, "thick": 1, "gap": -4, "dot": 0, "outline": 0, "color": "Cyan (#00ffff)"}
     },
     {
-        "id": "zywoo", "name": "ZywOo", "real": "Mathieu Herbaut",
-        "team": "Vitality", "country": "FR", "role": "AWPer",
-        "photo": "assets/pros/zywoo.png",
-        "dpi": 400, "sens": 1.9, "zoom": 1.0, "hz": 1000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 2, "thick": 0, "gap": -3, "dot": 0,
-                  "color": 1, "r": 0, "g": 255, "b": 0, "alpha": 255},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 1},
-        "bob": {"lower": 5, "lat": 0.4, "vert": 0.25, "cycle": 0.98},
-        "fps": 400, "radar": 0.4,
-        "launch": "-novid -tickrate 128 -allow_third_party_software",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "4", "aniso": "4"},
+        "id": "donk",
+        "name": "donk",
+        "real": "Danil Kryshkovets",
+        "team": "Team Spirit",
+        "country": "RU",
+        "role": "Rifler",
+        "photo": "assets/pros/donk.png",
+        "share_code": "CSGO-HRxqT-U3L2S-x9sP7-U22pU-F2aJD",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 1; cl_crosshairthickness 1.5; cl_crosshairgap -4; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 5; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 165; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#00ffa5",
+        "desc": "Mira verde-menta ultracompacta com espessura 1.5, desenhada para spray transfer e agressividade pura de rifle.",
+        "params": {"size": 1, "thick": 1.5, "gap": -4, "dot": 0, "outline": 0, "color": "Mint Green (#00ffa5)"}
     },
     {
-        "id": "s1mple", "name": "s1mple", "real": "Oleksandr Kostyliev",
-        "team": "BC.Game", "country": "UA", "role": "AWPer",
-        "photo": "assets/pros/s1mple.png",
-        "dpi": 400, "sens": 3.09, "zoom": 1.0, "hz": 1000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 1, "thick": 1, "gap": -4, "dot": 0,
-                  "color": 4, "r": 0, "g": 255, "b": 255, "alpha": 200},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2},
-        "bob": {"lower": 21, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
-        "fps": 0, "radar": 0.45,
-        "launch": "-freq 360 -novid -console +fps_max 999",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "8", "aniso": "0"},
-    },
-    {
-        "id": "niko", "name": "NiKo", "real": "Nikola Kovac",
-        "team": "Falcons", "country": "BA", "role": "Rifler",
+        "id": "niko",
+        "name": "NiKo",
+        "real": "Nikola Kovač",
+        "team": "Falcons",
+        "country": "BA",
+        "role": "Rifler",
         "photo": "assets/pros/niko.png",
-        "dpi": 800, "sens": 0.815, "zoom": 0.9, "hz": 2000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 0, "thick": 2, "gap": -4, "dot": 1,
-                  "color": 5, "r": 0, "g": 255, "b": 145, "alpha": 255},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2},
-        "bob": {"lower": 15, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
-        "fps": 400, "radar": 0.35, "launch": "",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "8", "aniso": "1"},
+        "share_code": "CSGO-XbaqV-3wASz-ip4tB-u4Gmu-nqcjC",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 1; cl_crosshairthickness 1; cl_crosshairgap -4; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 5; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 145; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#00ff91",
+        "desc": "A retícula estática do maior rifler da história do CS, calibrada para headshots de um único tiro de AK-47.",
+        "params": {"size": 1, "thick": 1, "gap": -4, "dot": 0, "outline": 0, "color": "Verde Esmeralda"}
     },
     {
-        "id": "ropz", "name": "ropz", "real": "Robin Kool",
-        "team": "Vitality", "country": "EE", "role": "Rifler",
+        "id": "zywoo",
+        "name": "ZywOo",
+        "real": "Mathieu Herbaut",
+        "team": "Vitality",
+        "country": "FR",
+        "role": "AWPer",
+        "photo": "assets/pros/zywoo.png",
+        "share_code": "CSGO-UmDxN-AZUpO-u4WCH-HQmu3-RERuF",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 2; cl_crosshairthickness 0; cl_crosshairgap -3; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 1; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 0; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#00ff00",
+        "desc": "Mira verde clássica fina e limpa de ZywOo, ideal para alinhamento rápido em duelos de longa distância.",
+        "params": {"size": 2, "thick": 0, "gap": -3, "dot": 0, "outline": 0, "color": "Verde Puro (#00ff00)"}
+    },
+    {
+        "id": "s1mple",
+        "name": "s1mple",
+        "real": "Oleksandr Kostyliev",
+        "team": "BC.Game",
+        "country": "UA",
+        "role": "AWPer",
+        "photo": "assets/pros/s1mple.png",
+        "share_code": "CSGO-UwHA2-rLBD3-qDws7-svzyC-yeoKG",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 1; cl_crosshairthickness 1; cl_crosshairgap -4; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 4; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 255; cl_crosshairusealpha 1; cl_crosshairalpha 200",
+        "color_hex": "#00e5ff",
+        "desc": "Retícula estática do s1mple com ligeira transparência (alpha 200) para máxima perceção periférica do alvo.",
+        "params": {"size": 1, "thick": 1, "gap": -4, "dot": 0, "outline": 0, "color": "Cyan Translúcido"}
+    },
+    {
+        "id": "ropz",
+        "name": "ropz",
+        "real": "Robin Kool",
+        "team": "Vitality",
+        "country": "EE",
+        "role": "Rifler",
         "photo": "assets/pros/ropz.png",
-        "dpi": 400, "sens": 1.77, "zoom": 1.0, "hz": 2000,
-        "res": "1920x1080", "aspect": "16:9 Nativa",
-        "cross": {"length": 2, "thick": 0.5, "gap": -3, "dot": 0,
-                  "color": 1, "r": 0, "g": 255, "b": 0, "alpha": 255},
-        "vm": {"fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2},
-        "bob": {"lower": 5, "lat": 0.1, "vert": 0.1, "cycle": 0.98},
-        "fps": 999, "radar": 0.65, "launch": "",
-        "video": {"w": 1920, "h": 1080, "aspect": 1, "msaa": "2", "aniso": "0"},
+        "share_code": "CSGO-HnhrC-TaH2q-vV2mt-xkJvY-XwP5F",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 2; cl_crosshairthickness 0.5; cl_crosshairgap -3; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 1; cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 0; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#00ff00",
+        "desc": "Ajustada com espessura 0.5 para ecrãs 1080p, oferecendo traços finos para lurkers e duelos cirúrgicos.",
+        "params": {"size": 2, "thick": 0.5, "gap": -3, "dot": 0, "outline": 0, "color": "Verde Suave"}
     },
     {
-        "id": "fallen", "name": "FalleN", "real": "Gabriel Toledo",
-        "team": "FURIA", "country": "BR", "role": "AWPer",
+        "id": "fallen",
+        "name": "FalleN",
+        "real": "Gabriel Toledo",
+        "team": "FURIA",
+        "country": "BR",
+        "role": "AWPer",
         "photo": "assets/pros/fallen.png",
-        "dpi": 400, "sens": 2.0, "zoom": 1.0, "hz": 1000,
-        "res": "1280x960", "aspect": "4:3 Stretched",
-        "cross": {"length": 2, "thick": 1, "gap": -6, "dot": 0,
-                  "color": 2, "r": 255, "g": 255, "b": 0, "alpha": 255},
-        "vm": {"fov": 60, "x": 1, "y": 1, "z": -1, "preset": 1},
-        "bob": {"lower": 5, "lat": 0.33, "vert": 0.14, "cycle": 0.98},
-        "fps": 0, "radar": 0.45,
-        "launch": "-refresh 360 -novid",
-        "video": {"w": 1280, "h": 960, "aspect": 0, "msaa": "4", "aniso": "1"},
+        "share_code": "CSGO-A6zRA-7Uf47-kU6Yq-6YQ5z-9H9mE",
+        "console_cmd": "cl_crosshairstyle 4; cl_crosshairsize 2; cl_crosshairthickness 1; cl_crosshairgap -6; cl_crosshairdot 0; cl_crosshair_drawoutline 0; cl_crosshaircolor 2; cl_crosshaircolor_r 255; cl_crosshaircolor_g 255; cl_crosshaircolor_b 0; cl_crosshairusealpha 1; cl_crosshairalpha 255",
+        "color_hex": "#ffff00",
+        "desc": "Mira amarela de alto contraste do Professor FalleN, visível em todas as zonas escuras ou claras dos mapas.",
+        "params": {"size": 2, "thick": 1, "gap": -6, "dot": 0, "outline": 0, "color": "Amarelo (#ffff00)"}
     },
 ]
 
-BY_ID = {p["id"]: p for p in PROS}
+BY_CROSSHAIR_ID = {c["id"]: c for c in PRO_CROSSHAIRS}
+
+
+# ---------- VIEWMODELS DOS PROS (POSICIONAMENTO DA ARMA) ----------
+# Imagens reais in-game do CS2 com boneco e armas em assets/viewmodels/<id>.jpg
+# Comandos de consola diretos (~) para posicionar a arma no CS2
+VIEWMODEL_PRESETS = [
+    {
+        "id": "classic_pro",
+        "name": "Clássico Competitivo Pro (launders / crashz)",
+        "tag": "Mais Usado (m0NESY & NiKo)",
+        "desc": "Arma rebaixada à direita com FOV 68. O padrão dos profissionais: liberta o centro do ecrã para uma linha de mira perfeitamente limpa sem perder a referência do cano.",
+        "image": "assets/viewmodels/classic_pro.jpg",
+        "fov": 68, "x": 2.5, "y": 0, "z": -1.5, "preset": 2,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 0; viewmodel_offset_z -1.5; viewmodel_presetpos 2",
+    },
+    {
+        "id": "compact_recessed",
+        "name": "Compacto & Recuado",
+        "tag": "Máxima Visão (FalleN / s1mple)",
+        "desc": "Arma recuada e encostada ao canto inferior direito (z=-2). Reduz o volume aparente da arma no ecrã para não esconder nenhum inimigo que entre pelos flancos.",
+        "image": "assets/viewmodels/compact_recessed.jpg",
+        "fov": 68, "x": 2.5, "y": 2, "z": -2, "preset": 0,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 2; viewmodel_offset_z -2; viewmodel_presetpos 0",
+    },
+    {
+        "id": "max_fov",
+        "name": "FOV Máximo / AWP Estendido",
+        "tag": "Estilo Snipers (ZywOo & donk)",
+        "desc": "Arma projetada para a frente exibindo as mãos e o cano completo. Proporciona excelente sensação de recoil e alinhamento tático com rifles e AWP.",
+        "image": "assets/viewmodels/max_fov.jpg",
+        "fov": 68, "x": 2.5, "y": 2, "z": -1, "preset": 3,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 2; viewmodel_offset_z -1; viewmodel_presetpos 3",
+    },
+    {
+        "id": "centered_doom",
+        "name": "Centrado / Doom Simétrico (Quake)",
+        "tag": "Estilo Retro / Quake",
+        "desc": "Arma posicionada na base central do ecrã apontando para o céu. Ideal para jogadores que preferem simetria absoluta e foco direto no eixo vertical de mira.",
+        "image": "assets/viewmodels/centered_doom.jpg",
+        "fov": 68, "x": -2, "y": 2, "z": -2, "preset": 0,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x -2; viewmodel_offset_y 2; viewmodel_offset_z -2; viewmodel_presetpos 0",
+    },
+    {
+        "id": "gangster",
+        "name": "Gangster Clássico (crashz)",
+        "tag": "Comunidade / Gangster",
+        "desc": "Posicionamento icónico elevado e inclinado estilo gangster da oficina do CS:GO/CS2. A arma fica inclinada para máxima diversão e estilo tático.",
+        "image": "assets/viewmodels/gangster.jpg",
+        "fov": 68, "x": -2, "y": 2, "z": 2, "preset": 0,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x -2; viewmodel_offset_y 2; viewmodel_offset_z 2; viewmodel_presetpos 0",
+    },
+    {
+        "id": "valve_default",
+        "name": "Padrão Oficial CS2 (Desktop)",
+        "tag": "Fábrica Valve",
+        "desc": "Posicionamento padrão de fábrica da Valve (FOV 60, offset 1, 1, -1). Recomendado para quem prefere a estética original do jogo.",
+        "image": "assets/viewmodels/valve_default.jpg",
+        "fov": 60, "x": 1, "y": 1, "z": -1, "preset": 1,
+        "console_cmd": "viewmodel_fov 60; viewmodel_offset_x 1; viewmodel_offset_y 1; viewmodel_offset_z -1; viewmodel_presetpos 1",
+    },
+    {
+        "id": "minimalist_low",
+        "name": "Minimalista Ultra Baixo",
+        "tag": "Anti-Distração",
+        "desc": "A arma quase desaparece da visão durante o movimento, proporcionando a menor área obstruída possível em combates caóticos.",
+        "image": "assets/viewmodels/minimalist_low.jpg",
+        "fov": 68, "x": 2.5, "y": -2, "z": -2, "preset": 0,
+        "console_cmd": "viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y -2; viewmodel_offset_z -2; viewmodel_presetpos 0",
+    }
+]
+
+BY_VIEWMODEL_ID = {v["id"]: v for v in VIEWMODEL_PRESETS}
+
+
+# ---------- MÉTODOS PÚBLICOS SEGUROS ----------
+
+def list_crosshairs():
+    """Lista todas as miras dos pros com código de partilha e comando de consola."""
+    return PRO_CROSSHAIRS
+
+
+def list_viewmodels():
+    """Lista todos os posicionamentos de arma (viewmodels) com imagem e comandos."""
+    return VIEWMODEL_PRESETS
 
 
 def list_pros():
+    """
+    Mantido para compatibilidade da API existente, mas agora devolve dados
+    focados exclusivamente em Miras e Viewmodels não destrutivos.
+    """
     out = []
-    for p in PROS:
+    for c in PRO_CROSSHAIRS:
         out.append({
-            "id": p["id"], "name": p["name"], "real": p["real"],
-            "team": p["team"], "country": p["country"], "role": p["role"],
-            "photo": p["photo"], "dpi": p["dpi"], "sens": p["sens"],
-            "edpi": round(p["dpi"] * p["sens"]),
-            "res": p["res"], "aspect": p["aspect"],
+            "id": c["id"],
+            "name": c["name"],
+            "real": c["real"],
+            "team": c["team"],
+            "country": c["country"],
+            "role": c["role"],
+            "photo": c["photo"],
+            "share_code": c["share_code"],
+            "console_cmd": c["console_cmd"],
+            "color_hex": c["color_hex"],
+            "desc": c["desc"],
+            "params": c["params"],
         })
     return out
 
 
-def build_pro_cfg(p):
-    c = p["cross"]
-    v = p["vm"]
-    b = p["bob"]
-    lines = [
-        f"// Midnight Optimizer — config de {p['name']} ({p['team']})",
-        "// Sensibilidade: ajusta ao teu DPI para igualar o eDPI do pro",
-        f"sensitivity \"{p['sens']}\"",
-        f"zoom_sensitivity_ratio \"{p['zoom']}\"",
-        "m_rawinput 1",
-        "",
-        "// Mira",
-        "cl_crosshairstyle 4",
-        f"cl_crosshairsize {c['length']}",
-        f"cl_crosshairthickness {c['thick']}",
-        f"cl_crosshairgap {c['gap']}",
-        f"cl_crosshairdot {c['dot']}",
-        "cl_crosshair_drawoutline 0",
-        f"cl_crosshaircolor {c['color']}",
-        f"cl_crosshaircolor_r {c['r']}",
-        f"cl_crosshaircolor_g {c['g']}",
-        f"cl_crosshaircolor_b {c['b']}",
-        "cl_crosshairusealpha 1",
-        f"cl_crosshairalpha {c['alpha']}",
-        "cl_crosshair_t 0",
-        "",
-        "// Viewmodel",
-        f"viewmodel_fov {v['fov']}",
-        f"viewmodel_offset_x {v['x']}",
-        f"viewmodel_offset_y {v['y']}",
-        f"viewmodel_offset_z {v['z']}",
-        f"viewmodel_presetpos {v['preset']}",
-        "cl_usenewbob 0",
-        f"cl_bob_lower_amt {b['lower']}",
-        f"cl_bobamt_lat {b['lat']}",
-        f"cl_bobamt_vert {b['vert']}",
-        f"cl_bobcycle {b['cycle']}",
-        "",
-        "// Rede + FPS",
-        "rate 786432",
-        "cl_cmdrate 128",
-        "cl_updaterate 128",
-        "cl_interp 0",
-        "cl_interp_ratio 1",
-        f"fps_max {p['fps']}",
-        "cl_showfps 1",
-        f"cl_hud_radar_scale {p['radar']}",
-        "",
-        "host_writeconfig",
-        f"echo \"MIDNIGHT: config de {p['name']} aplicada\"",
-    ]
-    return "\n".join(lines) + "\n"
+def apply_crosshair_safe(pro_id):
+    """
+    Aplica a mira do pro de forma 100% segura num ficheiro isolado (midnight_crosshair.cfg).
+    NUNCA mexe em sensibilidade, binds, resolução ou definições de vídeo.
+    """
+    c = BY_CROSSHAIR_ID.get(pro_id)
+    if not c:
+        return {"success": False, "output": "Mira não encontrada."}
 
-
-def apply_pro(pro_id):
-    p = BY_ID.get(pro_id)
-    if not p:
-        return {"success": False, "output": "Pro desconhecido."}
-    running, _ = game_tweaks.cs2_running()
-    if running:
-        return {"success": False,
-                "output": "⛔ Fecha o CS2 primeiro! O jogo apaga mudancas feitas com ele aberto."}
     info = game_tweaks.find_cs2()
     if not info or not info.get("cfg_dir"):
-        return {"success": False,
-                "output": "CS2 nao detetado. Prime 'Escolher pasta do CS2' e aponta para o jogo."}
-    logs = []
+        return {
+            "success": True,
+            "output": f"Código de Partilha de {c['name']}: {c['share_code']}\nComando Consola: {c['console_cmd']}",
+            "share_code": c["share_code"],
+            "console_cmd": c["console_cmd"],
+            "note": "CS2 não detetado no disco para guardar cfg automática, copia o código diretamente para o jogo!"
+        }
+
     cfg_dir = info["cfg_dir"]
+    target = os.path.join(cfg_dir, "midnight_crosshair.cfg")
+    game_tweaks.backup_file(target)
 
-    # 1. midnight_pro.cfg com tudo do pro
-    pro_cfg = os.path.join(cfg_dir, "midnight_pro.cfg")
-    game_tweaks.backup_file(pro_cfg)
+    cmd_lines = c['console_cmd'].replace('; ', '\n')
+    cfg_content = f"""// Midnight Optimizer — Mira de {c['name']} ({c['team']})
+// 100% Seguro: Nao altera binds, sensibilidade ou resolucao
+{cmd_lines}
+host_writeconfig
+echo "MIDNIGHT: Mira de {c['name']} Carregada"
+"""
     try:
-        with open(pro_cfg, "w", encoding="utf-8") as f:
-            f.write(build_pro_cfg(p))
-        logs.append(f"✔ midnight_pro.cfg ({p['name']})")
+        with open(target, "w", encoding="utf-8") as f:
+            f.write(cfg_content)
+        # Liga ao autoexec sem apagar nada
+        game_tweaks._ensure_exec(cfg_dir, "midnight_crosshair")
+        
+        # Dispara notificação no overlay in-game
+        overlay.notify_process(
+            title=f"Mira de {c['name']} Ativa",
+            message=f"Código CS2: {c['share_code']}",
+            badge="CS2 MIRA",
+            theme="cyan"
+        )
+        return {
+            "success": True,
+            "output": f"✔ Mira de {c['name']} configurada em midnight_crosshair.cfg!\nCódigo CS2: {c['share_code']}\nPodes colar na consola: {c['console_cmd']}",
+            "share_code": c["share_code"],
+            "console_cmd": c["console_cmd"],
+        }
     except Exception as e:
-        return {"success": False, "output": f"Falha a escrever cfg: {e}"}
+        return {"success": False, "output": f"Erro ao gravar cfg: {e}"}
 
-    # 2. autoexec executa o ficheiro do pro
-    autoexec = info["autoexec"]
-    game_tweaks.backup_file(autoexec)
+
+def apply_viewmodel_safe(preset_id):
+    """
+    Aplica o posicionamento de arma (viewmodel) escolhido de forma 100% segura.
+    Grava apenas em midnight_viewmodel.cfg e nunca altera binds ou sensibilidades.
+    """
+    v = BY_VIEWMODEL_ID.get(preset_id)
+    if not v:
+        return {"success": False, "output": "Preset de viewmodel não encontrado."}
+
+    info = game_tweaks.find_cs2()
+    if not info or not info.get("cfg_dir"):
+        return {
+            "success": True,
+            "output": f"Comandos de Consola ({v['name']}):\n{v['console_cmd']}",
+            "console_cmd": v["console_cmd"],
+            "note": "CS2 não detetado no disco, copia e cola os comandos diretamente na consola (~)."
+        }
+
+    cfg_dir = info["cfg_dir"]
+    target = os.path.join(cfg_dir, "midnight_viewmodel.cfg")
+    game_tweaks.backup_file(target)
+
+    vm_lines = v['console_cmd'].replace('; ', '\n')
+    cfg_content = f"""// Midnight Optimizer — Viewmodel {v['name']}
+// 100% Seguro: Nao mexe em binds, sensibilidade ou graficos
+{vm_lines}
+host_writeconfig
+echo "MIDNIGHT: Viewmodel {v['name']} Carregado"
+"""
     try:
-        cur = ""
-        if os.path.isfile(autoexec):
-            cur = open(autoexec, encoding="utf-8", errors="ignore").read()
-        if "midnight_pro" not in cur:
-            with open(autoexec, "a", encoding="utf-8") as f:
-                if cur and not cur.endswith("\n"):
-                    f.write("\n")
-                f.write("exec midnight_pro\n")
-        logs.append("✔ autoexec ligado ao pro")
+        with open(target, "w", encoding="utf-8") as f:
+            f.write(cfg_content)
+        # Liga ao autoexec sem apagar nada
+        game_tweaks._ensure_exec(cfg_dir, "midnight_viewmodel")
+
+        # Dispara notificação no overlay in-game
+        overlay.notify_process(
+            title=f"Viewmodel {v['name']}",
+            message="Posicionamento da arma aplicado com sucesso",
+            badge="CS2 VIEWMOD",
+            theme="gold"
+        )
+        return {
+            "success": True,
+            "output": f"✔ Viewmodel '{v['name']}' configurado em midnight_viewmodel.cfg!\nComandos: {v['console_cmd']}",
+            "console_cmd": v["console_cmd"],
+        }
     except Exception as e:
-        logs.append(f"✘ autoexec: {e}")
+        return {"success": False, "output": f"Erro ao gravar cfg de viewmodel: {e}"}
 
-    # 3. video: resolucao + MSAA + aniso do pro
-    v = p["video"]
-    for vid in info.get("video_candidates", []):
-        try:
-            game_tweaks.backup_file(vid)
-            txt = open(vid, encoding="utf-8", errors="ignore").read()
-            txt = re.sub(r'"setting\.defaultres"\s+"[^"]*"',
-                         f"\"setting.defaultres\"\t\t\"{v['w']}\"", txt)
-            txt = re.sub(r'"setting\.defaultresheight"\s+"[^"]*"',
-                         f"\"setting.defaultresheight\"\t\t\"{v['h']}\"", txt)
-            txt = re.sub(r'"setting\.aspectratiomode"\s+"[^"]*"',
-                         f"\"setting.aspectratiomode\"\t\t\"{v['aspect']}\"", txt)
-            txt = re.sub(r'"setting\.mat_antialias"\s+"[^"]*"',
-                         f"\"setting.mat_antialias\"\t\t\"{v['msaa']}\"", txt)
-            txt = re.sub(r'"setting\.mat_forceaniso"\s+"[^"]*"',
-                         f"\"setting.mat_forceaniso\"\t\t\"{v['aniso']}\"", txt)
-            open(vid, "w", encoding="utf-8").write(txt)
-            logs.append(f"✔ video {v['w']}x{v['h']} aplicado")
-        except Exception as e:
-            logs.append(f"✘ video: {e}")
 
-    if p["launch"]:
-        logs.append(f"ⓘ Launch Options (colar no Steam): {p['launch']}")
-    else:
-        logs.append("ⓘ Este pro nao usa Launch Options.")
-    logs.append(f"ⓘ DPI do pro: {p['dpi']} — ajusta o teu rato p/ eDPI {round(p['dpi']*p['sens'])}.")
-    return {"success": True, "output": "\n".join(logs),
-            "launch": p["launch"], "name": p["name"]}
+# Aliases para compatibilidade de rotas antigas
+def apply_pro(pro_id):
+    """Encaminha para a aplicação segura de mira."""
+    return apply_crosshair_safe(pro_id)

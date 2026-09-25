@@ -6,108 +6,92 @@ Midnight Optimizer v3.0 - Build Release Script
 Gera instaladores e arquivos para release no GitHub
 """
 
+import sys
 import json
 from pathlib import Path
 from datetime import datetime
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 def get_version():
-    """Retorna a versão atual baseada em CHANGELOG.md"""
+    """Retorna a versão atual baseada em CHANGELOG.md ou package.json"""
+    try:
+        with open('package.json', 'r', encoding='utf-8') as f:
+            pkg = json.load(f)
+            v = pkg.get('version')
+            if v:
+                return v.lstrip('v')
+    except Exception:
+        pass
+
     try:
         with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
             content = f.read()
             if '## [v' in content:
-                lines = content.split('\n')
-                for line in lines:
+                for line in content.split('\n'):
                     if '## [' in line and ']' in line:
-                        return line.split('[')[1].split(']')[0].strip()
-    except FileNotFoundError:
+                        return line.split('[')[1].split(']')[0].strip().lstrip('v')
+    except Exception:
         pass
 
-    # Fallback para package.json
-    try:
-        with open('package.json', 'r') as f:
-            pkg = json.load(f)
-            return pkg.get('version', '3.0.0')
-    except:
-        return '3.0.0'
+    return '3.1.0'
 
 def update_version_files():
     """Atualiza versão em todos os arquivos"""
     version = get_version()
 
-    files_to_update = [
-        'package.json',
-        'renderer.js',
-        'app.py',
-    ]
-
-    for filepath in files_to_update:
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            if version in content:
-                continue
-
-            # Substituir versões antigas pela nova
-            new_content = content.replace('3.0.0', version)
-            new_content = new_content.replace('v2.', f'v{version}.')
-
-            with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(new_content)
-        except FileNotFoundError:
-            print(f"⚠️  Arquivo {filepath} não encontrado (OK)")
+    # package.json
+    try:
+        with open('package.json', 'r', encoding='utf-8') as f:
+            pkg = json.load(f)
+        pkg['version'] = version
+        with open('package.json', 'w', encoding='utf-8') as f:
+            json.dump(pkg, f, indent=2)
+    except Exception:
+        pass
 
 def create_installer():
     """Cria o instalador Inno Setup"""
-
+    ver = get_version()
     installer_path = Path('installer/setup.iss')
+    installer_path.parent.mkdir(parents=True, exist_ok=True)
 
-    iss_content = f'''#define APP_VERSION "{get_version()}"
-#define APP_NAME "Midnight Optimizer {get_version()}"
+    iss_content = f'''#define APP_VERSION "{ver}"
+#define APP_NAME "Midnight Optimizer {ver}"
 #define AUTHOR "chibangar"
 
 [Setup]
-AppName={APP_NAME}
-AppVersion=APP_VERSION
-AppPublisher={AUTHOR}
+AppName={{#APP_NAME}}
+AppVersion={{#APP_VERSION}}
+AppPublisher={{#AUTHOR}}
 AppPublisherEmail=contact@midnightoptimizer.com
-DefaultDirName={autopath}\\Midnight Optimizer {APP_VERSION}
-DefaultGroupName={APP_NAME}
+DefaultDirName={{autopf}}\\Midnight Optimizer
+DefaultGroupName=Midnight Optimizer
 WizardStyle=modern
-OutputBaseFilename=Midnight_Optimizer_{APP_VERSION}_Setup
-UninstallDisplayIcon={app}\\midnight.exe
+OutputBaseFilename=Midnight_Optimizer_{ver}_Setup
 Compression=lzma2
 SolidCompression=yes
 DisableDirPage=yes
 DisableProgramsPage=yes
 DisableReadyPage=yes
-LicenseFile=LICENSE
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "portuguese"; MessagesFile: "compiler:Languages\\Portuguese.isl"
 
 [Files]
-{app}*.exe;{app}*.bat;{app}*.py;{app}*.json;{app}*.txt
-{app}{PATHSEP}styles.css;{app}{PATHSEP}styles-modern.css;{app}{PATHSEP}index.html
-{app}{PATHSEP}assets\\*;{app}{PATHSEP}oauth_config.example.json
+Source: "dist\\MidnightOptimizer.exe"; DestDir: "{{app}}"; Flags: ignoreversion
 
 [Icons]
-Name: "{commondesktop}\\Midnight Optimizer"; Filename: "{app}\\iniciar.bat"; IconFilename: "{app}\\assets\\icon.ico"
-Name: "{userdesktop}\\Midnight Optimizer"; Filename: "{app}\\iniciar.bat"
-Name: "{commonprograms}\\Midnight Optimizer"; Filename: "{app}\\iniciar.bat"
+Name: "{{autodesktop}}\\Midnight Optimizer"; Filename: "{{app}}\\MidnightOptimizer.exe"
+Name: "{{commonprograms}}\\Midnight Optimizer"; Filename: "{{app}}\\MidnightOptimizer.exe"
 
 [Run]
-Filename: "{sys}\\cmd.exe"; Parameters: "/c start {app}\\iniciar.bat & exit"; Flags: waituntilfinished; Description: "Iniciando Midnight Optimizer..."; StatusMsg: "Abrindo app..."
+Filename: "{{app}}\\MidnightOptimizer.exe"; Description: "Iniciar Midnight Optimizer"; Flags: nowait postinstall skipifsilent
 '''
-
-    if installer_path.exists():
-        with open(installer_path, 'r', encoding='utf-8') as f:
-            current = f.read()
-
-        # Manter o conteúdo existente mas atualizar versiones
-        updated = current.replace('APP_VERSION="{get_version()}"', f'APP_VERSION="{get_version()}"')
 
     with open(installer_path, 'w', encoding='utf-8') as f:
         f.write(iss_content)
@@ -115,74 +99,32 @@ Filename: "{sys}\\cmd.exe"; Parameters: "/c start {app}\\iniciar.bat & exit"; Fl
 def create_release_notes():
     """Cria as notas da release para o GitHub"""
 
-    notes = f'''## 🎉 Midnight Optimizer v{get_version()} — Design Moderno!
+    notes = f'''## 🚀 Midnight Optimizer v{get_version()} — Professional Gaming Suite
 
-### ✨ Novidades Principais
+### ✨ Destaques da Versão
 
-#### 🎨 Glassmorphism Premium
-- Efeitos de vidro fosco em todos os cards
-- Background animado com partículas
-- Transições fluidas e profissionais
+#### ⚡ Nova Interface Moderna e Profissional
+- Design System Dark Obsidian de alta precisão com micro-contraste apurado.
+- Iconografia vetorial SVG nativa em toda a navegação e controlos rápidos.
+- Centro de Controlo no Dashboard com telemetria de hardware (CPU, GPU, RAM, Disco) em tempo real.
+- Layout ergonómico e responsivo sem animações invasivas ou efeitos desfocados desnecessários.
+- 3 temas refinados: WoW Midnight (Índigo/Violeta), CS2 Tático (Âmbar) e Call of Duty (Dourado Militar).
 
-#### 💫 15+ Animações Novas
-- Ripple effect nos botões
-- Hover animations com física de mola
-- Float, shimmer, glow pulses
-- Gradient backgrounds animados
+#### 🎯 Otimização de Latência & Kernel
+- Agendamento de processos e prioridade em tempo real para jogos competitivos.
+- Otimização da pilha de rede TCP/IP e rotinas rápidas de flush DNS.
+- Gestão de temporários e suspensão de processos em segundo plano.
+- Configurações dedicadas para CS2, WoW e Call of Duty.
 
-#### 🚀 Performance
-- Transições otimizadas de 300ms
-- Focus rings acessíveis
-- High DPI (4K) ready
-- Memory footprint reduzido
-
-### 🔧 O que Mudou?
-
-| Antes (v2.x) | Depois (v3.0) |
-|-------------|---------------|
-| Cards sólidos | Glassmorphism blur |
-| Botões estáticos | Ripple animation |
-| Background fixo | Partículas animadas |
-| Transições bruscas | 300ms smooth transitions |
-
-### 📦 O que Incluí
-
-- `styles-modern.css` (~850 linhas de CSS premium)
-- `CHANGELOG.md` - Histórico completo
-- `.claude-contributor.md` - Docs do contribuinte AI
-- Installer atualizado com novos recursos
-
-### ⚠️ Requisitos
-
-**Necessário para v3.0:**
-- Windows 10/11 (64-bit)
-- 8GB RAM mínimo
-- GPU GTX 1050+ recomendado
-
-### 📋 Changelog Completo
-
-Veja o arquivo CHANGELOG.md para todas as mudanças.
+#### 📦 Automatização de Releases
+- Compilação automática de executáveis Windows via GitHub Actions a cada tag/release.
+- Executável nativo autónomo `MidnightOptimizer.exe` pronto a correr.
 
 ---
 
-## 👥 Contribuintes
-
-Obrigado a todos que contribuíram para este projeto!
-
-- **chibangar** — Desenvolvedor principal ⭐
-- **Claude Code** (@noreply@anthropic.com) — Automação e melhorias v3 🤖
-
----
-
-## 🔗 Links
-
-- [GitHub](https://github.com/chibangar/Otimiza-ao-de-jogos)
-- [Contributors](https://github.com/chibangar/Otimiza-ao-de-jogos/graphs/contributors)
-- [Issue Tracker](https://github.com/chibangar/Otimiza-ao-de-jogos/issues)
-
----
-
-> *"Good players play.<br>Great players optimize."*
+### 📋 Requisitos de Sistema
+- Windows 10 ou Windows 11 (64-bit)
+- Direitos de Administrador para otimizações de energia e registo
 '''
 
     release_path = Path('RELEASE_NOTES.md')
@@ -206,21 +148,21 @@ def main():
 
     css_valid = False
     try:
-        with open('styles-modern.css', 'r') as f:
+        with open('styles.css', 'r', encoding='utf-8') as f:
             content = f.read()
-            if 'glass-panel' in content and 'ripple' in content:
+            if '--bg-void' in content:
                 css_valid = True
-                print("✓ styles-modern.css válido")
+                print("✓ styles.css válido")
     except FileNotFoundError:
-        print("⚠️  styles-modern.css não encontrado!")
+        print("⚠️  styles.css não encontrado!")
 
     html_valid = False
     try:
-        with open('index.html', 'r') as f:
+        with open('index.html', 'r', encoding='utf-8') as f:
             content = f.read()
-            if 'styles-modern.css' in content:
+            if 'styles.css' in content:
                 html_valid = True
-                print("✓ index.html referencia CSS moderno")
+                print("✓ index.html referencia CSS")
     except FileNotFoundError:
         print("⚠️  index.html não encontrado!")
 

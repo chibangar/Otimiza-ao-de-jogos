@@ -46,12 +46,18 @@ async function getBackend(){
       cs2Competitive: ()=>a.cs2_competitive(),
       cs2Restore: ()=>a.cs2_restore(),
       cs2Launch: ()=>a.cs2_launch_options(),
+      cs2HitregFix: ()=>a.cs2_hitreg_fix(),
+      testOverlay: ()=>a.test_in_game_overlay(),
       pickCs2Folder: ()=>a.pick_cs2_folder(),
       killCs2: ()=>a.kill_cs2(),
       wowCompetitive: ()=>a.wow_competitive(),
       wowBalanced: ()=>a.wow_balanced(),
       wowRestore: ()=>a.wow_restore(),
       listPros: ()=>a.list_pros(),
+      listCrosshairs: ()=>a.list_crosshairs(),
+      listViewmodels: ()=>a.list_viewmodels(),
+      applyCrosshair: (id)=>a.apply_crosshair(id),
+      applyViewmodel: (id)=>a.apply_viewmodel(id),
       applyPro: (id)=>a.apply_pro(id),
       checkUpdate: ()=>a.check_update(),
       startUpdate: ()=>a.start_update(),
@@ -134,7 +140,19 @@ function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page
 }
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
 
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3200); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.remove('hide');
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>{
+    t.classList.remove('show');
+    t.classList.add('hide');
+    setTimeout(()=>t.classList.remove('hide'), 220);
+  }, 3400);
+}
 function withTimeout(p, ms, label){
   return Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout '+ms+'ms em '+label)), ms))]);
 }
@@ -1239,87 +1257,277 @@ document.getElementById('vm-ear')?.addEventListener('click', async ()=>{
 async function checkForUpdate(silent){
   try{
     if(!window.midnightAPI || !window.midnightAPI.checkUpdate) return;
+    const banner = document.getElementById('update-banner');
+    if(!banner) return;
+
     try{
-      const last=await window.midnightAPI.updateLastResult();
-      if(last && last.success===false){
-        document.getElementById('update-banner').style.display='flex';
-        document.getElementById('update-text').textContent='⚠ '+last.output;
-        toast('⚠ '+last.output);
-        return;
+      const last = await window.midnightAPI.updateLastResult();
+      if(last && last.success === false && !silent){
+        toast('⚠ ' + last.output);
       }
     }catch{}
+
     const r = await window.midnightAPI.checkUpdate();
-    if(!(r && r.success)){
-      try{ await window.midnightAPI.logError('checkUpdate falhou: '+((r&&r.output)||'desconhecido')); }catch{}
-      return;
-    }
     if(r && r.success && r.available){
-      const banner=document.getElementById('update-banner');
-      const wasHidden=banner.style.display==='none';
-      banner.style.display='flex';
-      document.getElementById('update-text').textContent=`Nova versão ${r.latest} disponível — atualiza sem sair da app!`;
-      if(wasHidden) toast(`✦ Nova versão ${r.latest} disponível!`);
+      const wasHidden = banner.style.display === 'none';
+      banner.style.display = 'flex';
+      document.getElementById('update-text').textContent = `Nova versão ${r.latest} disponível — atualiza com 1 clique!`;
+      document.getElementById('btn-update-now').style.display = '';
+      document.getElementById('btn-update-later').style.display = '';
+      document.getElementById('btn-update-restart').style.display = 'none';
+      document.getElementById('update-fill').style.width = '0%';
+      if(wasHidden || !silent) toast(`✦ Nova versão ${r.latest} disponível!`);
+    } else {
+      banner.style.display = 'none';
+      if(!silent && r && r.success){
+        toast(`✔ Tens a versão mais recente instalada (${r.current || 'v3.2.4'})!`);
+      }
     }
-  }catch(e){ try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{} }
+  }catch(e){
+    try{ await window.midnightAPI.logError('checkForUpdate: '+(e&&e.stack||e)); }catch{}
+    if(!silent) toast('⚠ Falha ao verificar atualizações: ' + e);
+  }
 }
-setInterval(()=>{ const b=document.getElementById('update-banner'); if(b && b.style.display==='none') checkForUpdate(true); }, 30*60*1000);
+
+setInterval(()=>{
+  checkForUpdate(true);
+}, 10*60*1000);
+
+document.getElementById('btn-check-update')?.addEventListener('click', async ()=>{
+  toast('🔍 A verificar atualizações no GitHub…');
+  await checkForUpdate(false);
+});
+
+document.getElementById('btn-check-update-sys')?.addEventListener('click', async ()=>{
+  toast('🔍 A verificar atualizações no GitHub…');
+  await checkForUpdate(false);
+});
+
 document.getElementById('btn-update-manual')?.addEventListener('click', async ()=>{
   toast('A abrir a página de Releases…');
   await window.midnightAPI.openReleasesPage();
 });
+
 document.getElementById('btn-update-later')?.addEventListener('click',()=>{
-  document.getElementById('update-banner').style.display='none';
+  document.getElementById('update-banner').style.display = 'none';
 });
+
 document.getElementById('btn-update-now')?.addEventListener('click', async ()=>{
-  document.getElementById('btn-update-now').style.display='none';
-  document.getElementById('btn-update-later').style.display='none';
+  const btnNow = document.getElementById('btn-update-now');
+  const btnLater = document.getElementById('btn-update-later');
+  if(btnNow) btnNow.style.display = 'none';
+  if(btnLater) btnLater.style.display = 'none';
+
+  toast('⬇ A descarregar atualização oficial do GitHub…');
   await window.midnightAPI.startUpdate();
-  const fill=document.getElementById('update-fill'), txt=document.getElementById('update-text');
-  const h=setInterval(async ()=>{
-    const p=await window.midnightAPI.updateProgress();
-    fill.style.width=(p.pct||0)+'%';
-    txt.textContent=`A descarregar atualização… ${p.pct||0}%`;
-    if(p.status==='ready'){ clearInterval(h); txt.textContent=`Versão ${p.version} pronta!`; document.getElementById('btn-update-restart').style.display=''; }
-    if(p.status==='error'){ clearInterval(h); txt.textContent='Falha: '+p.error; }
-  },500);
+
+  const fill = document.getElementById('update-fill');
+  const txt = document.getElementById('update-text');
+
+  const h = setInterval(async ()=>{
+    const p = await window.midnightAPI.updateProgress();
+    const pct = p.pct || 0;
+    if(fill) fill.style.width = pct + '%';
+    if(txt) txt.textContent = `A descarregar atualização… ${pct}%`;
+
+    if(p.status === 'ready'){
+      clearInterval(h);
+      if(fill) fill.style.width = '100%';
+      if(txt) txt.textContent = `Versão ${p.version} pronta! A reiniciar…`;
+      toast(`✔ Versão ${p.version} pronta! A reiniciar a app…`);
+      const rBtn = document.getElementById('btn-update-restart');
+      if(rBtn) rBtn.style.display = '';
+
+      // Reinicia automaticamente após 1.5 segundos
+      setTimeout(async ()=>{
+        try {
+          await window.midnightAPI.applyUpdate();
+        } catch(e) {
+          toast('Falha ao reiniciar: ' + e);
+        }
+      }, 1500);
+    }
+    if(p.status === 'error'){
+      clearInterval(h);
+      if(txt) txt.textContent = 'Falha no download: ' + (p.error || 'Erro');
+      toast('Falha no download: ' + p.error);
+      if(btnNow) btnNow.style.display = '';
+    }
+  }, 500);
 });
+
 document.getElementById('btn-update-restart')?.addEventListener('click', async ()=>{
-  const btn=document.getElementById('btn-update-restart');
-  btn.disabled=true; btn.textContent='A reiniciar…';
+  const btn = document.getElementById('btn-update-restart');
+  btn.disabled = true;
+  btn.textContent = 'A reiniciar…';
   toast('A aplicar atualização e a reiniciar…');
   try{
-    const r=await window.midnightAPI.applyUpdate();
-    // Se chegámos aqui, o restart falhou (o sucesso fecha o processo).
-    btn.disabled=false; btn.textContent='Reiniciar agora';
-    const msg=(r && r.output) || 'Falha desconhecida no restart.';
-    toast('⚠ '+msg);
-    try{ await window.midnightAPI.logError('applyUpdate falhou: '+msg); }catch{}
+    const r = await window.midnightAPI.applyUpdate();
+    btn.disabled = false;
+    btn.textContent = 'Reiniciar agora';
+    const msg = (r && r.output) || 'Falha no restart.';
+    toast('⚠ ' + msg);
   }catch(e){
-    btn.disabled=false; btn.textContent='Reiniciar agora';
-    toast('⚠ Falha no restart: '+e);
-    try{ await window.midnightAPI.logError('applyUpdate excecao: '+(e&&e.stack||e)); }catch{}
+    btn.disabled = false;
+    btn.textContent = 'Reiniciar agora';
+    toast('⚠ Falha no restart: ' + e);
   }
 });
 
-// ---------- GALERIA PROS ----------
-async function renderPros(){
-  const grid = document.getElementById('pros-grid'); if(!grid) return;
-  if(!window.midnightAPI || !window.midnightAPI.listPros){ grid.innerHTML='<div class="card">Backend sem pros.</div>'; return; }
-  try{
-    const list = await withTimeout(window.midnightAPI.listPros(), 15000, 'listPros');
-    grid.innerHTML='';
-    list.forEach(p=>{
-      const d=document.createElement('div'); d.className='pro-card';
-      d.innerHTML=`<img src="${p.photo}" alt="${p.name}" onerror="this.style.display='none'"><h4>${p.name}</h4><div class="team">${p.team} • ${p.role}</div><div class="specs">${p.dpi} DPI × ${p.sens} sens = <b>${p.edpi} eDPI</b><br>${p.res} ${p.aspect}</div><button class="btn gold small">⚔ Usar config</button>`;
-      d.querySelector('button').addEventListener('click', async ()=>{
-        toast(`⚔ A aplicar config de ${p.name}… (fecha o CS2 primeiro)`);
-        const r = await window.midnightAPI.applyPro(p.id);
-        ilog((r.success?'✔ ':'✘ ')+`[${p.name}] `+(r.output||''));
-        toast(r.success ? `Config de ${p.name} aplicada!` : r.output);
+// ---------- CS2: MIRAS & VIEWMODELS ----------
+function buildCrosshairSvg(c) {
+  const col = c.color_hex || '#00ff91';
+  const p = c.params || { size: 1.5, thick: 1, gap: -4, dot: 0 };
+  const center = 14;
+  const gap = Math.max(2, 4 + (p.gap !== undefined ? p.gap : -4));
+  const len = Math.max(3, (p.size !== undefined ? p.size : 1) * 3.5);
+  const thick = Math.max(1, p.thick !== undefined ? p.thick : 1);
+  const dot = p.dot ? `<circle cx="${center}" cy="${center}" r="1.5" fill="${col}"/>` : '';
+  return `
+    <svg viewBox="0 0 28 28" width="28" height="28" style="overflow:visible">
+      <line x1="${center}" y1="${center - gap - len}" x2="${center}" y2="${center - gap}" stroke="${col}" stroke-width="${thick}" stroke-linecap="square"/>
+      <line x1="${center}" y1="${center + gap}" x2="${center}" y2="${center + gap + len}" stroke="${col}" stroke-width="${thick}" stroke-linecap="square"/>
+      <line x1="${center - gap - len}" y1="${center}" x2="${center - gap}" y2="${center}" stroke="${col}" stroke-width="${thick}" stroke-linecap="square"/>
+      <line x1="${center + gap}" y1="${center}" x2="${center + gap + len}" y2="${center}" stroke="${col}" stroke-width="${thick}" stroke-linecap="square"/>
+      ${dot}
+    </svg>
+  `;
+}
+
+async function renderPros() {
+  const cGrid = document.getElementById('crosshairs-grid');
+  const vGrid = document.getElementById('viewmodels-grid');
+  const tabCross = document.getElementById('tab-btn-crosshairs');
+  const tabVm = document.getElementById('tab-btn-viewmodels');
+  const contCross = document.getElementById('tab-content-crosshairs');
+  const contVm = document.getElementById('tab-content-viewmodels');
+
+  // Subtabs alternância
+  if (tabCross && tabVm && contCross && contVm) {
+    tabCross.onclick = () => {
+      tabCross.classList.add('active');
+      tabVm.classList.remove('active');
+      contCross.style.display = 'block';
+      contVm.style.display = 'none';
+    };
+    tabVm.onclick = () => {
+      tabVm.classList.add('active');
+      tabCross.classList.remove('active');
+      contVm.style.display = 'block';
+      contCross.style.display = 'none';
+    };
+  }
+
+  // 1. Renderizar Miras (Crosshairs)
+  if (cGrid && window.midnightAPI && window.midnightAPI.listCrosshairs) {
+    try {
+      const list = await withTimeout(window.midnightAPI.listCrosshairs(), 12000, 'listCrosshairs');
+      cGrid.innerHTML = '';
+      (list || []).forEach(c => {
+        const d = document.createElement('div');
+        d.className = 'crosshair-card';
+        d.innerHTML = `
+          <div class="crosshair-header">
+            <img src="${c.photo}" alt="${c.name}" onerror="this.src='assets/games/cs2.jpg'">
+            <div class="crosshair-player-info">
+              <h4>${c.name}</h4>
+              <div class="team">${c.team} • ${c.role}</div>
+            </div>
+          </div>
+          <div class="crosshair-preview-box" title="${c.desc}">
+            <div class="crosshair-reticle">
+              ${buildCrosshairSvg(c)}
+            </div>
+          </div>
+          <p class="muted small" style="margin:0;font-size:10.5px;line-height:1.3">${c.desc}</p>
+          <input type="text" class="crosshair-code-input" readonly value="${c.share_code}">
+          <div class="crosshair-actions">
+            <button class="btn gold small btn-copy-code" title="Copiar código para colar nas definições do CS2">📋 Código</button>
+            <button class="btn ghost small btn-copy-cmd" title="Copiar comandos para a consola (~) da Valve">⌨ Consola</button>
+          </div>
+          <button class="btn ghost small btn-apply-cross" style="margin-top:2px;width:100%">⚡ Aplicar ao CS2 (Seguro)</button>
+        `;
+
+        d.querySelector('.btn-copy-code').onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(c.share_code);
+            toast(`Código de mira de ${c.name} copiado! Cola no CS2 (Definições > Mira > Partilhar/Importar).`);
+          } catch {
+            prompt('Copia o código da mira:', c.share_code);
+          }
+        };
+
+        d.querySelector('.btn-copy-cmd').onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(c.console_cmd);
+            toast(`Comandos da mira de ${c.name} copiados! Cola na consola do CS2 (~).`);
+          } catch {
+            prompt('Copia os comandos da consola:', c.console_cmd);
+          }
+        };
+
+        d.querySelector('.btn-apply-cross').onclick = async () => {
+          toast(`⚡ A aplicar mira de ${c.name} de forma segura…`);
+          const r = await window.midnightAPI.applyCrosshair(c.id);
+          ilog((r.success ? '✔ ' : '✘ ') + (r.output || ''));
+          toast(r.success ? `Mira de ${c.name} aplicada sem alterar binds!` : r.output);
+        };
+
+        cGrid.appendChild(d);
       });
-      grid.appendChild(d);
-    });
-  }catch(e){ grid.innerHTML='<div class="card">Erro a carregar pros: '+String(e&&e.message||e)+'</div>'; try{ await window.midnightAPI.logError('renderPros: '+(e&&e.stack||e)); }catch{} }
+    } catch (e) {
+      cGrid.innerHTML = `<div class="card">Falha ao carregar miras: ${e}</div>`;
+    }
+  }
+
+  // 2. Renderizar Viewmodels (Posicionamento da Arma)
+  if (vGrid && window.midnightAPI && window.midnightAPI.listViewmodels) {
+    try {
+      const list = await withTimeout(window.midnightAPI.listViewmodels(), 12000, 'listViewmodels');
+      vGrid.innerHTML = '';
+      (list || []).forEach(v => {
+        const d = document.createElement('div');
+        d.className = 'viewmodel-card';
+        d.innerHTML = `
+          <div class="viewmodel-img-wrap">
+            <img src="${v.image}" alt="${v.name}" loading="lazy">
+          </div>
+          <div>
+            <span class="viewmodel-badge">${v.tag}</span>
+            <h4 class="viewmodel-title">${v.name}</h4>
+          </div>
+          <p class="viewmodel-desc">${v.desc}</p>
+          <div class="muted small" style="font-family:var(--font-mono);font-size:10px;background:var(--bg-inset);padding:4px 6px;border-radius:var(--r-xs);border:1px solid var(--border)">
+            FOV ${v.fov} • x:${v.x} y:${v.y} z:${v.z}
+          </div>
+          <div class="viewmodel-actions">
+            <button class="btn gold small btn-copy-vm" style="flex:1">📋 Copiar Consola (~)</button>
+            <button class="btn ghost small btn-apply-vm" style="flex:1">⚡ Aplicar CS2</button>
+          </div>
+        `;
+
+        d.querySelector('.btn-copy-vm').onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(v.console_cmd);
+            toast(`Comandos de viewmodel copiados! Cola na consola do CS2 (~).`);
+          } catch {
+            prompt('Copia os comandos do viewmodel:', v.console_cmd);
+          }
+        };
+
+        d.querySelector('.btn-apply-vm').onclick = async () => {
+          toast(`⚡ A aplicar viewmodel '${v.name}'…`);
+          const r = await window.midnightAPI.applyViewmodel(v.id);
+          ilog((r.success ? '✔ ' : '✘ ') + (r.output || ''));
+          toast(r.success ? `Viewmodel '${v.name}' configurado com sucesso!` : r.output);
+        };
+
+        vGrid.appendChild(d);
+      });
+    } catch (e) {
+      vGrid.innerHTML = `<div class="card">Falha ao carregar viewmodels: ${e}</div>`;
+    }
+  }
 }
 
 // ---------- IN-GAME CS2 & WOW ----------
@@ -1378,6 +1586,21 @@ document.getElementById('btn-cs2-launch')?.addEventListener('click', async ()=>{
 });
 document.getElementById('btn-cs2-restore')?.addEventListener('click', async ()=>{
   const r = await window.midnightAPI.cs2Restore(); ilog(r.output); toast('Backup CS2 restaurado.');
+});
+document.getElementById('btn-cs2-hitreg')?.addEventListener('click', async ()=>{
+  toast('🎯 A corrigir registo de tiros e desfasamento sub-tick…');
+  const r = await window.midnightAPI.cs2HitregFix();
+  ilog((r.success?'✔ ':'✘ ')+(r.output||''));
+  if(r.clean_count !== undefined){
+    ilog(`Limpeza de Shaders: ${r.clean_count} ficheiros removidos.`);
+  }
+  toast(r.success ? '✔ Registo de tiros do CS2 corrigido! Buffer em 0 ticks e shaders limpos.' : 'Hitreg: '+(r.output||''));
+  if(r.success) histAdd('✓','CS2 Hitreg & Sub-Tick Otimizado');
+});
+document.getElementById('btn-cs2-overlay-test')?.addEventListener('click', async ()=>{
+  toast('🔔 A disparar overlay in-game…');
+  await window.midnightAPI.testOverlay();
+  toast('Notificação overlay in-game disparada no ecrã com popout!');
 });
 document.getElementById('btn-wow-apply')?.addEventListener('click', async ()=>{
   toast('⚔ A aplicar WoW Raid FPS… (fecha o jogo primeiro)');

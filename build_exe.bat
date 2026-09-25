@@ -13,7 +13,7 @@ python -m pip install -r requirements.txt
 REM 2. Gerar EXE com PyInstaller (janela sem consola, um ficheiro so)
 echo.
 echo [2/3] A compilar EXE...
-python -m PyInstaller --noconfirm --onefile --windowed --icon "assets\icon.ico" --name "MidnightOptimizer" --add-data "index.html;." --add-data "styles.css;." --add-data "interface.css;." --add-data "interface.js;." --add-data "renderer.js;." --add-data "assets;assets" app.py
+python -m PyInstaller --noconfirm --clean MidnightOptimizer.spec
 
 echo.
 echo [3/3] Pronto!

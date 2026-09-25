@@ -1,29 +1,58 @@
-# Este arquivo automatiza a criação de releases no GitHub
-# Para criar um release: git tag vX.Y.Z && git push origin vX.Y.Z
-
-name: Release Automático
+name: Publicar Release Automática
 
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versão da release (ex: v3.1.0)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  build-and-release:
+    runs-on: windows-latest
     steps:
-      - name: Checkout código
+      - name: Checkout do repositório
         uses: actions/checkout@v4
-      
-      - name: Criar Release no GitHub
-        run: |
-          # O GitHub cria automaticamente o release quando push da tag!
-          echo "Release v$(echo ${{ github.ref_name }}) criado automaticamente!"
 
-      - name: Upload de assets (opcional)
-        uses: softprops/action-gh-release@v1
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
-          files: ./installer/*.exe, ./installer/*.msi, ./installer/*.iso
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Compilar Executável com PyInstaller
+        run: |
+          python -m PyInstaller --noconfirm --clean MidnightOptimizer.spec
+
+      - name: Empacotar Ficheiros para Distribuição
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path release_dist
+          Copy-Item "dist\MidnightOptimizer.exe" -Destination "release_dist\MidnightOptimizer.exe"
+          Copy-Item "README.md" -Destination "release_dist\README.md"
+          Compress-Archive -Path "release_dist\*" -DestinationPath "MidnightOptimizer-Windows-x64.zip" -Force
+
+      - name: Publicar Release no GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/MidnightOptimizer.exe
+            MidnightOptimizer-Windows-x64.zip
           generate_release_notes: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
