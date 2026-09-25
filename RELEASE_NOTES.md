@@ -1,3 +1,16 @@
+## ⚡ Pulse Gaming Optimizer v4.4.1 — Interface Limpa, Moderna e Despoluída
+
+### 🚀 Destaques da Versão 4.4.1
+- **✨ Interface Visualmente Limpa e Despoluída**:
+  - Eliminação de distrações e ruídos visuais para uma experiência de utilização profissional, rápida e focada na vitória.
+  - Navegação suave e silenciosa: remoção de sintetizadores sonoros de hover que causavam sobrecarga acústica.
+  - Cursor nativo do Windows 10/11 preservado com resposta imediata e taxa de atualização sem atrasos.
+  - Remoção de inclinação 3D agressiva que causava rotação indesejada ao passar o rato por cima dos elementos.
+  - Alinhamento da barra de topo com controlos de fechar/minimizar na extremidade direita do ecrã e botão Discord ergonómico.
+  - Fundo sofisticado com iluminação ambiente calma e seletor de atmosferas integrado no menu de navegação.
+
+---
+
 ## ⚡ Pulse Gaming Optimizer v4.4.0 — Login com Discord em 1 Clique & Loopback Blindado
 
 ### 🚀 Destaques da Versão 4.4.0

@@ -1,5 +1,15 @@
 # Changelog
 
+## [v4.4.1] - 2026-09-25
+
+### ✨ Interface Limpa, Moderna e Despoluída (UI/UX Declutter & Polish)
+- **Eliminação de Poluição Visual & Sons Intrusivos**: Remoção de sintetizadores de áudio ao passar o rato (hover sounds desativados por padrão), proporcionando uma navegação silenciosa e focada no essencial.
+- **Restauração de Cursor Nativo de Alta Performance**: Remoção do cursor customizado e de anéis que causavam arrastamento; o cursor nativo do sistema agora responde com latência zero.
+- **Eliminação de Efeitos 3D Excessivos**: Desativação de inclinação 3D agressiva (matrix tilt) que causava oscilações ao mover o rato sobre cartões e botões.
+- **Alinhamento Ergonómico da Barra de Topo**: Reposicionamento dos controlos de janela (Minimizar, Maximizar, Fechar) para a extremidade direita no padrão Windows, com botão de autenticação Discord compacto e elegante.
+- **Limpeza de Fundo e Gradientes**: Substituição de múltiplos focos de luz desfocados por uma atmosfera escura serena e equilibrada com iluminação sutil.
+- **Seletor de Atmosferas Integrado**: Remoção da dock flutuante que tapava o rodapé e o texto, integrando a seleção de temas diretamente na navegação.
+
 ## [v4.4.0] - 2026-09-25
 
 ### 🎮 Autenticação e Login com Discord em 1 Clique (Oficial & Sem Configurações)

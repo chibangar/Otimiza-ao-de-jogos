@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
    1. SINTETIZADOR DE EFEITOS SONOROS (WEB AUDIO API)
    ========================================================================== */
 let _audioCtx = null;
-let _sfxEnabled = true;
+let _sfxEnabled = false;
 
 function getAudioContext() {
   if (!_audioCtx) {
@@ -66,11 +66,6 @@ function initAudioSynthesizer() {
     const ico = toggleBtn.querySelector('.sfx-icon');
     if (ico) ico.textContent = _sfxEnabled ? '🔊' : '🔇';
   }
-
-  // Ligar som de hover em botões e links principais
-  document.querySelectorAll('button, .nav-link, .btn-hero-primary, .btn-hero-secondary, .real-sound-card, .cat-pill').forEach(el => {
-    el.addEventListener('mouseenter', () => playHoverSound());
-  });
 }
 
 function playHoverSound() {
@@ -377,7 +372,11 @@ function initThreeJsHeroCore() {
     if (crystalMat) { crystalMat.color.setHex(c1); crystalMat.emissive.setHex(c1); }
     if (cageMat) cageMat.color.setHex(c1);
     if (particleMat) particleMat.color.setHex(c1);
-    if (gridFloor && gridFloor.material) gridFloor.material.color.setHex(c1);
+    // GridHelper has array of materials [centerLine, grid]
+    if (gridFloor) {
+      const mats = Array.isArray(gridFloor.material) ? gridFloor.material : [gridFloor.material];
+      mats.forEach(m => { if (m && m.color) m.color.setHex(c1); });
+    }
   };
 
   const initialTheme = localStorage.getItem('pulse_theme') || 'midnight';
@@ -853,31 +852,11 @@ function initSoftwareManagerShowcase() {
 }
 
 /* ==========================================================================
-   7. FÍSICA DE INCLINAÇÃO 3D EM CARTÕES (MATRIX TILT)
+   7. FÍSICA DE INCLINAÇÃO 3D EM CARTÕES (DESATIVADA PARA INTERFACE LIMPA)
    ========================================================================== */
 function init3DMatrixTiltPhysics() {
-  const tiltCards = document.querySelectorAll('[data-tilt]');
-
-  tiltCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = ((y - centerY) / centerY) * -7;
-      const rotateY = ((x - centerX) / centerX) * 7;
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(10px)`;
-      card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-      card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
-    });
-  });
+  // Desativado para manter interface estável e não poluída
+  return;
 }
 
 /* ==========================================================================
@@ -928,41 +907,11 @@ function initNavbarScroll() {
 }
 
 /* ==========================================================================
-   10. CURSOR CYBERPUNK INTERATIVO DE ALTA PRECISÃO
+   10. CURSOR (NATIVO E FLUIDO)
    ========================================================================== */
 function initCustomCursor() {
-  const dot = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
-
-  let mouseX = -100, mouseY = -100;
-  let ringX = -100, ringY = -100;
-  let isMoving = false;
-
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
-    if (!isMoving) {
-      ringX = mouseX;
-      ringY = mouseY;
-      isMoving = true;
-    }
-  });
-
-  function renderCursor() {
-    ringX += (mouseX - ringX) * 0.18;
-    ringY += (mouseY - ringY) * 0.18;
-    ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
-    requestAnimationFrame(renderCursor);
-  }
-  requestAnimationFrame(renderCursor);
-
-  const interactables = 'a, button, [data-tilt], .real-sound-card, .pro-card, .cat-pill, .soft-preview-item, .view-tab, .bench-tab, .mode-btn, .faq-question';
-  document.querySelectorAll(interactables).forEach(el => {
-    el.addEventListener('mouseenter', () => ring.classList.add('active'));
-    el.addEventListener('mouseleave', () => ring.classList.remove('active'));
-  });
+  // Mantém cursor nativo sem polling de frame nem lag
+  return;
 }
 
 /* ==========================================================================
@@ -1211,7 +1160,7 @@ function initProCrosshairsLab() {
    13. DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS & 3D LIGHTS)
    ========================================================================== */
 function initThemeDock() {
-  const dockBtns = document.querySelectorAll('.theme-dock-btn');
+  const dockBtns = document.querySelectorAll('.theme-dock-btn, .theme-nav-btn');
   const savedTheme = localStorage.getItem('pulse_theme') || 'midnight';
 
   function applyTheme(theme) {

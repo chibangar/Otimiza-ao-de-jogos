@@ -92,51 +92,10 @@
 }
 
 /* ==========================================================================
-   CURSOR CYBERPUNK DE ALTA PRECISÃO
+   CURSOR & BASE VISUALS (Puro, Fluido & Nativo)
    ========================================================================== */
-@media (pointer: fine) {
-  .cursor-dot {
-    width: 6px;
-    height: 6px;
-    background-color: var(--cyan);
-    position: fixed;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 99999;
-    box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
-    transform: translate(-50%, -50%);
-    transition: width 0.15s, height 0.15s, background-color 0.2s;
-  }
-
-  .cursor-ring {
-    width: 32px;
-    height: 32px;
-    border: 1.5px solid rgba(var(--cyan-rgb), 0.55);
-    position: fixed;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 99998;
-    transform: translate(-50%, -50%);
-    transition: width 0.2s, height 0.2s, border-color 0.2s, transform 0.08s ease-out;
-    box-shadow: 0 0 12px rgba(var(--cyan-rgb), 0.2);
-  }
-
-  .cursor-ring.active {
-    width: 48px;
-    height: 48px;
-    border-color: var(--gold);
-    background: rgba(var(--cyan-rgb), 0.08);
-  }
-}
-
-@media (pointer: coarse) {
-  .cursor-dot, .cursor-ring {
-    display: none !important;
-  }
+.cursor-dot, .cursor-ring {
+  display: none !important;
 }
 
 *, *::before, *::after {
@@ -152,6 +111,9 @@ html {
 
 body {
   background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(1200px 600px at 50% -120px, rgba(0, 240, 255, 0.05), transparent 70%),
+    radial-gradient(900px 500px at 85% 60%, rgba(168, 85, 247, 0.03), transparent 70%);
   color: var(--text-main);
   font-family: var(--font-main);
   line-height: 1.6;
@@ -160,7 +122,7 @@ body {
   min-height: 100vh;
 }
 
-/* Grelha 3D Cyberpunk de Fundo */
+/* Grelha 3D Sutil de Fundo (Minimalista) */
 .cyber-grid-bg {
   position: fixed;
   top: 0;
@@ -168,12 +130,13 @@ body {
   width: 100vw;
   height: 100vh;
   background-image: 
-    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
   background-position: center center;
   pointer-events: none;
   z-index: 0;
+  opacity: 0.5;
   mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 80%);
   -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 80%);
 }
@@ -186,50 +149,12 @@ body {
   height: 100vh;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.35;
 }
 
-/* Brilhos Ambientais */
+/* Desativação de brilhos ambientais poluentes */
 .ambient-glow {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(140px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.16;
-}
-
-.ambient-glow.cyan {
-  width: 600px;
-  height: 600px;
-  background: var(--cyan);
-  top: -150px;
-  left: -150px;
-  animation: floatAmbient 22s ease-in-out infinite alternate;
-}
-
-.ambient-glow.purple {
-  width: 700px;
-  height: 700px;
-  background: var(--purple);
-  bottom: 5%;
-  right: -200px;
-  animation: floatAmbient 28s ease-in-out infinite alternate-reverse;
-}
-
-.ambient-glow.gold {
-  width: 500px;
-  height: 500px;
-  background: var(--gold);
-  top: 45%;
-  left: 15%;
-  opacity: 0.08;
-  animation: floatAmbient 32s ease-in-out infinite alternate;
-}
-
-@keyframes floatAmbient {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, 30px) scale(1.08); }
-  100% { transform: translate(-30px, -40px) scale(0.95); }
+  display: none !important;
 }
 
 /* Glassmorphism Panel */
@@ -472,6 +397,39 @@ body {
 .btn-primary.small {
   padding: 6px 14px;
   font-size: 12px;
+}
+
+/* Pulsing glow button (navbar download) */
+.pulse-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--cyan), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 0;
+}
+
+.pulse-btn:hover .btn-glow {
+  opacity: 0.25;
+}
+
+.btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ícones dentro de tabs (bench, sb, etc) */
+.bench-icon {
+  font-size: 14px;
+}
+
+.sb-tab-icon {
+  font-size: 16px;
 }
 
 .btn-ghost {
@@ -948,14 +906,9 @@ body {
   display: block;
 }
 
-/* Mira e Retículas HUD no Canvas */
+/* Mira e Retículas HUD no Canvas (Ocultadas para visual minimalista) */
 .hud-overlay-reticles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
+  display: none !important;
 }
 
 .corner-bracket {
@@ -2373,7 +2326,7 @@ body {
    FOOTER
    ========================================================================== */
 .footer {
-  padding: 40px 24px;
+  padding: 40px 24px 80px;
   background: rgba(4, 5, 9, 0.95);
   border-top: 1px solid var(--border);
   position: relative;
@@ -2419,66 +2372,43 @@ body {
 }
 
 /* ==========================================================================
-   DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS)
+/* ==========================================================================
+   SELETOR DE TEMAS & ATMOSFERAS (Integrado na Navbar & Footer)
    ========================================================================== */
 .theme-dock-floating {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  pointer-events: auto;
+  display: none !important;
 }
 
-.theme-dock-inner {
-  display: flex;
+.theme-nav-selector {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(7, 10, 19, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(var(--cyan-rgb), 0.2);
+  padding: 4px 8px;
 }
 
-.theme-dock-lbl {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--text-faint);
-  margin-right: 4px;
-}
-
-.theme-dock-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
+.theme-nav-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--r-pill);
-  color: var(--text-muted);
-  font-family: var(--font-hud);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.22s var(--ease);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  transition: all 0.2s var(--ease);
 }
 
-.theme-dock-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.06);
+.theme-nav-btn:hover {
+  transform: scale(1.18);
 }
 
-.theme-dock-btn.active {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  box-shadow: 0 0 16px rgba(var(--cyan-rgb), 0.35);
+.theme-nav-btn.active {
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 10px rgba(var(--cyan-rgb), 0.4);
 }
 
 .dock-dot {

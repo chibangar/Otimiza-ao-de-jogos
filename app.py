@@ -90,12 +90,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.4.0"
+APP_VERSION = "4.4.1"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "✨ Interface Limpa & Minimalista: Visual despoluído, calmo e moderno, sem distrações visuais excessivas, barra superior ergonómica e melhor usabilidade!",
     "🎮 Login com Discord em 1 Clique: Entra instantaneamente com a tua conta Discord sem configurações manuais — chaves oficiais embutidas e sincronização automática de avatar e perfil!",
     "📦 Instalador & Gestor de Softwares: Catálogo com 10 categorias e 94 ferramentas essenciais (Dev, Jogos, Navegadores, Runtimes, Utilitários) com instalação silenciosa em lote via Winget!",
     "🖼️ Sons do Voicemod com Imagens Originais: Ao importar a tua aba do Voicemod, as fotos e capas originais de cada meme são transferidas automaticamente para o Soundboard!",

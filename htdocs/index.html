@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulse Gaming Optimizer — Suite 3D de Alta Performance &amp; Baixa Latência</title>
+  <title>Pulse Gaming Optimizer v4.4.1 — Suite de Alta Performance</title>
   
   <meta name="description" content="Pulse Gaming Optimizer: Suite desportiva para jogos competitivos. Otimização DPC 0.05ms, Soundboard integrado com fotos originais do Voicemod, novo Instalador de Softwares com 10 categorias e estúdio de miras dos pros. 100% VAC-Safe.">
   <meta name="keywords" content="pulse gaming optimizer, otimizador de jogos, cs2 boost, valorant fps, soundboard voicemod, software installer winget, miras cs2 pros, dpc latency">
@@ -28,17 +28,9 @@
   <script src="assets/three.min.js"></script>
 </head>
 <body>
-  <!-- Cursor Cyberpunk Interativo -->
-  <div class="cursor-dot" id="cursor-dot"></div>
-  <div class="cursor-ring" id="cursor-ring"></div>
-
-  <!-- Fundo Cyberpunk com Grelha 3D e Nebulosas -->
+  <!-- Fundo Sutil Minimalista com Grelha e Partículas Leves -->
   <div class="cyber-grid-bg"></div>
   <canvas id="particle-canvas"></canvas>
-
-  <div class="ambient-glow cyan" id="glow-cyan"></div>
-  <div class="ambient-glow purple" id="glow-purple"></div>
-  <div class="ambient-glow gold" id="glow-gold"></div>
 
   <!-- HUD Top Bar & Navegação -->
   <header class="navbar" id="navbar">
@@ -46,41 +38,47 @@
       <a href="#hero" class="brand">
         <div class="brand-logo-wrap">
           <img src="assets/logo.png" alt="Pulse Gaming Logo" class="brand-img">
-          <div class="logo-pulse-ring"></div>
         </div>
         <div class="brand-text">
           <span class="brand-title">PULSE<span class="brand-dot">.</span></span>
-          <span class="brand-sub">GAMING OPTIMIZER // 4.3</span>
+          <span class="brand-sub">GAMING OPTIMIZER // 4.4.1</span>
         </div>
       </a>
 
       <nav class="nav-menu" id="nav-menu">
-        <a href="#hero" class="nav-link"><span class="nav-idx">[01]</span> Visão Geral</a>
-        <a href="#crosshairs" class="nav-link"><span class="nav-idx">[02]</span> Miras dos Pros</a>
-        <a href="#benchmarks" class="nav-link"><span class="nav-idx">[03]</span> Benchmarks 3D</a>
-        <a href="#soundboard" class="nav-link"><span class="nav-idx">[04]</span> Soundboard Voicemod</a>
-        <a href="#softwares" class="nav-link"><span class="nav-idx">[05]</span> Instalador de Apps</a>
-        <a href="#features" class="nav-link"><span class="nav-idx">[06]</span> Tecnologia</a>
-        <a href="#faq" class="nav-link"><span class="nav-idx">[07]</span> FAQ</a>
+        <a href="#hero" class="nav-link">Visão Geral</a>
+        <a href="#crosshairs" class="nav-link">Miras dos Pros</a>
+        <a href="#benchmarks" class="nav-link">Benchmarks 3D</a>
+        <a href="#soundboard" class="nav-link">Soundboard Voicemod</a>
+        <a href="#softwares" class="nav-link">Instalador de Apps</a>
+        <a href="#features" class="nav-link">Tecnologia</a>
+        <a href="#faq" class="nav-link">FAQ</a>
       </nav>
 
       <div class="nav-actions">
+        <!-- Seletor de Atmosfera Discreto -->
+        <div class="theme-nav-selector" title="Escolher Atmosfera / Tema">
+          <button class="theme-nav-btn active" data-theme="midnight" title="WoW Midnight"><span class="dock-dot purple"></span></button>
+          <button class="theme-nav-btn" data-theme="blaze" title="CS2 Blaze"><span class="dock-dot orange"></span></button>
+          <button class="theme-nav-btn" data-theme="specops" title="COD SpecOps"><span class="dock-dot green"></span></button>
+          <button class="theme-nav-btn" data-theme="frost" title="Titanium Frost"><span class="dock-dot blue"></span></button>
+        </div>
+
         <!-- Botão de Efeitos Sonoros Web Audio -->
-        <button class="btn-sfx-toggle" id="btn-sfx-toggle" title="Ativar / Desativar Efeitos Sonoros 3D">
-          <span class="sfx-icon">🔊</span>
-          <span class="sfx-text">SFX ATIVO</span>
+        <button class="btn-sfx-toggle muted" id="btn-sfx-toggle" title="Ativar / Desativar Efeitos Sonoros">
+          <span class="sfx-icon">🔇</span>
+          <span class="sfx-text">SFX MUTADO</span>
         </button>
 
         <a href="https://github.com/chibangar/Otimiza-ao-de-jogos" target="_blank" rel="noopener" class="btn-github" title="Repositório no GitHub">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
           <span>GitHub</span>
         </a>
         
-        <a href="#download" class="btn-primary pulse-btn">
-          <span class="btn-glow"></span>
-          <span class="btn-text">⚡ Download v4.3.0</span>
+        <a href="#download" class="btn-primary">
+          <span class="btn-text">⚡ Download v4.4.1</span>
         </a>
 
         <button class="nav-toggle" id="nav-toggle" aria-label="Abrir Menu">
@@ -97,9 +95,9 @@
     <div class="hero-container">
       <!-- Coluna da Esquerda: Textos & CTAs -->
       <div class="hero-content">
-        <div class="hero-badge" data-tilt>
+        <div class="hero-badge">
           <span class="badge-dot"></span>
-          <span>SYS_TELEMETRY // V4.3.0 OFICIAL</span>
+          <span>PULSE GAMING OPTIMIZER // V4.4.1</span>
           <span class="badge-tag">100% VAC-SAFE</span>
         </div>
 
@@ -109,36 +107,19 @@
         </h1>
 
         <p class="hero-desc">
-          A suite desportiva desenhada para competição de alta precisão: Redução de latência DPC para <b>0.05ms</b>, novo <b>Instalador de 94 Softwares em 10 categorias</b>, Soundboard com capas originais do Voicemod e estúdio de miras dos melhores jogadores do mundo.
+          A suite de gaming desenhada para alta performance e zero distrações: Redução de latência DPC para <b>0.05ms</b>, novo <b>Instalador de 94 Softwares</b>, Soundboard com capas do Voicemod e estúdio de miras dos melhores jogadores do mundo.
         </p>
 
-        <!-- Barra de Ativação do Reator Turbo (Interativo) -->
-        <div class="reactor-action-banner glass-panel" id="reactor-banner" data-tilt>
-          <div class="reactor-banner-left">
-            <div class="mini-reactor-core" id="mini-reactor-btn">
-              <span class="mini-core-icon">⚡</span>
-              <div class="mini-core-ring"></div>
-            </div>
-            <div>
-              <b class="reactor-banner-title">MODO COMPETITIVO TURBO</b>
-              <p class="reactor-banner-sub" id="reactor-status-text">Clica no núcleo para injetar boost e disparar o framerate</p>
-            </div>
-          </div>
-          <button class="btn-boost-trigger" id="btn-boost-trigger">
-            <span>ATIVAR BOOST</span>
-          </button>
-        </div>
-
         <div class="hero-cta">
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer.exe" class="btn-hero-primary" id="btn-download-primary">
+          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.4.1/PulseOptimizer.exe" class="btn-hero-primary" id="btn-download-primary">
             <div class="btn-icon">⚡</div>
             <div class="btn-label-group">
               <span class="btn-label-top">Descarregar PulseOptimizer.exe</span>
-              <span class="btn-label-bottom">Windows 10/11 x64 • 46.39 MB • Portátil</span>
+              <span class="btn-label-bottom">Windows 10/11 x64 • 46 MB • Portátil</span>
             </div>
           </a>
 
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer-Windows-x64.zip" class="btn-hero-secondary">
+          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.4.1/PulseOptimizer-Windows-x64.zip" class="btn-hero-secondary">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
@@ -208,19 +189,6 @@
             <div class="view-panel active" id="panel-3d-core">
               <div class="webgl-canvas-container" id="webgl-container">
                 <canvas id="webgl-hero-canvas"></canvas>
-                
-                <!-- HUD de Mira e Coordenadas em Cima do 3D -->
-                <div class="hud-overlay-reticles">
-                  <div class="corner-bracket top-left"></div>
-                  <div class="corner-bracket top-right"></div>
-                  <div class="corner-bracket bottom-left"></div>
-                  <div class="corner-bracket bottom-right"></div>
-                  <div class="hud-coord-text" id="hud-coord-display">PITCH: +0.0° // YAW: +0.0°</div>
-                  <div class="hud-energy-status">
-                    <span class="energy-dot"></span>
-                    <span id="hud-core-status">ESTADO: PRONTO • CLICA NO NÚCLEO 3D</span>
-                  </div>
-                </div>
               </div>
               <p class="reactor-hint">⚡ <b>Física 3D Real:</b> Move o rato para rodar o núcleo quântico. Clica para disparar a onda de choque de energia!</p>
             </div>
@@ -496,7 +464,7 @@
             <span>Aba Voicemod: <b>Memes &amp; Gaming Pro</b> (62 Sons Originais Importados)</span>
           </div>
           <div class="sb-controls-live">
-            <button class="btn ghost xs" id="btn-sb-stop-all">⏹ Parar Som</button>
+            <button class="btn-ghost xs" id="btn-sb-stop-all">⏹ Parar Som</button>
             <span class="sb-tip">⚡ Áudio real com desencriptação Opus/WAV</span>
           </div>
         </div>
@@ -780,21 +748,21 @@
        ========================================================================== -->
   <section class="section download-section" id="download">
     <div class="section-container">
-      <div class="download-card glass-panel" data-tilt>
-        <div class="download-badge">VERSÃO OFICIAL v4.3.0 ESTÁVEL</div>
+      <div class="download-card glass-panel">
+        <div class="download-badge">VERSÃO OFICIAL v4.4.1 ESTÁVEL</div>
         <h2 class="download-title">Pronto para Dominar os Teus Jogos?</h2>
         <p class="download-subtitle">Descarrega já o Pulse Gaming Optimizer e sente a diferença na primeira partida.</p>
 
         <div class="download-actions">
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer.exe" class="btn-download-mega">
+          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.4.1/PulseOptimizer.exe" class="btn-download-mega">
             <span class="mega-icon">⚡</span>
             <div class="mega-text">
               <span class="mega-title">Download PulseOptimizer.exe</span>
-              <span class="mega-sub">Windows 10/11 x64 • 46.39 MB • Portátil</span>
+              <span class="mega-sub">Windows 10/11 x64 • 46 MB • Portátil</span>
             </div>
           </a>
 
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer-Windows-x64.zip" class="btn-download-zip">
+          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.4.1/PulseOptimizer-Windows-x64.zip" class="btn-download-zip">
             <span class="zip-icon">📦</span>
             <span>Baixar Arquivo ZIP Completo</span>
           </a>
@@ -810,31 +778,6 @@
   </section>
 
   <!-- ==========================================================================
-       DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS INTERATIVO)
-       ========================================================================== -->
-  <div class="theme-dock-floating">
-    <div class="theme-dock-inner glass-panel">
-      <span class="theme-dock-lbl">ATMOSFERA:</span>
-      <button class="theme-dock-btn active" data-theme="midnight" title="☾ WoW Midnight (Roxo/Ouro)">
-        <span class="dock-dot purple"></span>
-        <span class="dock-name">WoW Midnight</span>
-      </button>
-      <button class="theme-dock-btn" data-theme="blaze" title="◉ CS2 Blaze (Laranja/Âmbar)">
-        <span class="dock-dot orange"></span>
-        <span class="dock-name">CS2 Blaze</span>
-      </button>
-      <button class="theme-dock-btn" data-theme="specops" title="★ COD SpecOps (Verde Militar)">
-        <span class="dock-dot green"></span>
-        <span class="dock-name">COD SpecOps</span>
-      </button>
-      <button class="theme-dock-btn" data-theme="frost" title="❄ Titanium Frost (Azul Glacial)">
-        <span class="dock-dot blue"></span>
-        <span class="dock-name">Titanium Frost</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
        RODAPÉ
        ========================================================================== -->
   <footer class="footer">
@@ -844,7 +787,7 @@
           <img src="assets/logo.png" alt="Pulse Gaming Logo" class="brand-img" style="width:28px;height:28px">
           <span class="brand-title">PULSE<span class="brand-dot">.</span></span>
         </div>
-        <p class="footer-copy">© 2026 Pulse Gaming Optimizer. Desenvolvido para a vitória e performance absoluta.</p>
+        <p class="footer-copy">© 2026 Pulse Gaming Optimizer. Suite de performance competitiva VAC-Safe.</p>
       </div>
 
       <div class="footer-links">

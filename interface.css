@@ -178,7 +178,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.2;
 }
 
 .nebula {
@@ -1119,12 +1119,13 @@ nav {
 }
 .hb-ico {
   font-weight: 800;
-  font-size: 14px;
+  font-size: 13px;
+  color: var(--accent);
 }
-.hb-ico.orange { color: #f97316; }
-.hb-ico.purple { color: #a855f7; }
-.hb-ico.blue { color: #06b6d4; }
-.hb-ico.green { color: #22c55e; }
+.hb-ico.orange { color: var(--accent); }
+.hb-ico.purple { color: var(--accent); }
+.hb-ico.blue { color: var(--accent2); }
+.hb-ico.green { color: var(--ok); }
 .hero-badge b {
   font-size: 11px;
   font-family: var(--font-mono);

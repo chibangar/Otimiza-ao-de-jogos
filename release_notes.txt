@@ -1,11 +1,12 @@
-⚡ Pulse Gaming Optimizer v4.4.0 — Login com Discord em 1 Clique & Loopback Blindado
+⚡ Pulse Gaming Optimizer v4.4.1 — Interface Limpa, Moderna e Despoluída
 
-## ✨ Principais Novidades da Versão 4.4.0
-- Login oficial com Discord em 1 clique: entra com a tua conta Discord sem configurações manuais (chaves oficiais embutidas).
-- Botão oficial do Discord disponível no ecrã de login e na barra de topo da aplicação.
-- Servidor loopback local robusto (captura de código de autorização rápida, tolerante a pedidos paralelos e com fecho automático do separador).
-- Sincronização automática do avatar oficial do Discord e nome de utilizador.
-- Gestão de perfil e estado de ligação na Ficha Técnica de Sistema.
+## ✨ Principais Novidades da Versão 4.4.1
+- Interface visualmente despoluída, focada na alta performance e usabilidade.
+- Navegação suave e silenciosa: remoção de sons de hover e beeps intrusivos.
+- Cursor nativo do Windows preservado com latência zero e taxa de atualização suave.
+- Desativação de inclinação 3D agressiva que causava rotação excessiva nos cartões.
+- Reposicionamento dos controlos de janela na extremidade direita do ecrã e botão Discord ergonómico.
+- Fundo elegante com iluminação radial subtil e seletor de atmosferas integrado no topo.
+- Login oficial com Discord em 1 clique e sincronização de perfil.
 - Instalador & Gestor de Softwares com 10 categorias e 94 ferramentas essenciais via Winget.
 - Importador de sons do Voicemod com fotos e capas originais preservadas.
-- Motor nativo de auto-update em PowerShell com reinício automático e verificação manual.
