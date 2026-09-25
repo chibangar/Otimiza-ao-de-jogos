@@ -89,19 +89,19 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "3.2.4"
+APP_VERSION = "4.0.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
-    "🎯 Miras & Viewmodels CS2: Miras dos pros com códigos de partilha, comandos de consola (~) e imagens de posicionamento de arma sem alterar binds ou sensibilidade.",
-    "⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg): Otimização com 1 clique para tiros que não registam, limpeza de cache de shaders DirectX e buffer de rede em 0 ticks.",
-    "🔔 In-Game Notification Overlay: Overlay flutuante animado com popout sobre os jogos, 100% VAC-Safe e sem perda de foco.",
-    "🛡️ Otimizações Profissionais Seguras: Configuração não destrutiva que mantém 100% intactos os teus controlos, sensibilidades e vídeo.",
-    "✨ Nova Interface Obsidian Profissional: Design system ergonómico, moderno e sem distrações.",
-    "📊 Novo Centro de Controlo no Dashboard: Telemetria em tempo real para CPU, GPU, RAM e Disco.",
-    "📦 Compilação e Releases Contínuas no GitHub Actions para Windows.",
+    "🌟 Redesign Completo 4.0: Visual Dark Gaming HUD & Glassmorphism com painéis translúcidos em vidro fumado e bordas iluminadas em neon.",
+    "⚡ Reator Orbital de Boost: Ativação instantânea do Modo Competitivo com anéis de energia interativos no Dashboard.",
+    "📊 Telemetria Circular SVG de Alta Precisão: Monitorização em tempo real para CPU, GPU, RAM e Disco.",
+    "🎨 4 Novas Atmosferas/Temas: WoW Midnight, CS2 Blaze, COD SpecOps e Titanium Frost com partículas dinâmicas.",
+    "🎯 Miras & Viewmodels CS2: Miras dos pros com códigos de partilha, comandos de consola (~) e imagens de posicionamento de arma.",
+    "⚡ Sub-Tick Hitreg & In-Game Overlay: Resolução para tiros que não registam e overlay flutuante 100% VAC-Safe.",
+    "🛡️ Otimizações Profissionais Seguras: Configuração não destrutiva que mantém intactos os teus controlos e sensibilidades.",
 ]
 
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)

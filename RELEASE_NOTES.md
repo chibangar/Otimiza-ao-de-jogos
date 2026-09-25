@@ -1,41 +1,30 @@
-## 🎯 Midnight Optimizer v3.2.4 — Motor de Auto-Update Blindado & CS2 Viewmodels Reais
+## 🌟 Midnight Optimizer v4.0.0 — Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism)
 
-### 🚀 Novidades da Versão 3.2.4
-- **Novo Motor de Auto-Update em PowerShell**: Substituição do processo legado por rotina nativa PowerShell com gestão inteligente de locks de ficheiro, retentativas e reinício garantido.
-- **Botão Dedicado 'Verificar Atualizações'**: Presente na barra lateral e na página de Sistema para procurar novidades a qualquer momento.
-- **Renders Reais dos Bonecos & Armas do CS2**: Cartas de viewmodels com capturas autênticas in-game estilo crashz' Viewmodel Generator (braços, luvas táticas e AK-47 sob céu aberto).
-- **Novo Preset Gangster Clássico**: Adicionado o posicionamento icónico com a arma inclinada.
-- **Executável 100% Livre de Falhas**: Integração determinística de todos os módulos e total compatibilidade de sintaxe.
+### 🚀 Destaques da Versão 4.0.0
 
-### ✨ Novidades Recentes da Linha v3.2
+- **Design System de Última Geração (Glassmorphism 2.0)**:
+  - Painéis translúcidos em vidro fumado escuro (`backdrop-filter: blur(20px)`), gradientes de profundidade e bordas com iluminação sutil a neon.
+  - Baixo consumo de CPU/GPU com pausas automáticas quando a app fica oculta ou em modo de jogo.
 
-#### 🎯 Miras dos Pros com 1 Clique (CS2)
-- Galeria completa dos melhores pro players do mundo: **m0NESY, donk, NiKo, ZywOo, s1mple, ropz e FalleN**.
-- Códigos de Partilha Oficiais do CS2 (`CSGO-...`) para importar diretamente nas Definições do jogo.
-- Comandos prontos para a Consola (`~`).
-- Pré-visualização gráfica interativa da mira com a cor real, espessura e abertura da retícula.
-- **100% Não Destrutivo**: Não altera a sensibilidade do rato, DPI nem resolução do jogador.
+- **Ícones Vetoriais SVG Nativos**:
+  - Eliminação total dos emojis de texto antigos em favor de ícones SVG de alta definição, perfeitamente integrados com as cores do tema ativo.
 
-#### 🔫 Viewmodels com Imagens Demonstrativas
-- 6 presets de posicionamento da arma no ecrã: **Clássico Pro, Compacto Recuado, FOV Máximo, Centrado Retro Doom, Padrão Valve e Minimalista**.
-- Imagens vetoriais dentro da app mostrando exatamente onde a arma fica posicionada e o espaço de mira libertado.
-- Botão para copiar comandos da consola ou aplicar de forma isolada (`midnight_viewmodel.cfg`).
+- **Reator Orbital de Boost no Dashboard**:
+  - Novo reator holográfico animado com anéis de energia em rotação contínua e ativação imediata do Modo Competitivo com 1 clique.
 
-#### ⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg Fix)
-- Botão de 1 clique para resolver desfasamento sub-tick e balas fantasma que não registam no CS2.
-- Limpeza automática de caches de shaders DirectX/GPU (elimina micro-stutters e quedas de FPS em duelos).
-- Buffer de rede em `0 ticks` (`cl_net_buffer_ticks 0`) para eliminar 15ms-30ms de atraso de interpolação.
-- Taxa máxima `rate 786432` e alinhamento de frame pacing (`engine_low_latency_sleep_after_client_tick true`).
-- Binds e sensibilidades 100% intactas!
+- **Telemetria Circular SVG em Tempo Real**:
+  - 4 medidores de anéis circulares SVG para monitorização dinâmica de CPU, GPU, RAM e Disco.
 
-#### 🔔 In-Game Notification Overlay (Popout Animado)
-- Notificações transparentes e flutuantes sobre o ecrã do jogo com animação suave de popout de entrada e saída.
-- 100% VAC-Safe: Não injeta DLLs nem mexe na memória do CS2.
-- Não minimiza o jogo nem perde o foco do rato durante o combate competitivo.
+- **4 Atmosferas Visuais / Temas Selecionáveis**:
+  - ☾ **WoW Midnight**: Roxo e dourado do Vazio cósmico
+  - ◉ **CS2 Blaze**: Laranja e âmbar tático de competição
+  - ★ **COD SpecOps**: Verde militar e ouro tático
+  - ❄ **Titanium Frost**: Azul ártico glacial de alta performance
 
+- **Integração Total com Recursos CS2 v3.2**:
+  - Miras dos Pros com códigos de partilha e preview gráfico.
+  - Presets de Viewmodel com renders autênticos in-game.
+  - Correção de Hitreg Sub-Tick e In-Game Overlay.
 
----
-
-### 📋 Requisitos de Sistema
-- Windows 10 ou Windows 11 (64-bit)
-- Direitos de Administrador para otimizações de energia e registo
+- **Empacotamento e Compilação Atualizados**:
+  - `MidnightOptimizer.spec` e `build_exe.bat` configurados com inclusão determinística de todos os novos recursos de interface.

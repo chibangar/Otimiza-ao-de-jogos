@@ -1,5 +1,16 @@
 # Changelog
 
+## [v4.0.0] - 2026-09-25
+
+### 🌟 Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism 4.0)
+- **Novo Design System em Vidro Translúcido 2.0**: Interface construída com `backdrop-filter: blur(20px)`, paletas escuras profundas e bordas com iluminação sutil a neon.
+- **Substituição Integral por Ícones Vetoriais SVG**: Remoção de todos os emojis em favor de um sistema nativo de ícones SVG ultrafinos, escaláveis e com iluminação reativa.
+- **Reator Orbital de Boost no Dashboard**: Novo componente visual interativo com anéis de energia em rotação contínua e acionamento instantâneo do Modo Competitivo.
+- **Telemetria Circular SVG em Tempo Real**: Monitorização precisa de CPU, GPU, RAM e Disco com animações suaves de preenchimento.
+- **4 Atmosferas Dinâmicas de Jogo**: Temas dedicados selecionáveis com partículas e atmosfera customizadas — *WoW Midnight* (Vazio Cósmico), *CS2 Blaze* (Laranja Tático), *COD SpecOps* (Verde Militar & Ouro) e *Titanium Frost* (Azul Glacial).
+- **Integração Total com Recursos CS2 v3.2**: Suporte visual nativo para sub-tabs de Miras dos Pros, Renders de Viewmodel, botão de correção de Hitreg Sub-Tick e In-Game Overlay.
+- **Empacotamento Determinístico**: Atualização do `MidnightOptimizer.spec` e `build_exe.bat` garantindo que os novos assets de interface são sempre incluídos no executável `.exe`.
+
 ## [v3.2.4] - 2026-09-24
 
 ### 🚀 Motor de Atualização Interno Blindado (PowerShell In-App Updater)

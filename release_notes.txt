@@ -1,36 +1,11 @@
-🎯 Midnight Optimizer v3.2.4 — Motor de Auto-Update Blindado & CS2 Viewmodels Reais
+🌟 Midnight Optimizer v4.0.0 — Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism)
 
-## ✨ Principais Novidades da Versão 3.2.4
-- Motor nativo de auto-update em PowerShell: substitui ficheiros bloqueados e reinicia automaticamente sem falhas.
-- Botão "Verificar Atualizações" na barra lateral e nas Definições de Sistema.
-- Renders reais dos bonecos e armas do CS2 (braços, luvas táticas e AK-47 sob céu aberto).
-- Novo preset Gangster Clássico.
-- Efeito dinâmico de zoom nas cartas de armas.
-- Empacotamento direto via MidnightOptimizer.spec garantindo todos os módulos no binário.
-- A aba de atualização desaparece automaticamente quando o Midnight Optimizer está na versão mais recente.
-- Reinicio automático após o download de nova versão dentro da app.
-- Deteção contínua em segundo plano a cada 15 minutos: quando houver nova versão no GitHub, a aba volta a aparecer.
-
-### 🎯 Miras dos Pros Oficiais CS2 (100% Não Destrutivo)
-- Galeria completa dos melhores pro players do mundo: m0NESY, donk, NiKo, ZywOo, s1mple, ropz e FalleN.
-- Códigos de Partilha Oficiais do CS2 (CSGO-...) para importar diretamente nas Definições do jogo.
-- Comandos prontos para a Consola (~).
-- Pré-visualização gráfica interativa da mira com a cor real, espessura e abertura da retícula.
-- 100% Não Destrutivo: Não altera a sensibilidade do rato, DPI nem resolução do jogador.
-
-### 🔫 Viewmodels com Imagens Demonstrativas
-- 6 presets de posicionamento da arma no ecrã: Clássico Pro, Compacto Recuado, FOV Máximo, Centrado Retro Doom, Padrão Valve e Minimalista.
-- Imagens vetoriais dentro da app mostrando exatamente onde a arma fica posicionada e o espaço de mira libertado.
-- Botão para copiar comandos da consola ou aplicar de forma isolada (midnight_viewmodel.cfg).
-
-### ⚡ Resolução de Registo de Tiros (Sub-Tick Hitreg Fix)
-- Botão de 1 clique para resolver desfasamento sub-tick e balas fantasma que não registam no CS2.
-- Limpeza automática de caches de shaders DirectX/GPU (elimina micro-stutters e quedas de FPS em duelos).
-- Buffer de rede em 0 ticks (cl_net_buffer_ticks 0) para eliminar 15ms-30ms de atraso de interpolação.
-- Taxa máxima rate 786432 e alinhamento de frame pacing (engine_low_latency_sleep_after_client_tick true).
-- Binds e sensibilidades 100% intactas!
-
-### 🔔 In-Game Notification Overlay (Popout Animado)
-- Notificações transparentes e flutuantes sobre o ecrã do jogo com animação suave de popout de entrada e saída.
-- 100% VAC-Safe: Não injeta DLLs nem mexe na memória do CS2.
-- Não minimiza o jogo nem perde o foco do rato durante o combate competitivo.
+## ✨ Principais Novidades da Versão 4.0.0
+- Redesign Completo 4.0: Interface construída em Glassmorphism 2.0 com painéis de vidro translúcido, gradientes táticos e bordas com iluminação em neon.
+- Reator Orbital de Boost: Componente central no Dashboard com anéis de energia interativos em rotação contínua e ativação instantânea do Modo Competitivo.
+- Telemetria Circular SVG de Alta Precisão: Monitorização visual em tempo real para CPU, GPU, RAM e Disco.
+- Sistema Nativo de Ícones SVG: Remoção completa de emojis de texto em favor de ícones vetoriais modernos e nítidos.
+- 4 Atmosferas/Temas Dinâmicos: WoW Midnight, CS2 Blaze, COD SpecOps e Titanium Frost com partículas reativas.
+- Miras dos Pros & Viewmodels CS2: Galeria completa dos melhores pro players, códigos de partilha e renders autênticos in-game.
+- Resolução de Registo de Tiros (Sub-Tick Hitreg Fix) e In-Game Notification Overlay.
+- Empacotamento determinístico com inclusão total dos novos componentes de interface no executável (.exe).
