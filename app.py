@@ -89,16 +89,17 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.0.0"
+APP_VERSION = "4.1.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
-    "🌟 Redesign Completo 4.0: Visual Dark Gaming HUD & Glassmorphism com painéis translúcidos em vidro fumado e bordas iluminadas em neon.",
+    "⚡ Rebranding Pulse Gaming Optimizer: Nova identidade visual com logotipo profissional esports, ícone dedicado e nome atualizado.",
+    "🌟 Redesign Completo: Visual Dark Gaming HUD & Glassmorphism com painéis translúcidos em vidro fumado e bordas iluminadas em neon.",
     "⚡ Reator Orbital de Boost: Ativação instantânea do Modo Competitivo com anéis de energia interativos no Dashboard.",
     "📊 Telemetria Circular SVG de Alta Precisão: Monitorização em tempo real para CPU, GPU, RAM e Disco.",
-    "🎨 4 Novas Atmosferas/Temas: WoW Midnight, CS2 Blaze, COD SpecOps e Titanium Frost com partículas dinâmicas.",
+    "🎨 4 Atmosferas/Temas Dinâmicos: WoW Midnight, CS2 Blaze, COD SpecOps e Titanium Frost.",
     "🎯 Miras & Viewmodels CS2: Miras dos pros com códigos de partilha, comandos de consola (~) e imagens de posicionamento de arma.",
     "⚡ Sub-Tick Hitreg & In-Game Overlay: Resolução para tiros que não registam e overlay flutuante 100% VAC-Safe.",
     "🛡️ Otimizações Profissionais Seguras: Configuração não destrutiva que mantém intactos os teus controlos e sensibilidades.",
@@ -1016,7 +1017,7 @@ class Api:
             return {"success": False, "output": str(e)}
 
     # ---------- ARRANQUE COM O WINDOWS ----------
-    _AUTOSTART_NAME = "Midnight Optimizer"
+    _AUTOSTART_NAME = "Pulse Gaming Optimizer"
     _AUTOSTART_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
     def _autostart_target(self):
@@ -1034,8 +1035,12 @@ class Api:
             import winreg
             h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
                                0, winreg.KEY_READ)
+            val = None
             try:
-                val, _ = winreg.QueryValueEx(h, self._AUTOSTART_NAME)
+                try:
+                    val, _ = winreg.QueryValueEx(h, self._AUTOSTART_NAME)
+                except FileNotFoundError:
+                    val, _ = winreg.QueryValueEx(h, "Midnight Optimizer")
             finally:
                 h.Close()
             return {"success": True, "enabled": bool(val), "path": val or ""}
@@ -1056,6 +1061,10 @@ class Api:
                 h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
                                    0, winreg.KEY_SET_VALUE)
                 try:
+                    try:
+                        winreg.DeleteValue(h, "Midnight Optimizer")
+                    except Exception:
+                        pass
                     winreg.SetValueEx(h, self._AUTOSTART_NAME, 0,
                                       winreg.REG_SZ, target)
                 finally:
@@ -1065,10 +1074,11 @@ class Api:
             h = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self._AUTOSTART_KEY,
                                0, winreg.KEY_SET_VALUE)
             try:
-                try:
-                    winreg.DeleteValue(h, self._AUTOSTART_NAME)
-                except FileNotFoundError:
-                    pass
+                for k in (self._AUTOSTART_NAME, "Midnight Optimizer"):
+                    try:
+                        winreg.DeleteValue(h, k)
+                    except FileNotFoundError:
+                        pass
             finally:
                 h.Close()
             return {"success": True, "enabled": False,
@@ -1244,7 +1254,7 @@ class Api:
                     outs.append({"index": i, "name": d["name"]})
             names = [(o["name"] or "").lower() for o in outs] + \
                     [(o["name"] or "").lower() for o in ins]
-            virtual = any("midnight" in n or "cable" in n for n in names)
+            virtual = any("pulse" in n or "midnight" in n or "cable" in n for n in names)
             return {"success": True, "inputs": ins, "outputs": outs,
                     "default_in": sd.default.device[0], "default_out": sd.default.device[1],
                     "virtual": virtual,
@@ -1252,11 +1262,11 @@ class Api:
         except Exception as e:
             return {"success": False, "output": str(e)}
 
-    # ---------- MICRO VIRTUAL "MIDNIGHT" (por cima do VB-CABLE) ----------
+    # ---------- MICRO VIRTUAL "PULSE" (por cima do VB-CABLE) ----------
     # Um driver de audio virtual do zero exigiria driver assinado; em vez
     # disso rebatizamos os endpoints do VB-CABLE (que o Setup ja instala)
-    # para o nome da app. Discord/CS2 passam a mostrar "Midnight".
-    _MIDNIGHT_NAMES = {"Render": "Midnight Speakers", "Capture": "Midnight Mic"}
+    # para o nome da app. Discord/CS2 passam a mostrar "Pulse".
+    _MIDNIGHT_NAMES = {"Render": "Pulse Speakers", "Capture": "Pulse Mic"}
     _MIDNIGHT_PKEY = "{a45c254e-df1c-4efd-8020-67d146a850e0},14"
     _MIDNIGHT_DESC = "{a45c254e-df1c-4efd-8020-67d146a850e0},2"
 
@@ -1299,7 +1309,7 @@ class Api:
                     fr_u = (fr or "").upper()
                     if ((direction == "Render" and (desc or "") == "CABLE Input") or
                             (direction == "Capture" and (desc or "") == "CABLE Output") or
-                            ("MIDNIGHT" in fr_u and ("CABLE" in (desc or "").upper()
+                            (("MIDNIGHT" in fr_u or "PULSE" in fr_u) and ("CABLE" in (desc or "").upper()
                                                      or "VB-AUDIO" in (desc or "").upper()))):
                         want = self._MIDNIGHT_NAMES[direction]
                         found.append({"direction": direction, "guid": guid,
@@ -1313,13 +1323,13 @@ class Api:
         return found
 
     def audio_brand_virtual(self):
-        """Rebatiza CABLE Input/Output -> Midnight Speakers/Mic (precisa admin)."""
+        """Rebatiza CABLE Input/Output -> Pulse Speakers/Mic (precisa admin)."""
         eps = self.audio_virtual_endpoints()
         if not eps:
             return {"success": False,
                     "output": "Micro virtual não encontrado. Corre o Setup para instalar."}
         if all(e.get("branded") for e in eps):
-            return {"success": True, "output": "Já está como Midnight. ✔"}
+            return {"success": True, "output": "Já está como Pulse. ✔"}
         try:
             import winreg
         except Exception as e:
@@ -1344,7 +1354,7 @@ class Api:
             except Exception as ex:
                 return {"success": False, "output": f"Falha em {e['desc']}: {ex}"}
         return {"success": True,
-                "output": "Micro virtual agora é Midnight:\n" + "\n".join(done) +
+                "output": "Micro virtual agora é Pulse:\n" + "\n".join(done) +
                           "\n\nSe os nomes antigos persistirem, reinicia o PC."}
 
     def audio_restart_service(self):
@@ -1735,7 +1745,7 @@ class Api:
         try:
             req = urllib.request.Request(
                 f"https://api.github.com/repos/{REPO}/releases/latest",
-                headers={"User-Agent": "MidnightOptimizer", "Accept": "application/vnd.github+json"})
+                headers={"User-Agent": "PulseGamingOptimizer", "Accept": "application/vnd.github+json"})
             with urllib.request.urlopen(req, timeout=15) as r:
                 rel = json.loads(r.read().decode())
             latest = rel.get("tag_name", "")
@@ -1744,7 +1754,7 @@ class Api:
             fallback = ""
             for a in rel.get("assets", []):
                 nm = a.get("name", "")
-                if nm == "MidnightOptimizer.exe":
+                if nm in ("PulseOptimizer.exe", "PulseGamingOptimizer.exe", "MidnightOptimizer.exe"):
                     dl = a.get("browser_download_url", "")
                     break
                 if not fallback and nm.lower().endswith(".exe") and "setup" not in nm.lower():
@@ -1778,13 +1788,13 @@ class Api:
 
         def _dl():
             try:
-                dest = os.path.join(tempfile.gettempdir(), "MidnightOptimizer_novo.exe")
+                dest = os.path.join(tempfile.gettempdir(), "PulseOptimizer_novo.exe")
                 try:
                     if os.path.isfile(dest):
                         os.remove(dest)
                 except Exception:
                     pass
-                req = urllib.request.Request(url, headers={"User-Agent": "MidnightOptimizer"})
+                req = urllib.request.Request(url, headers={"User-Agent": "PulseGamingOptimizer"})
                 with urllib.request.urlopen(req, timeout=60) as r, open(dest, "wb") as f:
                     total = int(r.headers.get("Content-Length") or 0)
                     got = 0
@@ -1836,7 +1846,7 @@ class Api:
             "Start-Sleep -Seconds 1\n"
             f'$target = "{cur}"\n'
             f'$source = "{new_exe}"\n'
-            "Get-Process | Where-Object { $_.Path -eq $target -or $_.ProcessName -like '*MidnightOptimizer*' } | Stop-Process -Force -ErrorAction SilentlyContinue\n"
+            "Get-Process | Where-Object { $_.Path -eq $target -or $_.ProcessName -like '*PulseOptimizer*' -or $_.ProcessName -like '*MidnightOptimizer*' } | Stop-Process -Force -ErrorAction SilentlyContinue\n"
             "$done = $false\n"
             "for ($i = 0; $i -lt 20; $i++) {\n"
             "    try {\n"
@@ -2068,7 +2078,7 @@ def main():
     api = Api()
     index = os.path.join(BASE_DIR, "index.html")
     window = webview.create_window(
-        "Midnight Optimizer — Forja Competitiva",
+        "Pulse Gaming Optimizer — Forja Competitiva",
         url=index,
         js_api=api,
         width=1280, height=800,

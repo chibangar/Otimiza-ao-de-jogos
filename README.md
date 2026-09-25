@@ -1,20 +1,26 @@
-# 🌙 Midnight Optimizer — Professional Gaming Suite (v3.1)
+<p align="center">
+  <img src="assets/logo.png" width="180" height="180" alt="Pulse Gaming Optimizer Logo" style="border-radius: 28px; box-shadow: 0 0 40px rgba(0,240,255,0.4);" />
+</p>
 
-Otimizador de alto desempenho e baixa latência para Windows 10 e Windows 11, projetado para jogos competitivos (CS2, World of Warcraft, Call of Duty, Valorant, Apex Legends e outros).
+# ⚡ Pulse Gaming Optimizer — Professional Esports Suite (v4.1)
 
-[![Release](https://img.shields.io/github/v/release/chibangar/Otimiza-ao-de-jogos?style=flat-square&color=818cf8)](https://github.com/chibangar/Otimiza-ao-de-jogos/releases)
+Otimizador de alto desempenho e latência zero para Windows 10 e Windows 11, desenvolvido especificamente para jogadores competitivos (CS2, Valorant, Apex Legends, World of Warcraft, Call of Duty e outros).
+
+[![Release](https://img.shields.io/github/v/release/chibangar/Otimiza-ao-de-jogos?style=flat-square&color=00f0ff)](https://github.com/chibangar/Otimiza-ao-de-jogos/releases)
 [![Plataforma](https://img.shields.io/badge/Plataforma-Windows%2010%20%7C%2011%20(64--bit)-0ea5e9?style=flat-square)](https://github.com/chibangar/Otimiza-ao-de-jogos)
 [![Licença](https://img.shields.io/badge/Licen%C3%A7a-MIT-10b981?style=flat-square)](LICENSE)
 
 ---
 
-## ⚡ Destaques da Versão 3.1
+## ⚡ Destaques da Versão 4.1
 
-- **Interface Moderna e Profissional**: Redesenhada com o design system *Obsidian Dark*, tipografia apurada (Inter & Sora), iconografia vetorial SVG nativa e ausência de efeitos visuais excessivos ou distrações.
-- **Centro de Controlo no Dashboard**: Telemetria em tempo real com leitura de hardware (CPU, GPU, RAM, Disco) e especificações do sistema.
-- **Modo Competitivo de 1 Clique**: Ativação instantânea do plano *Ultimate Performance*, priorização de threads no kernel, agendamento de GPU por hardware (HAGS) e desativação do Xbox DVR.
-- **Afinamento In-Game**: Perfis de jogadores profissionais para Counter-Strike 2 e perfis dedicados para World of Warcraft e Call of Duty, sempre com salvaguarda automática de cópias de segurança.
-- **Compilação e Releases Automáticas**: Integração contínua através de GitHub Actions, gerando o executável autónomo Windows em cada nova versão.
+- **Nova Identidade Visual & Logótipo Esports**: Marca oficial **Pulse Gaming Optimizer** com emblema eletrizante em escudo cibernético neon cyan e violeta.
+- **Design System de Alta Performance (Dark HUD & Glassmorphism)**: Painéis translúcidos em vidro fumado escuro, gradientes de profundidade e bordas iluminadas a neon.
+- **Reator Orbital no Dashboard**: Acionamento instantâneo do Modo Competitivo com anéis de aceleração de energia holográficos.
+- **Telemetria Circular SVG**: 4 anéis dinâmicos de leitura em tempo real para processador (CPU), placa gráfica (GPU), memória RAM e disco.
+- **Miras & Viewmodels CS2 v3.2**: Configurações dos melhores jogadores profissionais do mundo, códigos de partilha e renderizações in-game.
+- **Microfone & Estúdio Virtual Pulse**: Modulador de voz e Soundboard com atalhos globais integrados ao Discord, Steam e CS2.
+- **Compilação e Releases Automáticas**: GitHub Actions atualizado com distribuição contínua do executável `PulseOptimizer.exe`.
 
 ---
 
@@ -39,7 +45,7 @@ Aplica num clique o conjunto de regras essenciais para menor latência de entrad
 - **Energia Contínua**: Manutenção de alimentação em portas USB para periféricos de alta taxa de sondagem (1000Hz+).
 
 ### 4. Estúdio de Áudio & Soundboard
-- Módulo de modulação de voz com microfone virtual dedicado.
+- Módulo de modulação de voz com microfone virtual dedicado **Pulse Mic**.
 - Soundboard com suporte para atalhos globais de teclado (F1–F12, combinações).
 - Integração direta com Discord, Steam e jogos multijogador.
 
@@ -49,7 +55,7 @@ Aplica num clique o conjunto de regras essenciais para menor latência de entrad
 
 ### Opção 1: Executável Pronto (Recomendado)
 1. Aceda à página de [Releases do GitHub](https://github.com/chibangar/Otimiza-ao-de-jogos/releases).
-2. Transfira o ficheiro `MidnightOptimizer.exe` (ou o ficheiro ZIP).
+2. Transfira o ficheiro `PulseOptimizer.exe` (ou `PulseOptimizer-Windows-x64.zip`).
 3. Execute como **Administrador** para permitir a aplicação de planos de energia e ajustes de registo.
 
 ### Opção 2: A Partir do Código Fonte

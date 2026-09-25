@@ -9,7 +9,9 @@ venv/
 build/
 dist/
 *.exe
+*.zip
 !MidnightOptimizer.spec
+!PulseOptimizer.spec
 
 # Node / Electron (ficheiros pesados locais)
 node_modules/

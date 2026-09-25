@@ -35,20 +35,25 @@ jobs:
 
       - name: Compilar Executável com PyInstaller
         run: |
-          python -m PyInstaller --noconfirm --clean MidnightOptimizer.spec
+          python -m PyInstaller --noconfirm --clean PulseOptimizer.spec
 
       - name: Empacotar Ficheiros para Distribuição
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force -Path release_dist
-          Copy-Item "dist\MidnightOptimizer.exe" -Destination "release_dist\MidnightOptimizer.exe"
+          Copy-Item "dist\PulseOptimizer.exe" -Destination "release_dist\PulseOptimizer.exe"
+          Copy-Item "dist\PulseOptimizer.exe" -Destination "dist\MidnightOptimizer.exe"
+          Copy-Item "dist\PulseOptimizer.exe" -Destination "release_dist\MidnightOptimizer.exe"
           Copy-Item "README.md" -Destination "release_dist\README.md"
-          Compress-Archive -Path "release_dist\*" -DestinationPath "MidnightOptimizer-Windows-x64.zip" -Force
+          Compress-Archive -Path "release_dist\*" -DestinationPath "PulseOptimizer-Windows-x64.zip" -Force
+          Copy-Item "PulseOptimizer-Windows-x64.zip" -Destination "MidnightOptimizer-Windows-x64.zip"
 
       - name: Publicar Release no GitHub
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            dist/PulseOptimizer.exe
+            PulseOptimizer-Windows-x64.zip
             dist/MidnightOptimizer.exe
             MidnightOptimizer-Windows-x64.zip
           generate_release_notes: true

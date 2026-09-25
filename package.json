@@ -1,7 +1,7 @@
 {
-  "name": "midnight-optimizer",
-  "version": "4.0.0",
-  "description": "Otimizador de jogos para Windows - Modo Competitivo estilo WoW Midnight",
+  "name": "pulse-gaming-optimizer",
+  "version": "4.1.0",
+  "description": "Pulse Gaming Optimizer - Suite Profissional de Otimização de Jogos e Sistema",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -16,8 +16,8 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.midnight.optimizer",
-    "productName": "Midnight Optimizer",
+    "appId": "com.pulse.gamingoptimizer",
+    "productName": "Pulse Gaming Optimizer",
     "win": {
       "target": [
         "nsis",
@@ -30,7 +30,7 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "shortcutName": "Midnight Optimizer"
+      "shortcutName": "Pulse Gaming Optimizer"
     }
   },
   "allowScripts": {

@@ -14,7 +14,8 @@ function createWindow() {
     minHeight: 640,
     backgroundColor: '#060714',
     autoHideMenuBar: true,
-    title: 'Midnight Optimizer',
+    title: 'Pulse Gaming Optimizer',
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

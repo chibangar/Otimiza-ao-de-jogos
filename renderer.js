@@ -118,6 +118,7 @@ async function getBackend(){
       bugsAdd: (t)=>a.bugs_add(t),
       bugsClear: ()=>a.bugs_clear(),
     };
+    window.pulseAPI = window.midnightAPI;
     return window.midnightAPI;
   }
   return null;
@@ -130,8 +131,8 @@ navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
   try{
-    const t=titles[page]||['Midnight Optimizer',''];
-    document.title=t[0]+' — Midnight Optimizer';
+    const t=titles[page]||['Pulse Gaming Optimizer',''];
+    document.title=t[0]+' — Pulse Gaming Optimizer';
     const h=document.getElementById('page-title'), d=document.getElementById('page-desc');
     if(h) h.textContent=t[0];
     if(d) d.textContent=t[1];
@@ -165,7 +166,7 @@ async function refreshVersion(){
     const r=await withTimeout(window.midnightAPI.appVersion(), 10000, 'appVersion');
     const v=(r && r.version) || '?';
     const sb=document.getElementById('app-version');
-    if(sb) sb.textContent=`Midnight Optimizer • v${v}`;
+    if(sb) sb.textContent=`Pulse Gaming Optimizer • v${v}`;
     const sv=document.getElementById('sys-version');
     if(sv) sv.textContent='v'+v;
   }catch{}
@@ -503,12 +504,12 @@ async function initVoice(){
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; out.appendChild(o); const m=document.createElement('option'); m.value=d.index; m.textContent=d.name; mon.appendChild(m); });
       const cableEl=document.getElementById('voice-cable');
       const virtOk = (dv.virtual !== undefined) ? dv.virtual : dv.cable;
-      if(cableEl) cableEl.textContent = virtOk ? '✔ Micro virtual Midnight pronto.' : '⚠ Sem micro virtual — corre o Setup.';
-      // Sem escolha guardada: usa o Midnight sozinho, como no Voicemod
+      if(cableEl) cableEl.textContent = virtOk ? '✔ Micro virtual Pulse pronto.' : '⚠ Sem micro virtual — corre o Setup.';
+      // Sem escolha guardada: usa o Pulse sozinho, como no Voicemod
       try{
         const s0=vmLoad();
         if(!s0.out){
-          const c=[...out.options].find(o=>/midnight|cable/i.test(o.text));
+          const c=[...out.options].find(o=>/pulse|midnight|cable/i.test(o.text));
           if(c){ out.value=c.value; vmSave(); }
         }
       }catch{}
@@ -1143,22 +1144,22 @@ async function initSound(){
       sel.innerHTML='';
       dv.outputs.forEach(d=>{ const o=document.createElement('option'); o.value=d.index; o.textContent=d.name; sel.appendChild(o); });
       if(saved && [...sel.options].some(o=>o.value==saved)) sel.value=saved;
-      else { const c=[...sel.options].find(o=>/midnight|cable/i.test(o.text)); if(c) sel.value=c.value; }
+      else { const c=[...sel.options].find(o=>/pulse|midnight|cable/i.test(o.text)); if(c) sel.value=c.value; }
       sel.addEventListener('change',()=>{ try{ localStorage.setItem(LS('sound_out'),sel.value); }catch{} });
       const sc=document.getElementById('sound-cable');
       const virtOk2 = (dv.virtual !== undefined) ? dv.virtual : dv.cable;
-      if(sc) sc.textContent = virtOk2 ? '✔ Micro virtual Midnight pronto.' : '⚠ Sem micro virtual — corre o Setup e reinicia o PC.';
+      if(sc) sc.textContent = virtOk2 ? '✔ Micro virtual Pulse pronto.' : '⚠ Sem micro virtual — corre o Setup e reinicia o PC.';
     }
   }catch{}
 }
 document.getElementById('btn-cable-out')?.addEventListener('click', ()=>{
   const sel=document.getElementById('sound-out');
-  const c=[...sel.options].find(o=>/midnight|cable/i.test(o.text));
-  if(c){ sel.value=c.value; try{ localStorage.setItem(LS('sound_out'),c.value); }catch{} toast('✔ Sons agora saem no Midnight → CS2/Discord. No jogo escolhe "Midnight Mic" como microfone.'); }
+  const c=[...sel.options].find(o=>/pulse|midnight|cable/i.test(o.text));
+  if(c){ sel.value=c.value; try{ localStorage.setItem(LS('sound_out'),c.value); }catch{} toast('✔ Sons agora saem no Pulse → CS2/Discord. No jogo escolhe "Pulse Mic" como microfone.'); }
   else toast('⚠ Sem micro virtual. Corre o Setup (instala sozinho) e reinicia o PC.');
 });
 document.getElementById('btn-brand-audio')?.addEventListener('click', async ()=>{
-  toast('A rebatizar micro virtual para Midnight…');
+  toast('A rebatizar micro virtual para Pulse…');
   try{
     const r=await window.midnightAPI.audioBrand();
     toast(r.output);

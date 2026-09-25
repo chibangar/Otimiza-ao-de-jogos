@@ -1,8 +1,13 @@
-## 🌟 Midnight Optimizer v4.0.0 — Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism)
+## ⚡ Pulse Gaming Optimizer v4.1.0 — Nova Marca Oficial & Logótipo Esports
 
-### 🚀 Destaques da Versão 4.0.0
+### 🚀 Destaques da Versão 4.1.0
 
-- **Design System de Última Geração (Glassmorphism 2.0)**:
+- **Rebranding Oficial para Pulse Gaming Optimizer**:
+  - Nova marca voltada para o cenário competitivo de alta performance e esports.
+  - Logótipo profissional com emblema em escudo de impulsos de alta frequência nas cores Electric Cyan e Neon Violet.
+  - Ícone de aplicação (.ico) multi-resolução de alta precisão (16px a 256px).
+
+- **Design System Dark Gaming HUD & Glassmorphism 2.0**:
   - Painéis translúcidos em vidro fumado escuro (`backdrop-filter: blur(20px)`), gradientes de profundidade e bordas com iluminação sutil a neon.
   - Baixo consumo de CPU/GPU com pausas automáticas quando a app fica oculta ou em modo de jogo.
 
@@ -15,16 +20,15 @@
 - **Telemetria Circular SVG em Tempo Real**:
   - 4 medidores de anéis circulares SVG para monitorização dinâmica de CPU, GPU, RAM e Disco.
 
-- **4 Atmosferas Visuais / Temas Selecionáveis**:
+- **4 Atmosferas Visuais Selecionáveis**:
   - ☾ **WoW Midnight**: Roxo e dourado do Vazio cósmico
   - ◉ **CS2 Blaze**: Laranja e âmbar tático de competição
   - ★ **COD SpecOps**: Verde militar e ouro tático
   - ❄ **Titanium Frost**: Azul ártico glacial de alta performance
 
-- **Integração Total com Recursos CS2 v3.2**:
-  - Miras dos Pros com códigos de partilha e preview gráfico.
-  - Presets de Viewmodel com renders autênticos in-game.
-  - Correção de Hitreg Sub-Tick e In-Game Overlay.
+- **Áudio Virtual Pulse Mic & Soundboard**:
+  - Microfone virtual rebatizado para `Pulse Mic` e `Pulse Speakers`.
+  - Soundboard integrado para partidas e chamadas Discord.
 
-- **Empacotamento e Compilação Atualizados**:
-  - `MidnightOptimizer.spec` e `build_exe.bat` configurados com inclusão determinística de todos os novos recursos de interface.
+- **Compilação e Releases**:
+  - Binários autónomos distribuídos como `PulseOptimizer.exe` e arquivo ZIP no GitHub Releases.

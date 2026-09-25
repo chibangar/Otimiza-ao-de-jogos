@@ -166,7 +166,7 @@
   document.addEventListener('midnight:navigate', event => {
     const page = event.detail?.page;
     if (!page) return;
-    const info = pageTitles[page] || ['MIDNIGHT OPTIMIZER', page.toUpperCase()];
+    const info = pageTitles[page] || ['PULSE GAMING OPTIMIZER', page.toUpperCase()];
     const eyebrow = document.getElementById('page-eyebrow');
     const title = document.getElementById('page-title');
     if (eyebrow) eyebrow.textContent = info[0];
