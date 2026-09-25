@@ -1389,19 +1389,41 @@ document.getElementById('btn-update-now')?.addEventListener('click', async ()=>{
     if(p.status === 'ready'){
       clearInterval(h);
       if(fill) fill.style.width = '100%';
-      if(txt) txt.textContent = `Versão ${p.version} pronta! A reiniciar…`;
-      toast(`✔ Versão ${p.version} pronta! A reiniciar a app…`);
-      const rBtn = document.getElementById('btn-update-restart');
-      if(rBtn) rBtn.style.display = '';
+      if(txt) txt.textContent = `Versão ${p.version} descarregada! A reiniciar e ligar a nova versão…`;
+      toast(`✔ Versão ${p.version} pronta! A reiniciar e ligar a app de forma automática…`);
 
-      // Reinicia automaticamente após 1.5 segundos
+      // Mostra o overlay de reinício automático
+      const rOverlay = document.getElementById('restart-overlay');
+      if(rOverlay) rOverlay.style.display = 'flex';
+
+      const rBtn = document.getElementById('btn-update-restart');
+      if(rBtn){
+        rBtn.style.display = '';
+        rBtn.disabled = true;
+        rBtn.textContent = 'A reiniciar agora…';
+      }
+
+      // Reinicia e liga a aplicação automaticamente após 1 segundo
       setTimeout(async ()=>{
         try {
-          await window.midnightAPI.applyUpdate();
+          const r = await window.midnightAPI.applyUpdate();
+          if(r && !r.success){
+            if(rOverlay) rOverlay.style.display = 'none';
+            if(rBtn){
+              rBtn.disabled = false;
+              rBtn.textContent = 'Reiniciar agora';
+            }
+            toast('⚠ ' + (r.output || 'Falha ao reiniciar.'));
+          }
         } catch(e) {
+          if(rOverlay) rOverlay.style.display = 'none';
+          if(rBtn){
+            rBtn.disabled = false;
+            rBtn.textContent = 'Reiniciar agora';
+          }
           toast('Falha ao reiniciar: ' + e);
         }
-      }, 1500);
+      }, 1000);
     }
     if(p.status === 'error'){
       clearInterval(h);
@@ -1416,16 +1438,22 @@ document.getElementById('btn-update-restart')?.addEventListener('click', async (
   const btn = document.getElementById('btn-update-restart');
   btn.disabled = true;
   btn.textContent = 'A reiniciar…';
-  toast('A aplicar atualização e a reiniciar…');
+  const rOverlay = document.getElementById('restart-overlay');
+  if(rOverlay) rOverlay.style.display = 'flex';
+  toast('A aplicar atualização e a ligar a nova versão…');
   try{
     const r = await window.midnightAPI.applyUpdate();
-    btn.disabled = false;
-    btn.textContent = 'Reiniciar agora';
-    const msg = (r && r.output) || 'Falha no restart.';
-    toast('⚠ ' + msg);
+    if(r && !r.success){
+      btn.disabled = false;
+      btn.textContent = 'Reiniciar agora';
+      if(rOverlay) rOverlay.style.display = 'none';
+      const msg = (r && r.output) || 'Falha no restart.';
+      toast('⚠ ' + msg);
+    }
   }catch(e){
     btn.disabled = false;
     btn.textContent = 'Reiniciar agora';
+    if(rOverlay) rOverlay.style.display = 'none';
     toast('⚠ Falha no restart: ' + e);
   }
 });

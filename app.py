@@ -1853,49 +1853,121 @@ class Api:
                 "error": _UPDATE.get("error", ""), "version": _UPDATE.get("version", "")}
 
     def apply_update_and_restart(self):
-        if not getattr(sys, "frozen", False):
-            return {"success": False, "output": "So no .exe final compilado. Usa o .exe do GitHub."}
         new_exe = _UPDATE.get("path", "")
         if not new_exe or not os.path.isfile(new_exe):
             return {"success": False, "output": "Atualizacao ainda nao descarregada."}
         if os.path.getsize(new_exe) < 5 * 1024 * 1024:
             return {"success": False, "output": "Ficheiro descarregado invalido. Tenta de novo."}
+
         cur = sys.executable
-        logf = os.path.join(tempfile.gettempdir(), "midnight_update.log")
-        ps1 = os.path.join(tempfile.gettempdir(), "midnight_update.ps1")
+        is_frozen = getattr(sys, "frozen", False)
+        was_admin = False
+        try:
+            was_admin = bool(self.is_admin().get("admin", False))
+        except Exception:
+            pass
+
+        current_pid = os.getpid()
+        logf = os.path.join(tempfile.gettempdir(), "pulse_update.log")
+        ps1 = os.path.join(tempfile.gettempdir(), "pulse_update.ps1")
         try:
             if os.path.isfile(logf):
                 os.remove(logf)
         except Exception:
             pass
 
-        # Script PowerShell profissional que lida com locks, retries e caminhos com espacos
-        ps_code = (
-            "$ErrorActionPreference = 'SilentlyContinue'\n"
-            f'$log = "{logf}"\n'
-            '"inicio" | Out-File -FilePath $log -Encoding utf8\n'
-            "Start-Sleep -Seconds 1\n"
-            f'$target = "{cur}"\n'
-            f'$source = "{new_exe}"\n'
-            "Get-Process | Where-Object { $_.Path -eq $target -or $_.ProcessName -like '*PulseOptimizer*' -or $_.ProcessName -like '*MidnightOptimizer*' } | Stop-Process -Force -ErrorAction SilentlyContinue\n"
-            "$done = $false\n"
-            "for ($i = 0; $i -lt 20; $i++) {\n"
-            "    try {\n"
-            "        Copy-Item -Path $source -Destination $target -Force -ErrorAction Stop\n"
-            "        $done = $true\n"
-            "        break\n"
-            "    } catch {\n"
-            "        Start-Sleep -Milliseconds 500\n"
-            "    }\n"
-            "}\n"
-            "if ($done) {\n"
-            '    "OK" | Out-File -FilePath $log -Encoding utf8\n'
-            "    Start-Process -FilePath $target\n"
-            "} else {\n"
-            '    "FALHOU" | Out-File -FilePath $log -Encoding utf8\n'
-            "}\n"
-            "Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue\n"
-        )
+        if not is_frozen:
+            # Em modo script Python / dev: inicia diretamente o novo executavel compilado
+            target = new_exe
+            work_dir = os.path.dirname(os.path.abspath(__file__))
+            ps_code = (
+                "$ErrorActionPreference = 'SilentlyContinue'\n"
+                f'$log = "{logf}"\n'
+                f'$target = "{target}"\n'
+                f'$workDir = "{work_dir}"\n'
+                '"inicio_dev" | Out-File -FilePath $log -Encoding utf8\n'
+                f'Wait-Process -Id {current_pid} -Timeout 5 -ErrorAction SilentlyContinue\n'
+                "Start-Sleep -Milliseconds 600\n"
+                "try {\n"
+                "    Start-Process -FilePath $target -WorkingDirectory $workDir -ErrorAction Stop\n"
+                '    "RESTART_DEV_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "} catch {\n"
+                '    Start-Process -FilePath "explorer.exe" -ArgumentList "`"$target`"" -ErrorAction SilentlyContinue\n'
+                '    "RESTART_DEV_EXPLORER_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "}\n"
+                "Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue\n"
+            )
+        else:
+            # Em executavel nativo (.exe): substitui o ficheiro e reinicia a app de forma 100% automatica
+            target = cur
+            work_dir = os.path.dirname(cur)
+            admin_flag = "$true" if was_admin else "$false"
+            ps_code = (
+                "$ErrorActionPreference = 'SilentlyContinue'\n"
+                f'$log = "{logf}"\n'
+                f'$target = "{target}"\n'
+                f'$source = "{new_exe}"\n'
+                f'$workDir = "{work_dir}"\n'
+                f'$wasAdmin = {admin_flag}\n'
+                '"inicio_exe" | Out-File -FilePath $log -Encoding utf8\n'
+                f'Wait-Process -Id {current_pid} -Timeout 6 -ErrorAction SilentlyContinue\n'
+                "Get-Process | Where-Object { $_.Path -eq $target -or $_.ProcessName -like '*PulseOptimizer*' -or $_.ProcessName -like '*MidnightOptimizer*' } | Stop-Process -Force -ErrorAction SilentlyContinue\n"
+                "Start-Sleep -Milliseconds 600\n"
+                "$done = $false\n"
+                "for ($i = 0; $i -lt 30; $i++) {\n"
+                "    try {\n"
+                '        $old = "$target.old"\n'
+                "        if (Test-Path $old) { Remove-Item -Path $old -Force -ErrorAction SilentlyContinue }\n"
+                "        if (Test-Path $target) { Move-Item -Path $target -Destination $old -Force -ErrorAction SilentlyContinue }\n"
+                "        Copy-Item -Path $source -Destination $target -Force -ErrorAction Stop\n"
+                "        $done = $true\n"
+                "        break\n"
+                "    } catch {\n"
+                "        Start-Sleep -Milliseconds 300\n"
+                "    }\n"
+                "}\n"
+                "if (-not $done) {\n"
+                "    for ($i = 0; $i -lt 15; $i++) {\n"
+                "        try {\n"
+                "            Copy-Item -Path $source -Destination $target -Force -ErrorAction Stop\n"
+                "            $done = $true\n"
+                "            break\n"
+                "        } catch {\n"
+                "            Start-Sleep -Milliseconds 400\n"
+                "        }\n"
+                "    }\n"
+                "}\n"
+                "if ($done) {\n"
+                '    "COPIADO_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "    Start-Sleep -Milliseconds 600\n"
+                "    $started = $false\n"
+                "    if ($wasAdmin) {\n"
+                "        try {\n"
+                "            Start-Process -FilePath $target -WorkingDirectory $workDir -Verb RunAs -ErrorAction Stop\n"
+                "            $started = $true\n"
+                '            "RESTART_RUNAS_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "        } catch {}\n"
+                "    }\n"
+                "    if (-not $started) {\n"
+                "        try {\n"
+                "            Start-Process -FilePath $target -WorkingDirectory $workDir -ErrorAction Stop\n"
+                "            $started = $true\n"
+                '            "RESTART_NORMAL_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "        } catch {\n"
+                '            Start-Process -FilePath "explorer.exe" -ArgumentList "`"$target`"" -ErrorAction SilentlyContinue\n'
+                '            "RESTART_EXPLORER_OK" | Out-File -FilePath $log -Encoding utf8\n'
+                "        }\n"
+                "    }\n"
+                "} else {\n"
+                '    "FALHOU_COPIA" | Out-File -FilePath $log -Encoding utf8\n'
+                "}\n"
+                'if (Test-Path "$target.old") {\n'
+                "    Start-Sleep -Seconds 2\n"
+                '    Remove-Item -Path "$target.old" -Force -ErrorAction SilentlyContinue\n'
+                "}\n"
+                "Remove-Item -Path $MyInvocation.MyCommand.Path -Force -ErrorAction SilentlyContinue\n"
+            )
+
         try:
             with open(ps1, "w", encoding="utf-8") as f:
                 f.write(ps_code)
@@ -1911,7 +1983,7 @@ class Api:
 
         try:
             import time
-            time.sleep(0.3)
+            time.sleep(0.4)
         except Exception:
             pass
         os._exit(0)
@@ -1928,16 +2000,23 @@ class Api:
 
     def update_last_result(self):
         try:
-            p = os.path.join(tempfile.gettempdir(), "midnight_update.log")
-            if os.path.isfile(p):
-                txt = open(p, encoding="utf-8", errors="ignore").read()
-                if "FALHOU" in txt:
-                    try:
-                        os.remove(p)
-                    except Exception:
-                        pass
-                    return {"success": False,
-                            "output": "O ultimo update falhou (sem permissao). Corre como administrador ou usa o botao Manual."}
+            for fname in ("pulse_update.log", "midnight_update.log"):
+                p = os.path.join(tempfile.gettempdir(), fname)
+                if os.path.isfile(p):
+                    txt = open(p, encoding="utf-8", errors="ignore").read()
+                    if "FALHOU" in txt:
+                        try:
+                            os.remove(p)
+                        except Exception:
+                            pass
+                        return {"success": False,
+                                "output": "O ultimo update falhou. Corre como administrador ou usa o botao Manual."}
+                    elif "OK" in txt or "RESTART" in txt:
+                        try:
+                            os.remove(p)
+                        except Exception:
+                            pass
+                        return {"success": True, "output": "Atualizacao concluida com sucesso!"}
         except Exception:
             pass
         return {"success": True}
