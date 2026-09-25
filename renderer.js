@@ -120,6 +120,11 @@ async function getBackend(){
       voicemodImportAuto: ()=>a.voicemod_import_auto(),
       voicemodImportFolder: ()=>a.voicemod_import_folder(),
       voicemodImportFile: ()=>a.voicemod_import_file(),
+      softwareCatalog: ()=>a.software_catalog(),
+      softwareInstall: (ids)=>a.software_install(ids),
+      softwareUninstall: (ids)=>a.software_uninstall(ids),
+      softwareProgress: ()=>a.software_progress(),
+      softwareCancel: ()=>a.software_cancel(),
     };
     window.pulseAPI = window.midnightAPI;
     return window.midnightAPI;
@@ -129,7 +134,7 @@ async function getBackend(){
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
-const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], online:['Online','Vê quem está na app e conversa em direto.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], sistema:['Sistema','Ficha arcana da tua máquina.'], bugs:['Chat de Bugs','Reporta bugs e vê os já registados.'] };
+const titles = { dashboard:['Dashboard','Visão geral da tua máquina de batalha.'], competitivo:['Modo Competitivo','Um clique para entrar em modo de guerra.'], ingame:['In-Game CS2 & WoW','Otimização dentro do próprio jogo, com backup.'], servers:['Servidores','Públicos PT/EU para entrar em 1 clique.'], online:['Online','Vê quem está na app e conversa em direto.'], voz:['Estúdio de Voz','Muda a tua voz como no Voicemod.'], sound:['Soundboard','Memes do myinstants com teclas de atalho.'], otimizacoes:['Otimizações Windows','Ativa cada runa de poder do sistema.'], jogos:['Meus Jogos','Lança com prioridade alta e boost.'], softwares:['Instalador de Softwares','Instalação rápida e gestão silenciosa de ferramentas essenciais via Winget.'], sistema:['Sistema','Ficha arcana da tua máquina.'], bugs:['Chat de Bugs','Reporta bugs e vê os já registados.'] };
 navBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
 function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page===page));
   pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+page));
@@ -648,6 +653,7 @@ async function boot(){
   await step('initOnline', initOnline);
   await step('initBugs', initBugs);
   await step('initAutostart', initAutostart);
+  await step('initSoftwares', initSoftwares);
   await step('hkRegister', hkRegister);
 }
 async function initLogin(){
@@ -1247,7 +1253,7 @@ async function handleVmImport(promise, label){
 }
 
 document.getElementById('btn-vm-auto')?.addEventListener('click', async ()=>{
-  await handleVmImport(window.midnightAPI.voicemodImportAuto(), 'A detetar pastas padrão do Voicemod');
+  await handleVmImport(window.midnightAPI.voicemodImportAuto(), 'A importar TUDO do Voicemod (todos os sons e fotos originais)');
 });
 
 document.getElementById('btn-vm-folder')?.addEventListener('click', async ()=>{
@@ -1906,3 +1912,418 @@ async function initAutostart(){
   }catch{}
   paintAutostart();
 }
+
+// ==========================================================================
+// INSTALADOR DE SOFTWARES & GESTOR DE PACOTES (WINGET)
+// ==========================================================================
+const SOFTWARE_CAT_ICONS = {
+  'Aplicações de Desenvolvimento': '💻',
+  'Visualizadores de Documentos': '📄',
+  'Gestão de Ficheiros e Discos': '💾',
+  'Jogos': '🎮',
+  'Imagem': '🎨',
+  'Runtimes e Dependências': '⚙️',
+  'Privacidade e Segurança': '🛡️',
+  'Navegadores': '🌐',
+  'Compressão': '🗜️',
+  'Utilitários de Personalização': '🛠️'
+};
+
+let _softwareCatalog = [];
+let _selectedSoftwareIds = new Set();
+let _softwareFilter = '';
+let _softwarePollTimer = null;
+let _softwareLoadedOnce = false;
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+async function loadSoftwareCatalog(force = false) {
+  if (!window.midnightAPI || !window.midnightAPI.softwareCatalog) return;
+  const container = document.getElementById('soft-categories-grid');
+  if (!force && _softwareLoadedOnce && _softwareCatalog.length > 0) {
+    renderSoftwareCatalog();
+    return;
+  }
+  if (container && (!force || _softwareCatalog.length === 0)) {
+    container.innerHTML = `
+      <div class="soft-loading-placeholder">
+        <div class="soft-spinner"></div>
+        <p>A carregar 94 aplicações e a verificar o registo do Windows...</p>
+      </div>`;
+  }
+  try {
+    const list = await window.midnightAPI.softwareCatalog();
+    _softwareCatalog = Array.isArray(list) ? list : [];
+    _softwareLoadedOnce = true;
+    renderSoftwareCatalog();
+  } catch (err) {
+    if (container) {
+      container.innerHTML = `
+        <div class="soft-loading-placeholder">
+          <p style="color:var(--danger)">Erro ao carregar catálogo: ${escapeHtml(err.message || String(err))}</p>
+          <button class="btn ghost small" id="btn-soft-retry">Tentar novamente</button>
+        </div>`;
+      document.getElementById('btn-soft-retry')?.addEventListener('click', () => loadSoftwareCatalog(true));
+    }
+  }
+}
+
+function renderSoftwareCatalog() {
+  const container = document.getElementById('soft-categories-grid');
+  if (!container) return;
+
+  const totalApps = _softwareCatalog.length;
+  const installedApps = _softwareCatalog.filter(a => a.installed).length;
+  const selectedCount = _selectedSoftwareIds.size;
+
+  const statTotal = document.getElementById('soft-stat-total');
+  const statInstalled = document.getElementById('soft-stat-installed');
+  const statSelected = document.getElementById('soft-stat-selected');
+  if (statTotal) statTotal.textContent = totalApps;
+  if (statInstalled) statInstalled.textContent = installedApps;
+  if (statSelected) statSelected.textContent = selectedCount;
+
+  // Atualizar botões de ação em lote
+  const btnInstall = document.getElementById('btn-soft-install-batch');
+  const btnUninstall = document.getElementById('btn-soft-uninstall-batch');
+  const cntInstall = document.getElementById('soft-btn-install-cnt');
+  const cntUninstall = document.getElementById('soft-btn-uninstall-cnt');
+
+  if (cntInstall) cntInstall.textContent = selectedCount;
+  if (btnInstall) btnInstall.disabled = (selectedCount === 0);
+
+  // Quantos selecionados estão atualmente instalados?
+  const selectedInstalledCount = _softwareCatalog.filter(a => _selectedSoftwareIds.has(a.id) && a.installed).length;
+  if (cntUninstall) cntUninstall.textContent = selectedInstalledCount;
+  if (btnUninstall) btnUninstall.disabled = (selectedInstalledCount === 0);
+
+  // Filtragem
+  const term = (_softwareFilter || '').toLowerCase().trim();
+  const filtered = _softwareCatalog.filter(app => {
+    if (!term) return true;
+    const n = (app.name || '').toLowerCase();
+    const c = (app.category || '').toLowerCase();
+    const d = (app.desc || '').toLowerCase();
+    const w = (app.winget || '').toLowerCase();
+    return n.includes(term) || c.includes(term) || d.includes(term) || w.includes(term);
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="soft-loading-placeholder">
+        <p>Nenhuma aplicação encontrada para a pesquisa "<b>${escapeHtml(term)}</b>".</p>
+        <button class="btn ghost small" id="btn-soft-filter-clear">Limpar filtro</button>
+      </div>`;
+    document.getElementById('btn-soft-filter-clear')?.addEventListener('click', clearSoftwareSearch);
+    return;
+  }
+
+  // Agrupamento por categoria preservando a ordem original
+  const categoriesMap = new Map();
+  filtered.forEach(app => {
+    const cat = app.category || 'Outros';
+    if (!categoriesMap.has(cat)) {
+      categoriesMap.set(cat, []);
+    }
+    categoriesMap.get(cat).push(app);
+  });
+
+  let html = '';
+  for (const [catName, apps] of categoriesMap.entries()) {
+    const icon = SOFTWARE_CAT_ICONS[catName] || '📦';
+    const allCatSelected = apps.length > 0 && apps.every(a => _selectedSoftwareIds.has(a.id));
+
+    html += `
+      <div class="soft-category-card" data-category="${escapeHtml(catName)}">
+        <div class="soft-cat-header">
+          <div class="soft-cat-title-wrap">
+            <span class="soft-cat-icon">${icon}</span>
+            <span class="soft-cat-title">${escapeHtml(catName)}</span>
+            <span class="soft-cat-badge">${apps.length} ${apps.length === 1 ? 'app' : 'apps'}</span>
+          </div>
+          <div class="soft-cat-actions">
+            <button class="btn ghost xs btn-soft-toggle-cat" data-category="${escapeHtml(catName)}">
+              ${allCatSelected ? 'Desmarcar Todos' : 'Selecionar Categoria'}
+            </button>
+          </div>
+        </div>
+        <div class="soft-apps-grid">
+    `;
+
+    apps.forEach(app => {
+      const isSelected = _selectedSoftwareIds.has(app.id);
+      const isInstalled = !!app.installed;
+
+      html += `
+        <div class="soft-card ${isInstalled ? 'is-installed' : ''} ${isSelected ? 'is-selected' : ''}" data-id="${escapeHtml(app.id)}">
+          <div class="soft-card-left">
+            <input type="checkbox" class="soft-checkbox" ${isSelected ? 'checked' : ''} data-id="${escapeHtml(app.id)}" aria-label="Selecionar ${escapeHtml(app.name)}">
+          </div>
+          <div class="soft-card-content">
+            <div class="soft-card-header">
+              <span class="soft-name" title="${escapeHtml(app.name)}">${escapeHtml(app.name)}</span>
+              <span class="soft-badge ${isInstalled ? 'installed' : 'available'}">
+                ${isInstalled ? '● Instalado' : '○ Disponível'}
+              </span>
+            </div>
+            <p class="soft-desc" title="${escapeHtml(app.desc)}">${escapeHtml(app.desc)}</p>
+            <div class="soft-footer">
+              <span class="soft-winget" title="${escapeHtml(app.winget)}">${escapeHtml(app.winget)}</span>
+              ${app.link ? `<button class="soft-link-btn" data-url="${escapeHtml(app.link)}" title="Abrir página oficial de ${escapeHtml(app.name)}">↗</button>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+
+  // Ligar eventos nos cards e botões renderizados
+  container.querySelectorAll('.soft-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.soft-link-btn')) return;
+      const id = card.dataset.id;
+      toggleSoftwareSelection(id);
+    });
+  });
+
+  container.querySelectorAll('.soft-checkbox').forEach(chk => {
+    chk.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = chk.dataset.id;
+      toggleSoftwareSelection(id);
+    });
+  });
+
+  container.querySelectorAll('.soft-link-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const url = btn.dataset.url;
+      if (url && window.midnightAPI && window.midnightAPI.openUrl) {
+        window.midnightAPI.openUrl(url);
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-soft-toggle-cat').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const cat = btn.dataset.category;
+      toggleCategorySelection(cat);
+    });
+  });
+}
+
+function toggleSoftwareSelection(id) {
+  if (_selectedSoftwareIds.has(id)) {
+    _selectedSoftwareIds.delete(id);
+  } else {
+    _selectedSoftwareIds.add(id);
+  }
+  renderSoftwareCatalog();
+}
+
+function toggleCategorySelection(catName) {
+  const catApps = _softwareCatalog.filter(a => a.category === catName);
+  const allSelected = catApps.every(a => _selectedSoftwareIds.has(a.id));
+  if (allSelected) {
+    catApps.forEach(a => _selectedSoftwareIds.delete(a.id));
+  } else {
+    catApps.forEach(a => _selectedSoftwareIds.add(a.id));
+  }
+  renderSoftwareCatalog();
+}
+
+function selectAllSoftwares() {
+  _softwareCatalog.forEach(a => _selectedSoftwareIds.add(a.id));
+  renderSoftwareCatalog();
+  toast(`${_softwareCatalog.length} programas selecionados.`);
+}
+
+function selectInstalledSoftwares() {
+  _selectedSoftwareIds.clear();
+  const installed = _softwareCatalog.filter(a => a.installed);
+  installed.forEach(a => _selectedSoftwareIds.add(a.id));
+  renderSoftwareCatalog();
+  toast(`${installed.length} programas instalados selecionados.`);
+}
+
+function selectUninstalledSoftwares() {
+  _selectedSoftwareIds.clear();
+  const uninstalled = _softwareCatalog.filter(a => !a.installed);
+  uninstalled.forEach(a => _selectedSoftwareIds.add(a.id));
+  renderSoftwareCatalog();
+  toast(`${uninstalled.length} programas disponíveis selecionados.`);
+}
+
+function clearSoftwareSelection() {
+  _selectedSoftwareIds.clear();
+  renderSoftwareCatalog();
+}
+
+function clearSoftwareSearch() {
+  _softwareFilter = '';
+  const inp = document.getElementById('soft-search-input');
+  if (inp) inp.value = '';
+  const clr = document.getElementById('btn-soft-search-clear');
+  if (clr) clr.style.display = 'none';
+  renderSoftwareCatalog();
+}
+
+async function startBatchInstall() {
+  if (_selectedSoftwareIds.size === 0) {
+    toast('Seleciona pelo menos uma aplicação para instalar.');
+    return;
+  }
+  const ids = Array.from(_selectedSoftwareIds);
+  try {
+    const btn = document.getElementById('btn-soft-install-batch');
+    if (btn) btn.disabled = true;
+    toast(`A iniciar instalação em lote de ${ids.length} aplicações...`);
+    showSoftwareProgress(true, 'A iniciar instalação...', 0, ids.length);
+    const r = await window.midnightAPI.softwareInstall(ids);
+    if (r && !r.success) {
+      toast(r.output || 'Falha ao iniciar instalação.');
+      showSoftwareProgress(false);
+      return;
+    }
+    startSoftwareProgressPolling();
+  } catch (err) {
+    toast('Erro: ' + (err.message || err));
+    showSoftwareProgress(false);
+  }
+}
+
+async function startBatchUninstall() {
+  const ids = _softwareCatalog.filter(a => _selectedSoftwareIds.has(a.id) && a.installed).map(a => a.id);
+  if (ids.length === 0) {
+    toast('Nenhuma das aplicações selecionadas está instalada.');
+    return;
+  }
+  try {
+    const btn = document.getElementById('btn-soft-uninstall-batch');
+    if (btn) btn.disabled = true;
+    toast(`A iniciar desinstalação de ${ids.length} aplicações...`);
+    showSoftwareProgress(true, 'A iniciar desinstalação...', 0, ids.length);
+    const r = await window.midnightAPI.softwareUninstall(ids);
+    if (r && !r.success) {
+      toast(r.output || 'Falha ao iniciar desinstalação.');
+      showSoftwareProgress(false);
+      return;
+    }
+    startSoftwareProgressPolling();
+  } catch (err) {
+    toast('Erro: ' + (err.message || err));
+    showSoftwareProgress(false);
+  }
+}
+
+async function cancelSoftwareBatch() {
+  try {
+    toast('A cancelar operação...');
+    if (window.midnightAPI && window.midnightAPI.softwareCancel) {
+      await window.midnightAPI.softwareCancel();
+    }
+  } catch (err) {
+    toast('Erro ao cancelar: ' + err);
+  }
+}
+
+function showSoftwareProgress(visible, title = '', done = 0, total = 0) {
+  const card = document.getElementById('soft-progress-card');
+  if (!card) return;
+  card.style.display = visible ? 'block' : 'none';
+  if (title) {
+    const t = document.getElementById('soft-prog-title');
+    if (t) t.textContent = title;
+  }
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const bar = document.getElementById('soft-prog-fill');
+  if (bar) bar.style.width = pct + '%';
+  const step = document.getElementById('soft-prog-step');
+  if (step) step.textContent = `Passo ${done} de ${total}`;
+  const pctEl = document.getElementById('soft-prog-pct');
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function startSoftwareProgressPolling() {
+  if (_softwarePollTimer) clearInterval(_softwarePollTimer);
+  _softwarePollTimer = setInterval(async () => {
+    try {
+      if (!window.midnightAPI || !window.midnightAPI.softwareProgress) return;
+      const p = await window.midnightAPI.softwareProgress();
+      if (!p) return;
+      if (p.running) {
+        showSoftwareProgress(true, p.current || 'A processar...', p.done || 0, p.total || 0);
+      } else {
+        clearInterval(_softwarePollTimer);
+        _softwarePollTimer = null;
+        showSoftwareProgress(true, p.current || 'Concluído!', p.total || 0, p.total || 0);
+        toast('Operação de softwares concluída!');
+        setTimeout(() => {
+          showSoftwareProgress(false);
+          loadSoftwareCatalog(true);
+        }, 1500);
+      }
+    } catch {
+      clearInterval(_softwarePollTimer);
+      _softwarePollTimer = null;
+    }
+  }, 1000);
+}
+
+async function initSoftwares() {
+  // Ligar botões de seleção superior
+  document.getElementById('btn-soft-sel-all')?.addEventListener('click', selectAllSoftwares);
+  document.getElementById('btn-soft-sel-installed')?.addEventListener('click', selectInstalledSoftwares);
+  document.getElementById('btn-soft-sel-uninstalled')?.addEventListener('click', selectUninstalledSoftwares);
+  document.getElementById('btn-soft-sel-none')?.addEventListener('click', clearSoftwareSelection);
+
+  // Barra de pesquisa
+  const searchInp = document.getElementById('soft-search-input');
+  const searchClr = document.getElementById('btn-soft-search-clear');
+  if (searchInp) {
+    searchInp.addEventListener('input', () => {
+      _softwareFilter = searchInp.value;
+      if (searchClr) searchClr.style.display = _softwareFilter ? 'block' : 'none';
+      renderSoftwareCatalog();
+    });
+  }
+  searchClr?.addEventListener('click', clearSoftwareSearch);
+
+  // Ações em lote
+  document.getElementById('btn-soft-install-batch')?.addEventListener('click', startBatchInstall);
+  document.getElementById('btn-soft-uninstall-batch')?.addEventListener('click', startBatchUninstall);
+  document.getElementById('btn-soft-cancel')?.addEventListener('click', cancelSoftwareBatch);
+  document.getElementById('btn-soft-refresh')?.addEventListener('click', () => {
+    toast('A atualizar catálogo e deteção de programas...');
+    loadSoftwareCatalog(true);
+  });
+
+  // Carregamento ao navegar para a aba 'softwares'
+  document.addEventListener('midnight:navigate', (e) => {
+    if (e.detail && e.detail.page === 'softwares') {
+      loadSoftwareCatalog();
+    }
+  });
+
+  // Pré-carrega suave
+  setTimeout(() => {
+    loadSoftwareCatalog();
+  }, 1200);
+}
+

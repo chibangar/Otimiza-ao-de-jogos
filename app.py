@@ -52,6 +52,7 @@ accounts = _safe_import("accounts")
 oauth_login = _safe_import("oauth_login")
 servers = _safe_import("servers")
 online = _safe_import("online")
+software_installer = _safe_import("software_installer")
 
 if len(sys.argv) > 1 and sys.argv[1] == "--overlay":
     if overlay and hasattr(overlay, "handle_cli"):
@@ -89,12 +90,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.2.1"
+APP_VERSION = "4.3.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "📦 Instalador & Gestor de Softwares: Catálogo com 10 categorias e 94 ferramentas essenciais (Dev, Jogos, Navegadores, Runtimes, Utilitários) com instalação silenciosa em lote via Winget!",
     "🖼️ Sons do Voicemod com Imagens Originais: Ao importar a tua aba do Voicemod, as fotos e capas originais de cada meme são transferidas automaticamente para o Soundboard!",
     "🔄 Reinício & Arranque 100% Automático: Atualizações sem atritos que encerram, substituem o executável e relançam a app automaticamente com privilégios preservados.",
     "🎙️ Importador de Sons Voicemod: Desencriptação automática de áudio OGG Opus/WAV com deteção em tempo real.",
@@ -1645,14 +1647,18 @@ class Api:
 
     # ---------- IMPORTADOR VOICEMOD ----------
     def voicemod_import_auto(self):
-        """Deteção automática de pastas do Voicemod (V2/V3) e importação."""
+        """Deteção e importação de todos os sons do Voicemod (V2/V3)."""
         try:
             import voicemod_importer
-            r = voicemod_importer.auto_import_voicemod(self._me())
+            r = voicemod_importer.import_all_voicemod(self._me())
             _SB_CACHE.clear()
             return r
         except Exception as e:
-            return {"success": False, "output": f"Erro na importação automática: {e}"}
+            return {"success": False, "output": f"Erro na importação: {e}"}
+
+    def voicemod_import_everything(self):
+        """Importa absolutamente tudo do Voicemod da pessoa (abas, memória, ficheiros e fotos)."""
+        return self.voicemod_import_auto()
 
     def voicemod_import_folder(self):
         """Abre seletor de pasta para importar ficheiros de áudio ou .dat do Voicemod."""
@@ -2202,6 +2208,53 @@ class Api:
             return {"success": True, "output": "Chat de bugs limpo."}
         except Exception as e:
             return {"success": False, "output": str(e)}
+
+    # ---------- INSTALADOR DE SOFTWARES & WINGET ----------
+    def software_catalog(self):
+        try:
+            if software_installer and hasattr(software_installer, "get_software_catalog_with_status"):
+                return software_installer.get_software_catalog_with_status()
+            return []
+        except Exception as e:
+            log_error("software_catalog error: " + str(e))
+            return []
+
+    def software_install(self, app_ids):
+        try:
+            if not software_installer:
+                return {"success": False, "output": "Módulo de instalação não disponível."}
+            t = threading.Thread(target=software_installer.run_batch_action, args=("install", app_ids), daemon=True)
+            t.start()
+            return {"success": True, "output": "Instalação em lote iniciada em segundo plano."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def software_uninstall(self, app_ids):
+        try:
+            if not software_installer:
+                return {"success": False, "output": "Módulo de instalação não disponível."}
+            t = threading.Thread(target=software_installer.run_batch_action, args=("uninstall", app_ids), daemon=True)
+            t.start()
+            return {"success": True, "output": "Desinstalação em lote iniciada em segundo plano."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
+    def software_progress(self):
+        try:
+            if software_installer and hasattr(software_installer, "get_progress"):
+                return software_installer.get_progress()
+            return {"running": False, "current": "", "total": 0, "done": 0, "log": []}
+        except Exception as e:
+            return {"running": False, "current": str(e), "total": 0, "done": 0, "log": []}
+
+    def software_cancel(self):
+        try:
+            if software_installer and hasattr(software_installer, "cancel_batch"):
+                return software_installer.cancel_batch()
+            return {"success": True, "output": "Cancelamento solicitado."}
+        except Exception as e:
+            return {"success": False, "output": str(e)}
+
 
 
 def main():

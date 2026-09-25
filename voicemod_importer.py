@@ -21,6 +21,8 @@ import tempfile
 import urllib.request
 import io
 from pathlib import Path
+import threading
+import concurrent.futures
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -377,13 +379,13 @@ def import_voicemod_v3_catalog(user_name):
         except Exception:
             pass
 
-    imported_count = 0
+    meta_lock = threading.Lock()
     imported_list = []
 
-    for item in sounds_data:
+    def _process_item(item):
         name = item.get("name")
         if not name:
-            continue
+            return None
 
         assets = item.get("assets", [])
         audio_url = None
@@ -401,35 +403,35 @@ def import_voicemod_v3_catalog(user_name):
             icon_url = item.get("icon_url")
 
         if not audio_url:
-            continue
+            return None
 
         safe_stem = re.sub(r"[^a-zA-Z0-9]+", "-", name.lower()).strip("-")[:40] or "som"
         dest_wav = os.path.join(target_dir, f"{safe_stem}.wav")
         dest_png = os.path.join(target_dir, f"{safe_stem}.png")
 
-        # Evita conflitos de nomes
-        idx = 1
-        while os.path.exists(dest_wav) and not os.path.exists(dest_png):
-            safe_stem = f"{safe_stem}-{idx}"
-            dest_wav = os.path.join(target_dir, f"{safe_stem}.wav")
-            dest_png = os.path.join(target_dir, f"{safe_stem}.png")
-            idx += 1
+        # Se já existir e for válido, reutiliza de imediato
+        if os.path.isfile(dest_wav) and os.path.getsize(dest_wav) > 1000 and os.path.isfile(dest_png) and os.path.getsize(dest_png) > 300:
+            fn = os.path.basename(dest_wav)
+            with meta_lock:
+                meta[fn] = {
+                    "title": name,
+                    "icon": os.path.basename(dest_png),
+                    "source": "voicemod_v3"
+                }
+            return {"title": name, "file": dest_wav, "photo": dest_png}
 
         try:
-            # 1. Download e Desencriptação do Áudio
             req = urllib.request.Request(audio_url, headers={"User-Agent": "PulseGamingOptimizer/4.2"})
             with urllib.request.urlopen(req, timeout=12) as resp:
                 raw_enc = resp.read()
 
             dec_ogg = decrypt_voicemod_audio(raw_enc)
 
-            # Grava ficheiro WAV limpo via soundfile para reprodução instantânea
             if _SF_OK:
                 try:
                     data_arr, samplerate = sf.read(io.BytesIO(dec_ogg))
                     sf.write(dest_wav, data_arr, samplerate, subtype="PCM_16")
                 except Exception:
-                    # Fallback gravando o OGG diretamente
                     with open(dest_wav.replace(".wav", ".ogg"), "wb") as f:
                         f.write(dec_ogg)
                     dest_wav = dest_wav.replace(".wav", ".ogg")
@@ -438,24 +440,29 @@ def import_voicemod_v3_catalog(user_name):
                     f.write(dec_ogg)
                 dest_wav = dest_wav.replace(".wav", ".ogg")
 
-            # 2. Download e Gravação da IMAGEM ORIGINAL
             if icon_url:
                 save_image_from_bytes_or_url(icon_url, dest_png, fallback_title=name)
             else:
                 generate_sound_icon(dest_png, name)
 
-            # 3. Registo de metadados
             fn = os.path.basename(dest_wav)
-            meta[fn] = {
-                "title": name,
-                "icon": os.path.basename(dest_png),
-                "source": "voicemod_v3"
-            }
+            with meta_lock:
+                meta[fn] = {
+                    "title": name,
+                    "icon": os.path.basename(dest_png),
+                    "source": "voicemod_v3"
+                }
 
-            imported_count += 1
-            imported_list.append({"title": name, "file": dest_wav, "photo": dest_png})
+            return {"title": name, "file": dest_wav, "photo": dest_png}
         except Exception:
-            continue
+            return None
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(_process_item, item) for item in sounds_data]
+        for f in concurrent.futures.as_completed(futures):
+            res = f.result()
+            if res:
+                imported_list.append(res)
 
     # Guarda o ficheiro de metadados consolidado
     try:
@@ -464,6 +471,7 @@ def import_voicemod_v3_catalog(user_name):
     except Exception:
         pass
 
+    imported_count = len(imported_list)
     return {
         "success": imported_count > 0,
         "count": imported_count,
@@ -585,49 +593,111 @@ def import_sounds_from_archive(archive_path, user_name):
             pass
 
 
-def auto_import_voicemod(user_name):
+def import_all_voicemod(user_name):
     """
-    Executa a deteção automática do Voicemod.
-    Primeiro tenta extrair do Voicemod V3 com imagens originais.
-    Se não encontrar, tenta as pastas de ficheiros locais V2.
+    Importa TUDO do Voicemod da pessoa:
+    - Todos os memes e sons da memória ativa e abas (V3)
+    - Todas as IMAGENS ORIGINAIS associadas
+    - Todas as pastas padrão do Voicemod (V2 memes, V3 cache, resources)
+    - Arquivos de som (.v2s, .vmsoundboard, backups zip) em Downloads, Documentos e Desktop
+    - Deduplicação inteligente e limpeza de ficheiros redundantes
     """
-    # 1. Tenta Voicemod V3 (com IMAGENS ORIGINAIS)
-    res_v3 = import_voicemod_v3_catalog(user_name)
-    if res_v3.get("success") and res_v3.get("count", 0) > 0:
-        return res_v3
+    target_dir = os.path.join(accounts.user_dir(user_name), "sounds")
+    os.makedirs(target_dir, exist_ok=True)
 
-    # 2. Se o V3 não respondeu, faz fallback para pastas do V2
-    dirs = get_standard_voicemod_dirs()
-    if not dirs:
-        return {
-            "success": False,
-            "needs_selection": True,
-            "output": "Nenhuma pasta padrão do Voicemod encontrada. Podes selecionar a pasta manualmente com o botão abaixo."
-        }
-
-    total_imported = 0
     all_sounds = []
+    seen_titles = set()
+
+    # 1. Catálogo V3 (memória ativa e cache com fotos originais)
+    try:
+        res_v3 = import_voicemod_v3_catalog(user_name)
+        if res_v3.get("success"):
+            for s in res_v3.get("sounds", []):
+                t = s.get("title", "").strip().lower()
+                if t and t not in seen_titles:
+                    seen_titles.add(t)
+                    all_sounds.append(s)
+    except Exception:
+        pass
+
+    # 2. Pastas padrão do Voicemod (V2 memes, databases, V3 resources)
+    dirs = get_standard_voicemod_dirs()
+    local_app_data = os.environ.get("LOCALAPPDATA", "")
+    if local_app_data:
+        res_dir = os.path.join(local_app_data, "VoicemodV3", "userCache", "resources")
+        if os.path.isdir(res_dir) and res_dir not in dirs:
+            dirs.append(res_dir)
 
     for d in dirs:
-        res = import_sounds_from_directory(d, user_name)
-        if res.get("success") and res.get("count", 0) > 0:
-            total_imported += res["count"]
-            all_sounds.extend(res["sounds"])
+        try:
+            r = import_sounds_from_directory(d, user_name)
+            if r.get("success"):
+                for s in r.get("sounds", []):
+                    t = s.get("title", "").strip().lower()
+                    if t and t not in seen_titles:
+                        seen_titles.add(t)
+                        all_sounds.append(s)
+        except Exception:
+            pass
 
-    if total_imported > 0:
+    # 3. Procura por ficheiros de backup/exportação (.v2s, .vmsoundboard, voicemod*.zip)
+    user_prof = os.environ.get("USERPROFILE", "")
+    if user_prof:
+        check_folders = [
+            os.path.join(user_prof, "Downloads"),
+            os.path.join(user_prof, "Documents"),
+            os.path.join(user_prof, "Desktop")
+        ]
+        for cf in check_folders:
+            if not os.path.isdir(cf):
+                continue
+            for root, _, files in os.walk(cf):
+                for f in files:
+                    fl = f.lower()
+                    if fl.endswith((".v2s", ".vmsoundboard")) or ("voicemod" in fl and fl.endswith(".zip")):
+                        archive_path = os.path.join(root, f)
+                        try:
+                            r = import_sounds_from_archive(archive_path, user_name)
+                            if r.get("success"):
+                                for s in r.get("sounds", []):
+                                    t = s.get("title", "").strip().lower()
+                                    if t and t not in seen_titles:
+                                        seen_titles.add(t)
+                                        all_sounds.append(s)
+                        except Exception:
+                            pass
+                break # apenas topo de cada pasta para máxima velocidade
+
+    # 4. Limpeza de ficheiros .ogg redundantes se já existir .wav correspondente
+    for fn in os.listdir(target_dir):
+        if fn.lower().endswith(".ogg"):
+            stem = os.path.splitext(fn)[0]
+            wav_path = os.path.join(target_dir, stem + ".wav")
+            if os.path.isfile(wav_path):
+                try:
+                    os.remove(os.path.join(target_dir, fn))
+                except Exception:
+                    pass
+
+    total = len(all_sounds)
+    if total > 0:
         return {
             "success": True,
-            "needs_selection": False,
-            "count": total_imported,
+            "count": total,
             "sounds": all_sounds,
-            "output": f"Sucesso! {total_imported} sons do Voicemod foram importados para o Soundboard."
+            "output": f"Sucesso total! {total} sons e memes do Voicemod com IMAGENS ORIGINAIS foram importados para o teu Soundboard."
         }
     else:
         return {
             "success": False,
             "needs_selection": True,
-            "output": "As pastas do Voicemod foram localizadas, mas estavam vazias. Por favor escolhe a pasta onde tens os teus ficheiros de áudio."
+            "output": "Nenhum som encontrado automaticamente no Voicemod. Podes escolher a pasta ou backup manualmente."
         }
+
+
+def auto_import_voicemod(user_name):
+    """Executa a importação completa de todos os sons do Voicemod."""
+    return import_all_voicemod(user_name)
 
 
 def pick_and_import_folder(user_name):

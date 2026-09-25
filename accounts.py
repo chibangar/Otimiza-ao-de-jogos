@@ -131,9 +131,13 @@ def custom_sounds(name):
         except Exception:
             pass
 
-    for fn in sorted(os.listdir(sdir)):
+    seen_stems = set()
+    for fn in sorted(os.listdir(sdir), key=lambda x: (not x.lower().endswith('.wav'), x.lower())):
         if fn.lower().endswith((".mp3", ".wav", ".ogg", ".flac")):
             stem = os.path.splitext(fn)[0]
+            if stem.lower() in seen_stems:
+                continue
+            seen_stems.add(stem.lower())
             sid = "u_" + stem
             
             photo = ""

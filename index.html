@@ -103,7 +103,12 @@
         <span class="nav-active-dot"></span>
       </button>
 
-      <div class="nav-section">Sistema &amp; Comunidade</div>
+      <div class="nav-section">Softwares &amp; Sistema</div>
+      <button class="nav-btn" data-page="softwares">
+        <span data-icon="softwares"></span>
+        <span>Instalador de Apps</span>
+        <span class="nav-active-dot"></span>
+      </button>
       <button class="nav-btn" data-page="online">
         <span data-icon="online"></span>
         <span>Online</span>
@@ -761,8 +766,8 @@
           <button class="btn gold" id="btn-cable-out">🎯 Usar Pulse Mic</button>
           <button class="btn ghost" id="btn-brand-audio">✨ Rebatizar</button>
           <button class="btn ghost" id="btn-audio-restart" title="Reinicia o serviço de áudio">↻ Reiniciar Áudio</button>
-          <button class="btn ghost" id="btn-import-voicemod" title="Importar sons do Voicemod">🎙️ Importar Voicemod</button>
-          <button class="btn gold" id="btn-add-sound">＋ Adicionar Som</button>
+          <button class="btn gold" id="btn-import-voicemod" title="Importar todos os sons e memes da tua conta do Voicemod">🎙️ Importar Tudo do Voicemod</button>
+          <button class="btn ghost" id="btn-add-sound">＋ Adicionar Som</button>
         </div>
       </div>
 
@@ -855,6 +860,86 @@
         </div>
       </div>
     </section>
+
+    <!-- PÁGINA 12: INSTALADOR DE SOFTWARES & GESTOR DE PACOTES (WINGET) -->
+    <section class="page" id="page-softwares">
+      <div class="games-head" style="margin-bottom:18px">
+        <div>
+          <h3>📦 Instalador &amp; Gestor de Softwares</h3>
+          <p class="muted">Catálogo completo com 10 categorias e 94 ferramentas essenciais. Instalação e remoção em lote silenciosas via Winget.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn ghost small" id="btn-soft-refresh" title="Atualiza o estado de programas instalados no sistema">↻ Atualizar Estado</button>
+        </div>
+      </div>
+
+      <!-- BARRA DE CONTROLO E SELEÇÃO SUPERIOR -->
+      <div class="card wide soft-control-bar">
+        <div class="soft-top-row">
+          <div class="soft-quick-selects">
+            <span class="soft-select-title">SELEÇÃO:</span>
+            <button class="btn ghost xs" id="btn-soft-sel-all">Selecionar Tudo</button>
+            <button class="btn ghost xs" id="btn-soft-sel-installed">Todos os Instalados</button>
+            <button class="btn ghost xs" id="btn-soft-sel-uninstalled">Todos os Não Instalados</button>
+            <button class="btn ghost xs" id="btn-soft-sel-none">Limpar</button>
+          </div>
+
+          <div class="soft-search-box">
+            <span class="ui-icon" data-icon="search"></span>
+            <input type="text" id="soft-search-input" placeholder="Pesquisar por nome, ID Winget ou descrição..." autocomplete="off">
+            <button class="soft-search-clear" id="btn-soft-search-clear" style="display:none" title="Limpar pesquisa">✕</button>
+          </div>
+        </div>
+
+        <div class="soft-action-row">
+          <div class="soft-stats-badges">
+            <span class="soft-stat-pill"><b id="soft-stat-total">0</b> programas</span>
+            <span class="soft-stat-pill success"><b id="soft-stat-installed">0</b> instalados</span>
+            <span class="soft-stat-pill active"><b id="soft-stat-selected">0</b> selecionados</span>
+          </div>
+
+          <div class="soft-batch-buttons">
+            <button class="btn gold small" id="btn-soft-install-batch" disabled>
+              <span>⬇ Instalar Selecionados (<span id="soft-btn-install-cnt">0</span>)</span>
+            </button>
+            <button class="btn outline small danger" id="btn-soft-uninstall-batch" disabled>
+              <span>🗑 Desinstalar Selecionados (<span id="soft-btn-uninstall-cnt">0</span>)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRESSO EM TEMPO REAL DE INSTALAÇÃO/DESINSTALAÇÃO -->
+      <div class="card wide soft-progress-banner" id="soft-progress-card" style="display:none">
+        <div class="soft-prog-header">
+          <div class="soft-prog-info">
+            <div class="soft-spinner"></div>
+            <div>
+              <b id="soft-prog-title">A processar operação...</b>
+              <p class="muted small" id="soft-prog-sub">Aguarde a conclusão dos comandos silenciosos do Winget...</p>
+            </div>
+          </div>
+          <div>
+            <button class="btn ghost small danger" id="btn-soft-cancel">Parar / Cancelar</button>
+          </div>
+        </div>
+        <div class="soft-prog-track">
+          <div class="soft-prog-bar" id="soft-prog-fill" style="width:0%"></div>
+        </div>
+        <div class="soft-prog-meta">
+          <span id="soft-prog-step">Passo 0 de 0</span>
+          <span id="soft-prog-pct">0%</span>
+        </div>
+      </div>
+
+      <!-- GRELHA DAS 10 CATEGORIAS DE SOFTWARE -->
+      <div class="soft-categories-container" id="soft-categories-grid">
+        <div class="soft-loading-placeholder">
+          <div class="soft-spinner"></div>
+          <p>A detetar programas instalados e a compilar catálogo do Windows...</p>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -944,21 +1029,21 @@
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
       <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:24px;flex-shrink:0;box-shadow:0 0 25px var(--accent-glow)">🎙️</div>
       <div>
-        <h3 style="margin:0;font-size:18px;color:#fff">Importar Sons do Voicemod</h3>
-        <p class="muted small" style="margin:2px 0 0 0">Transfere toda a tua coleção de memes e áudios para o Pulse Soundboard.</p>
+        <h3 style="margin:0;font-size:18px;color:#fff">Importar Tudo do Voicemod</h3>
+        <p class="muted small" style="margin:2px 0 0 0">Transfere todos os sons, memes, abas e fotografias originais da tua conta para o Soundboard.</p>
       </div>
     </div>
     
     <div style="background:var(--card-sub);padding:14px;border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:16px;font-size:12.5px;color:var(--text-dim);line-height:1.55">
-      💡 Suporta deteção automática do Voicemod V2/V3 (pasta <code>memes</code>, ficheiros <code>.dat</code> descodificados, nomes de <code>memeSearch.db</code>), pastas locais e backups <code>.zip</code>.
+      💡 <b>Varredura Completa:</b> Extrai automaticamente todos os sons e memes da memória ativa do Voicemod, abas guardadas, fotografias originais em alta definição e pastas locais de áudio.
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="btn gold" id="btn-vm-auto" style="justify-content:flex-start;padding:13px 16px;text-align:left;height:auto">
-        <span style="font-size:20px;margin-right:12px">⚡</span>
+      <button class="btn gold" id="btn-vm-auto" style="justify-content:flex-start;padding:14px 16px;text-align:left;height:auto;box-shadow:0 0 20px rgba(0,229,255,0.25)">
+        <span style="font-size:22px;margin-right:12px">⚡</span>
         <div>
-          <b style="display:block;font-size:13.5px">Deteção Automática do Voicemod</b>
-          <span style="font-size:11.5px;opacity:0.85;display:block">Procurar pastas padrão (%LocalAppData%\Voicemod\memes) e importar tudo</span>
+          <b style="display:block;font-size:14px;color:#fff">Importar TUDO Automaticamente (Recomendado)</b>
+          <span style="font-size:11.5px;opacity:0.9;display:block">Varre a memória ativa, todas as abas, imagens originais de cada meme e pastas locais</span>
         </div>
       </button>
 
