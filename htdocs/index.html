@@ -3,37 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulse Gaming Optimizer — Suite Profissional de Alta Performance para Jogos</title>
+  <title>Pulse Gaming Optimizer — Suite 3D de Alta Performance &amp; Baixa Latência</title>
   
-  <meta name="description" content="Pulse Gaming Optimizer é a suite definitiva para jogos competitivos: Otimização DPC de baixa latência, Soundboard integrado com importador Voicemod com imagens originais, Telemetria circular e miras dos pros. 100% VAC-Safe.">
-  <meta name="keywords" content="pulse gaming optimizer, otimizador de jogos, cs2 boost, valorant fps, soundboard voicemod, otimizar windows para jogos, dpc latency">
+  <meta name="description" content="Pulse Gaming Optimizer é a suite definitiva para jogos competitivos: Otimização DPC de baixa latência, Soundboard integrado com importador Voicemod com fotos originais, novo Instalador de Softwares com 10 categorias e telemetria 3D. 100% VAC-Safe.">
+  <meta name="keywords" content="pulse gaming optimizer, otimizador de jogos, cs2 boost, valorant fps, soundboard voicemod, software installer winget, dpc latency">
   <meta name="author" content="Pulse Gaming Team">
-  <meta name="theme-color" content="#06080f">
+  <meta name="theme-color" content="#040509">
   
-  <!-- Open Graph / Redes Sociais -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Pulse Gaming Optimizer — Otimização Extrema & Soundboard">
-  <meta property="og:description" content="Ganha mais FPS, reduz o input lag e desfruta da suite definitiva com Soundboard Voicemod com imagens originais. 100% VAC-Safe e Grátis.">
+  <meta property="og:title" content="Pulse Gaming Optimizer — Suite 3D de Alta Performance">
+  <meta property="og:description" content="Ganha mais FPS, reduz o input lag e desfruta da suite definitiva com Soundboard Voicemod e Instalador de 94 Softwares. 100% VAC-Safe e Grátis.">
   <meta property="og:image" content="assets/logo.png">
   <meta property="og:url" content="https://github.com/chibangar/Otimiza-ao-de-jogos">
   
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js 3D WebGL Library (Local) -->
+  <script src="assets/three.min.js"></script>
 </head>
 <body>
-  <!-- Canvas de Partículas Interativas Cyberpunk -->
+  <!-- Fundo Cyberpunk com Grelha 3D e Brilhos -->
+  <div class="cyber-grid-bg"></div>
   <canvas id="particle-canvas"></canvas>
 
-  <!-- Luzes de Ambiente de Fundo -->
   <div class="ambient-glow cyan"></div>
   <div class="ambient-glow purple"></div>
   <div class="ambient-glow gold"></div>
 
-  <!-- Barra de Navegação -->
+  <!-- HUD Top Bar & Navegação -->
   <header class="navbar" id="navbar">
     <div class="nav-container">
       <a href="#hero" class="brand">
@@ -42,30 +45,39 @@
           <div class="logo-pulse-ring"></div>
         </div>
         <div class="brand-text">
-          <span class="brand-title">PULSE</span>
-          <span class="brand-sub">GAMING OPTIMIZER</span>
+          <span class="brand-title">PULSE<span class="brand-dot">.</span></span>
+          <span class="brand-sub">GAMING OPTIMIZER // 4.3</span>
         </div>
       </a>
 
       <nav class="nav-menu" id="nav-menu">
-        <a href="#features" class="nav-link">Funcionalidades</a>
-        <a href="#soundboard" class="nav-link">Soundboard & Voicemod</a>
-        <a href="#telemetry" class="nav-link">Telemetria</a>
-        <a href="#benchmarks" class="nav-link">Desempenho</a>
-        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#hero" class="nav-link"><span class="nav-idx">[01]</span> Visão Geral</a>
+        <a href="#benchmarks" class="nav-link"><span class="nav-idx">[02]</span> Benchmarks 3D</a>
+        <a href="#soundboard" class="nav-link"><span class="nav-idx">[03]</span> Soundboard Voicemod</a>
+        <a href="#softwares" class="nav-link"><span class="nav-idx">[04]</span> Instalador de Apps</a>
+        <a href="#features" class="nav-link"><span class="nav-idx">[05]</span> Tecnologia</a>
+        <a href="#faq" class="nav-link"><span class="nav-idx">[06]</span> FAQ</a>
       </nav>
 
       <div class="nav-actions">
-        <a href="https://github.com/chibangar/Otimiza-ao-de-jogos" target="_blank" rel="noopener" class="btn-github" title="Ver código no GitHub">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <!-- Botão de Efeitos Sonoros Web Audio -->
+        <button class="btn-sfx-toggle" id="btn-sfx-toggle" title="Ativar / Desativar Efeitos Sonoros Sintetizados">
+          <span class="sfx-icon">🔊</span>
+          <span class="sfx-text">SFX ATIVO</span>
+        </button>
+
+        <a href="https://github.com/chibangar/Otimiza-ao-de-jogos" target="_blank" rel="noopener" class="btn-github" title="Repositório no GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
           <span>GitHub</span>
         </a>
+        
         <a href="#download" class="btn-primary pulse-btn">
           <span class="btn-glow"></span>
           <span class="btn-text">⚡ Download v4.3.0</span>
         </a>
+
         <button class="nav-toggle" id="nav-toggle" aria-label="Abrir Menu">
           <span></span><span></span><span></span>
         </button>
@@ -73,127 +85,175 @@
     </div>
   </header>
 
-  <!-- Secção Hero -->
+  <!-- SECÇÃO HERO 3D INTERATIVA -->
   <section class="hero" id="hero">
     <div class="hero-container">
+      <!-- Coluna da Esquerda: Textos & CTAs -->
       <div class="hero-content">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          <span>VERSÃO 4.3.0 OFICIAL LANÇADA</span>
+          <span>SYS_TELEMETRY // V4.3.0 DISPONÍVEL</span>
           <span class="badge-tag">100% VAC-SAFE</span>
         </div>
 
         <h1 class="hero-title">
-          Eleva o Teu Jogo ao <span class="gradient-text">Limite da Performance</span>
+          DOMINA A ARENA COM <span class="gradient-text">PERFORMANCE 3D PURA</span>
         </h1>
 
         <p class="hero-desc">
-          A suite definitiva para esports e gaming competitivo: Otimização de baixa latência DPC, telemetria circular SVG em tempo real, <b>Instalador &amp; Gestor de Softwares com 10 categorias</b>, Soundboard integrado com fotos originais do Voicemod e auto-update 100% autónomo.
+          A suite de engenharia desportiva para gaming competitivo: Otimização de baixa latência DPC (0.05ms), <b>novo Instalador de Softwares com 10 categorias e 94 ferramentas</b>, Soundboard com capas e fotos originais do Voicemod e auto-update transparente.
         </p>
 
         <div class="hero-cta">
           <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer.exe" class="btn-hero-primary" id="btn-download-primary">
             <div class="btn-icon">⚡</div>
             <div class="btn-label-group">
-              <span class="btn-label-top">Descarregar Agora Grátis</span>
-              <span class="btn-label-bottom">PulseOptimizer.exe • Windows 10/11 x64</span>
+              <span class="btn-label-top">Descarregar PulseOptimizer.exe</span>
+              <span class="btn-label-bottom">Windows 10/11 x64 • Versão Oficial 4.3.0</span>
             </div>
           </a>
 
           <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer-Windows-x64.zip" class="btn-hero-secondary">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            <span>Pacote ZIP Portátil</span>
+            <span>Pacote .ZIP Portátil</span>
           </a>
         </div>
 
+        <!-- Estatísticas Rápidas do Sistema -->
         <div class="hero-stats">
-          <div class="stat-pill">
+          <div class="stat-pill" data-tilt>
             <span class="stat-val">+42%</span>
             <span class="stat-desc">Estabilidade FPS</span>
           </div>
-          <div class="stat-pill">
-            <span class="stat-val">-35ms</span>
-            <span class="stat-desc">Latência de Sistema</span>
+          <div class="stat-pill" data-tilt>
+            <span class="stat-val">0.05ms</span>
+            <span class="stat-desc">Latência DPC</span>
           </div>
-          <div class="stat-pill">
+          <div class="stat-pill" data-tilt>
             <span class="stat-val">1000Hz</span>
-            <span class="stat-desc">Polling Otimizado</span>
+            <span class="stat-desc">Polling Timer</span>
           </div>
-          <div class="stat-pill">
+          <div class="stat-pill" data-tilt>
             <span class="stat-val">0 Bans</span>
             <span class="stat-desc">Anti-Cheat Seguro</span>
           </div>
         </div>
       </div>
 
-      <!-- Mockup Interativo 3D do App HUD -->
+      <!-- Coluna da Direita: VISUALIZADOR 3D WEBGL INTERATIVO COM MOUSE PARALLAX -->
       <div class="hero-preview-wrapper" id="hero-preview">
         <div class="mockup-card glass-panel" id="mockup-tilt">
+          <!-- Cabeçalho do HUD 3D -->
           <div class="mockup-header">
             <div class="mockup-dots">
               <span class="dot red"></span>
               <span class="dot yellow"></span>
               <span class="dot green"></span>
             </div>
-            <div class="mockup-title">⚡ PULSE GAMING OPTIMIZER v4.3.0 — DASHBOARD</div>
+            <div class="mockup-title">
+              <span class="hud-tag">WEBGL 3D</span>
+              <span id="hero-hud-title">NÚCLEO QUÂNTICO GPU // TELEMETRIA HOLOGRÁFICA</span>
+            </div>
             <div class="mockup-status">
               <span class="status-indicator"></span>
-              <span>ONLINE</span>
+              <span id="hero-fps-counter">60.0 FPS</span>
             </div>
+          </div>
+
+          <!-- Abas para Alternar entre o Núcleo 3D e o Mockup da Aplicação -->
+          <div class="hero-view-tabs">
+            <button class="view-tab active" data-view="3d-core">
+              <span class="tab-icon">🔮</span>
+              <span>Núcleo 3D Interativo</span>
+            </button>
+            <button class="view-tab" data-view="app-hud">
+              <span class="tab-icon">🖥️</span>
+              <span>App HUD &amp; Reator</span>
+            </button>
+            <button class="view-tab" data-view="live-gauges">
+              <span class="tab-icon">📊</span>
+              <span>Telemetria SVG</span>
+            </button>
           </div>
 
           <div class="mockup-body">
-            <!-- Reator Orbital Interativo -->
-            <div class="reactor-preview-box">
-              <div class="orbital-reactor-hud" id="demo-reactor">
-                <div class="reactor-ring ring-1"></div>
-                <div class="reactor-ring ring-2"></div>
-                <div class="reactor-ring ring-3"></div>
-                <div class="reactor-center-btn">
-                  <div class="reactor-icon">⚡</div>
-                  <div class="reactor-label" id="reactor-text">MODO TURBO</div>
-                  <div class="reactor-state" id="reactor-sub">CLICA PARA TESTAR</div>
+            <!-- VISTA 1: Canvas 3D WebGL Real (Three.js) -->
+            <div class="view-panel active" id="panel-3d-core">
+              <div class="webgl-canvas-container" id="webgl-container">
+                <canvas id="webgl-hero-canvas"></canvas>
+                
+                <!-- HUD de Mira e Coordenadas em Cima do 3D -->
+                <div class="hud-overlay-reticles">
+                  <div class="corner-bracket top-left"></div>
+                  <div class="corner-bracket top-right"></div>
+                  <div class="corner-bracket bottom-left"></div>
+                  <div class="corner-bracket bottom-right"></div>
+                  <div class="hud-coord-text" id="hud-coord-display">PITCH: +0.0° // YAW: +0.0°</div>
+                  <div class="hud-energy-status">
+                    <span class="energy-dot"></span>
+                    <span id="hud-core-status">ESTADO: PRONTO • CLICA PARA CARREGAR</span>
+                  </div>
                 </div>
               </div>
-              <p class="reactor-hint">⚡ Clica no reator para simular a injeção instantânea de FPS</p>
+              <p class="reactor-hint">⚡ <b>Interação Física 3D:</b> Move o rato para rodar o núcleo. Clica no reator para libertar uma onda de choque de energia!</p>
             </div>
 
-            <!-- Mini Telemetria SVG -->
-            <div class="telemetry-grid-preview">
-              <div class="mini-gauge-card">
-                <div class="gauge-svg-wrap">
-                  <svg viewBox="0 0 100 100" class="mini-gauge">
-                    <circle cx="50" cy="50" r="40" class="gauge-track"/>
-                    <circle cx="50" cy="50" r="40" class="gauge-bar cyan" id="demo-gauge-cpu" style="stroke-dashoffset: 65;"/>
-                  </svg>
-                  <span class="gauge-number" id="val-cpu">24%</span>
+            <!-- VISTA 2: Mockup do Reator Orbital da Aplicação -->
+            <div class="view-panel" id="panel-app-hud" style="display:none">
+              <div class="reactor-preview-box">
+                <div class="orbital-reactor-hud" id="demo-reactor">
+                  <div class="reactor-ring ring-1"></div>
+                  <div class="reactor-ring ring-2"></div>
+                  <div class="reactor-ring ring-3"></div>
+                  <div class="reactor-center-btn">
+                    <div class="reactor-icon">⚡</div>
+                    <div class="reactor-label" id="reactor-text">MODO TURBO</div>
+                    <div class="reactor-state" id="reactor-sub">CLICA PARA ATIVAR</div>
+                  </div>
                 </div>
-                <span class="gauge-label">CPU LOAD</span>
+                <p class="reactor-hint">⚡ Clica no reator para simular a injeção instantânea de FPS no jogo ativo</p>
               </div>
+            </div>
 
-              <div class="mini-gauge-card">
-                <div class="gauge-svg-wrap">
-                  <svg viewBox="0 0 100 100" class="mini-gauge">
-                    <circle cx="50" cy="50" r="40" class="gauge-track"/>
-                    <circle cx="50" cy="50" r="40" class="gauge-bar purple" id="demo-gauge-gpu" style="stroke-dashoffset: 45;"/>
-                  </svg>
-                  <span class="gauge-number" id="val-gpu">38%</span>
+            <!-- VISTA 3: Telemetria Circular SVG de Alta Resolução -->
+            <div class="view-panel" id="panel-live-gauges" style="display:none">
+              <div class="telemetry-grid-preview">
+                <div class="mini-gauge-card">
+                  <div class="gauge-svg-wrap">
+                    <svg viewBox="0 0 100 100" class="mini-gauge">
+                      <circle cx="50" cy="50" r="40" class="gauge-track"/>
+                      <circle cx="50" cy="50" r="40" class="gauge-bar cyan" id="demo-gauge-cpu" style="stroke-dashoffset: 65;"/>
+                    </svg>
+                    <span class="gauge-number" id="val-cpu">24%</span>
+                  </div>
+                  <span class="gauge-label">CPU LOAD</span>
                 </div>
-                <span class="gauge-label">GPU RTX 5080</span>
-              </div>
 
-              <div class="mini-gauge-card">
-                <div class="gauge-svg-wrap">
-                  <svg viewBox="0 0 100 100" class="mini-gauge">
-                    <circle cx="50" cy="50" r="40" class="gauge-track"/>
-                    <circle cx="50" cy="50" r="40" class="gauge-bar gold" id="demo-gauge-ram" style="stroke-dashoffset: 95;"/>
-                  </svg>
-                  <span class="gauge-number" id="val-ram">4.1 GB</span>
+                <div class="mini-gauge-card">
+                  <div class="gauge-svg-wrap">
+                    <svg viewBox="0 0 100 100" class="mini-gauge">
+                      <circle cx="50" cy="50" r="40" class="gauge-track"/>
+                      <circle cx="50" cy="50" r="40" class="gauge-bar purple" id="demo-gauge-gpu" style="stroke-dashoffset: 45;"/>
+                    </svg>
+                    <span class="gauge-number" id="val-gpu">38%</span>
+                  </div>
+                  <span class="gauge-label">GPU RTX 5080</span>
                 </div>
-                <span class="gauge-label">RAM DISPONÍVEL</span>
+
+                <div class="mini-gauge-card">
+                  <div class="gauge-svg-wrap">
+                    <svg viewBox="0 0 100 100" class="mini-gauge">
+                      <circle cx="50" cy="50" r="40" class="gauge-track"/>
+                      <circle cx="50" cy="50" r="40" class="gauge-bar gold" id="demo-gauge-ram" style="stroke-dashoffset: 95;"/>
+                    </svg>
+                    <span class="gauge-number" id="val-ram">4.1 GB</span>
+                  </div>
+                  <span class="gauge-label">RAM DISPONÍVEL</span>
+                </div>
               </div>
+              <p class="reactor-hint">📊 Medidores circulares de precisão que não consomem mais de 0.1% de CPU</p>
             </div>
           </div>
         </div>
@@ -201,271 +261,335 @@
     </div>
   </section>
 
-  <!-- Secção de Funcionalidades Principais -->
-  <section class="section features" id="features">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">TECNOLOGIA DE PONTA</span>
-        <h2 class="section-title">Construído para a Competição de Alta Precisão</h2>
-        <p class="section-desc">Cada módulo do Pulse Gaming Optimizer foi desenvolvido para remover atritos, garantir fluidez absoluta e manter o controlo nas tuas mãos.</p>
-      </div>
-
-      <div class="features-grid">
-        <!-- Card 1: Reator de Boost -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon cyan">⚡</div>
-          <h3 class="feature-heading">Reator Orbital de Boost</h3>
-          <p class="feature-text">Ativa o Modo Competitivo com 1 clique. Otimiza timers de sistema (0.5ms resolution), purga cache de memória em standby e prioriza fios de CPU para o teu jogo.</p>
-          <div class="feature-tag">LATÊNCIA ULTRA-BAIXA</div>
-        </div>
-
-        <!-- Card 2: Soundboard & Voicemod -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon purple">🎙️</div>
-          <h3 class="feature-heading">Soundboard & Importador Voicemod</h3>
-          <p class="feature-text">Importa instantaneamente toda a biblioteca de sons do Voicemod com as suas <b>fotos e capas originais</b>. Descodificação automática de ficheiros cifrados OGG Opus/WAV.</p>
-          <div class="feature-tag">COM CAPAS ORIGINAIS</div>
-        </div>
-
-        <!-- Card 3: Telemetria Circular SVG -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon gold">📊</div>
-          <h3 class="feature-heading">Telemetria Circular SVG</h3>
-          <p class="feature-text">Monitorização visual com anéis circulares vetoriais para CPU, GPU, RAM e Disco. Desenvolvido para consumir menos de 0.1% de processamento em segundo plano.</p>
-          <div class="feature-tag">ZERO CONSUMO</div>
-        </div>
-
-        <!-- Card 4: Miras e Viewmodels CS2 -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon red">🎯</div>
-          <h3 class="feature-heading">Perfis de Miras & Viewmodels CS2</h3>
-          <p class="feature-text">Acede às miras dos melhores pros do mundo (s1mple, NiKo, donk, m0NESY, ZywOo) com códigos de partilha oficiais e comandos de consola prontos a aplicar.</p>
-          <div class="feature-tag">ESPORTS PROS</div>
-        </div>
-
-        <!-- Card 5: 100% VAC-Safe -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon green">🛡️</div>
-          <h3 class="feature-heading">100% VAC-Safe & Seguro</h3>
-          <p class="feature-text">Sem injeção de DLLs, sem cheats e sem alterações permanentes destrutivas. Totalmente compatível e seguro com VAC, FaceIt AC, Riot Vanguard e EasyAntiCheat.</p>
-          <div class="feature-tag">ANTI-CHEAT APROVADO</div>
-        </div>
-
-        <!-- Card 6: Auto-Update Autónomo -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon blue">🔄</div>
-          <h3 class="feature-heading">Reinício & Arranque Automático</h3>
-          <p class="feature-text">Atualizações suaves sem intervenção manual. Ao atualizar, a aplicação fecha a versão antiga, substitui os ficheiros de forma atómica e reinicia-se sozinha.</p>
-          <div class="feature-tag">ATUALIZAÇÃO SEM ATRITO</div>
-        </div>
-
-        <!-- Card 7: Instalador de Softwares Winget -->
-        <div class="feature-card glass-panel" data-tilt>
-          <div class="feature-icon purple">📦</div>
-          <h3 class="feature-heading">Instalador &amp; Gestor de Apps</h3>
-          <p class="feature-text">Grelha completa estilo WinUtil com 10 categorias e 94 ferramentas essenciais (Dev, Jogos, Navegadores, Runtimes). Deteção via Registo e instalação silenciosa em lote via Winget.</p>
-          <div class="feature-tag">10 CATEGORIAS • 94 APPS</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Secção Soundboard & Voicemod Interativo -->
-  <section class="section soundboard-section" id="soundboard">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-tag">DIVERSÃO & MEMES EM JOGO</span>
-        <h2 class="section-title">O Teu Soundboard Completo com Capas Originais</h2>
-        <p class="section-desc">Testa agora mesmo o reprodutor de sons diretamente no browser. No Pulse Optimizer, todas as fotos e memes originais da tua aba do Voicemod são transferidos com fidelidade máxima.</p>
-      </div>
-
-      <div class="soundboard-demo-box glass-panel">
-        <div class="sb-demo-header">
-          <div class="sb-tab-badge">
-            <span class="sb-tab-icon">🎙️</span>
-            <span>Aba: My first soundboard (Voicemod Importado)</span>
-          </div>
-          <div class="sb-tip">⚡ Clica num meme para ouvir a demonstração de áudio interativo</div>
-        </div>
-
-        <div class="sound-grid-demo" id="demo-sound-grid">
-          <!-- Item 1: Kalinka -->
-          <div class="sound-card-demo" data-sound="kalinka">
-            <div class="sound-img-wrap">
-              <div class="sound-emoji-badge">🇷🇺</div>
-              <div class="sound-wave-bars">
-                <span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-            <span class="sound-name">Kalinka mix (russia)</span>
-            <span class="sound-status">▶ Tocar Som</span>
-          </div>
-
-          <!-- Item 2: Mario Jump -->
-          <div class="sound-card-demo" data-sound="mario">
-            <div class="sound-img-wrap">
-              <div class="sound-emoji-badge">🍄</div>
-              <div class="sound-wave-bars">
-                <span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-            <span class="sound-name">Mario64 - Jump</span>
-            <span class="sound-status">▶ Tocar Som</span>
-          </div>
-
-          <!-- Item 3: OMG WOW -->
-          <div class="sound-card-demo" data-sound="wow">
-            <div class="sound-img-wrap">
-              <div class="sound-emoji-badge">😲</div>
-              <div class="sound-wave-bars">
-                <span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-            <span class="sound-name">OMG WOW</span>
-            <span class="sound-status">▶ Tocar Som</span>
-          </div>
-
-          <!-- Item 4: Acelerada -->
-          <div class="sound-card-demo" data-sound="horn">
-            <div class="sound-img-wrap">
-              <div class="sound-emoji-badge">🎺</div>
-              <div class="sound-wave-bars">
-                <span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-            <span class="sound-name">Acelerada MLG Horn</span>
-            <span class="sound-status">▶ Tocar Som</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Secção de Telemetria & Temas -->
-  <section class="section telemetry-section" id="telemetry">
-    <div class="section-container">
-      <div class="telemetry-showcase-split">
-        <div class="split-text">
-          <span class="section-tag">DARK GAMING HUD 2.0</span>
-          <h2 class="section-title">4 Atmosferas Visuais Selecionáveis</h2>
-          <p class="section-desc">Personaliza a tua interface de acordo com a tua batalha e estética do teu setup. Cada tema altera o esquema de cores, a iluminação dos medidores circulares e a aura do reator.</p>
-
-          <div class="theme-picker-demo">
-            <button class="theme-pill active" data-theme="midnight">☾ WoW Midnight (Roxo/Ouro)</button>
-            <button class="theme-pill" data-theme="blaze">◉ CS2 Blaze (Laranja/Âmbar)</button>
-            <button class="theme-pill" data-theme="specops">★ COD SpecOps (Verde Militar)</button>
-            <button class="theme-pill" data-theme="frost">❄ Titanium Frost (Azul Glacial)</button>
-          </div>
-
-          <div class="theme-features-list">
-            <div class="tf-item">✔ Efeitos glassmorphism com vidro fumado escuro</div>
-            <div class="tf-item">✔ Animações pausadas automaticamente durante o jogo</div>
-            <div class="tf-item">✔ Sem perda de performance na GPU ou CPU</div>
-          </div>
-        </div>
-
-        <div class="split-preview">
-          <div class="telemetry-interactive-card glass-panel" id="telemetry-hud-card">
-            <div class="hud-card-top">
-              <span class="hud-indicator active"></span>
-              <span class="hud-title-theme" id="theme-active-title">WoW Midnight Active</span>
-            </div>
-            <div class="hud-rings-row">
-              <div class="hud-ring-item">
-                <div class="hud-circle-wrap">
-                  <svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" class="hud-bg"/>
-                    <circle cx="50" cy="50" r="42" class="hud-val c-accent" style="stroke-dashoffset: 70;"/>
-                  </svg>
-                  <span class="hud-num">1.2ms</span>
-                </div>
-                <span class="hud-desc">DPC Latency</span>
-              </div>
-              <div class="hud-ring-item">
-                <div class="hud-circle-wrap">
-                  <svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" class="hud-bg"/>
-                    <circle cx="50" cy="50" r="42" class="hud-val c-purple" style="stroke-dashoffset: 35;"/>
-                  </svg>
-                  <span class="hud-num">480 FPS</span>
-                </div>
-                <span class="hud-desc">Framerate CS2</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Secção de Benchmarks e Comparação -->
+  <!-- SECÇÃO 2: BENCHMARK 3D INTERATIVO & SIMULADOR DE FRAMETIMES -->
   <section class="section benchmarks" id="benchmarks">
     <div class="section-container">
       <div class="section-header">
-        <span class="section-tag">COMPROVADO EM TESTES</span>
-        <h2 class="section-title">Resultados de Performance no Jogo</h2>
-        <p class="section-desc">Comparação direta antes e depois da otimização com o Pulse Gaming Optimizer em máquinas de competição.</p>
+        <span class="section-tag">SIMULAÇÃO EM TEMPO REAL</span>
+        <h2 class="section-title">Comparação 3D de Frametimes &amp; Latência</h2>
+        <p class="section-desc">Vê a diferença prática entre o Windows padrão e a estabilidade proporcionada pelo Pulse Gaming Optimizer.</p>
       </div>
 
-      <div class="benchmark-table-wrap glass-panel">
-        <table class="benchmark-table">
-          <thead>
-            <tr>
-              <th>Métrica / Teste de Sistema</th>
-              <th>Padrão do Windows</th>
-              <th>Com Pulse Gaming Optimizer</th>
-              <th>Melhoria Real</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>Latência de DPC (Input Delay)</b></td>
-              <td class="bad">845 µs</td>
-              <td class="good">120 µs</td>
-              <td class="highlight">-85% Latência</td>
-            </tr>
-            <tr>
-              <td><b>CS2 Framerate Médio (1080p Comp)</b></td>
-              <td>310 FPS</td>
-              <td class="good">385 FPS</td>
-              <td class="highlight">+75 FPS (+24%)</td>
-            </tr>
-            <tr>
-              <td><b>1% Low FPS (Quedas Bruscas)</b></td>
-              <td class="bad">145 FPS</td>
-              <td class="good">230 FPS</td>
-              <td class="highlight">+58% Estabilidade</td>
-            </tr>
-            <tr>
-              <td><b>Consumo de RAM em Idle</b></td>
-              <td>5.8 GB</td>
-              <td class="good">3.9 GB</td>
-              <td class="highlight">-1.9 GB Libertados</td>
-            </tr>
-            <tr>
-              <td><b>Tickrate Hitreg (Tiros no Alvo)</b></td>
-              <td>Desalinhado</td>
-              <td class="good">Sub-Tick Sincronizado</td>
-              <td class="highlight">100% Consistente</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Caixa Interativa com Seletor de Jogo -->
+      <div class="benchmark-interactive-box glass-panel" data-tilt>
+        <div class="bench-top-bar">
+          <div class="bench-game-tabs">
+            <button class="bench-tab active" data-game="cs2">
+              <span class="bench-icon">🎯</span> Counter-Strike 2
+            </button>
+            <button class="bench-tab" data-game="cod">
+              <span class="bench-icon">★</span> Call of Duty: Warzone
+            </button>
+            <button class="bench-tab" data-game="wow">
+              <span class="bench-icon">⚔️</span> World of Warcraft
+            </button>
+          </div>
+
+          <!-- Modo Normal vs Modo Pulse Turbo -->
+          <div class="bench-toggle-wrap">
+            <span class="bench-toggle-lbl">PERFIL ATIVO:</span>
+            <div class="bench-mode-switch">
+              <button class="mode-btn" id="btn-mode-stock">Windows Padrão</button>
+              <button class="mode-btn active" id="btn-mode-pulse">⚡ Pulse Turbo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner com a imagem real do jogo selecionado -->
+        <div class="bench-game-backdrop" id="bench-backdrop" style="background-image: url('assets/games/cs2.jpg');">
+          <div class="bench-backdrop-tint"></div>
+          <div class="bench-backdrop-info">
+            <h3 id="bench-game-title">COUNTER-STRIKE 2 — COMPETITIVO 1080P</h3>
+            <p id="bench-game-desc">Sub-Tick Aligned • NVIDIA Reflex Boost • Latência DPC 0.05ms • Zero Stuttering</p>
+          </div>
+        </div>
+
+        <!-- Gráfico Animado de Frametimes (Canvas) -->
+        <div class="bench-graph-wrapper">
+          <div class="graph-legend">
+            <div class="legend-item"><span class="legend-color cyan"></span><span>Curva de Frametime (ms por frame)</span></div>
+            <div class="legend-item"><span class="legend-color red"></span><span>Picos de Stuttering (Windows Padrão)</span></div>
+            <div class="legend-state" id="graph-state-label">ESTÁVEL // 3.2ms CONSISTENTE</div>
+          </div>
+          <canvas id="frametime-canvas" width="900" height="220"></canvas>
+        </div>
+
+        <!-- Grelha de Métricas em Tempo Real -->
+        <div class="bench-metrics-grid">
+          <div class="metric-card">
+            <span class="metric-label">FRAMES POR SEGUNDO (FPS)</span>
+            <b class="metric-val" id="m-fps">385 FPS</b>
+            <small class="metric-gain" id="m-fps-gain">+75 FPS (+24%)</small>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">1% LOWS (ESTABILIDADE)</span>
+            <b class="metric-val" id="m-lows">230 FPS</b>
+            <small class="metric-gain" id="m-lows-gain">+58% Fluidez</small>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">LATÊNCIA DPC DE ENTRADA</span>
+            <b class="metric-val" id="m-dpc">0.08 ms</b>
+            <small class="metric-gain" id="m-dpc-gain">-85% Input Lag</small>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">TIMERS DE SISTEMA</span>
+            <b class="metric-val" id="m-timer">0.500 ms</b>
+            <small class="metric-gain" id="m-timer-gain">Resolução Máxima</small>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Secção de Perguntas Frequentes (FAQ) -->
+  <!-- SECÇÃO 3: SOUNDBOARD INTERATIVO COM SONS & FOTOS ORIGINAIS DO VOICEMOD -->
+  <section class="section soundboard-section" id="soundboard">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">TECNOLOGIA EXCLUSIVA VOICEMOD</span>
+        <h2 class="section-title">Soundboard Real com Capas &amp; Fotos Originais</h2>
+        <p class="section-desc">Clica em qualquer meme abaixo para ouvir o som reproduzido e ver o visualizador de frequências de áudio em tempo real!</p>
+      </div>
+
+      <div class="soundboard-demo-box glass-panel" data-tilt>
+        <div class="sb-demo-header">
+          <div class="sb-tab-badge">
+            <span class="sb-tab-icon">🎙️</span>
+            <span>Aba Voicemod: <b>Memes &amp; Gaming Pro</b> (62 Sons Originais Importados)</span>
+          </div>
+          <div class="sb-controls-live">
+            <button class="btn ghost xs" id="btn-sb-stop-all">⏹ Parar Som</button>
+            <span class="sb-tip">⚡ Áudio real com desencriptação Opus/WAV</span>
+          </div>
+        </div>
+
+        <!-- Grelha de Sons com Fotos Originais -->
+        <div class="sound-grid-real" id="sound-grid-real">
+          <!-- Item 1: MLG Air Horn -->
+          <div class="real-sound-card" data-audio="assets/sounds/mlg-air-horn.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/mlg-air-horn.png" alt="MLG Air Horn" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">MLG Air Horn</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Vine Boom -->
+          <div class="real-sound-card" data-audio="assets/sounds/vine-boom-sound.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/vine-boom-sound.png" alt="Vine Boom" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">Vine Boom Effect</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 3: GTA San Andreas Passed -->
+          <div class="real-sound-card" data-audio="assets/sounds/gta-sa-mission-passed.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/gta-sa-mission-passed.png" alt="GTA SA Passed" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">GTA SA Mission Passed</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 4: FBI Open Up -->
+          <div class="real-sound-card" data-audio="assets/sounds/fbi-open-up.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/fbi-open-up.png" alt="FBI Open Up" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">FBI Open Up!</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 5: GTA V Wasted -->
+          <div class="real-sound-card" data-audio="assets/sounds/gta-v-wasted.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/gta-v-wasted.png" alt="GTA V Wasted" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">GTA V Wasted</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 6: Goku Drip -->
+          <div class="real-sound-card" data-audio="assets/sounds/goku-drip.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/goku-drip.png" alt="Goku Drip" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">Goku Drip Theme</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 7: Discord Ping -->
+          <div class="real-sound-card" data-audio="assets/sounds/discord-notification.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/discord-notification.png" alt="Discord Ping" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">Discord Notification</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+
+          <!-- Item 8: Windows XP Error -->
+          <div class="real-sound-card" data-audio="assets/sounds/windows-xp-error.mp3">
+            <div class="real-sound-cover-wrap">
+              <img src="assets/sounds/windows-xp-error.png" alt="Windows XP Error" class="real-sound-cover" onerror="this.src='assets/icon.png'">
+              <div class="sound-wave-anim">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="real-sound-meta">
+              <b class="real-sound-title">Windows XP Error</b>
+              <span class="real-sound-status">▶ Clica para Tocar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECÇÃO 4: INSTALADOR DE SOFTWARES (10 CATEGORIAS & 94 APPS) -->
+  <section class="section softwares-section" id="softwares">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">NOVIDADE DA VERSÃO 4.3.0</span>
+        <h2 class="section-title">Instalador &amp; Gestor de Softwares (Winget)</h2>
+        <p class="section-desc">Inspirado na grelha WinUtil de Chris Titus: 10 categorias organizadas com 94 ferramentas essenciais para gaming, programação, multimédia e otimização.</p>
+      </div>
+
+      <div class="software-demo-wrapper glass-panel" data-tilt>
+        <!-- Barra de Abas das Categorias -->
+        <div class="soft-cat-pills" id="soft-pills-bar">
+          <button class="cat-pill active" data-cat="dev">💻 Dev (10)</button>
+          <button class="cat-pill" data-cat="jogos">🎮 Jogos (9)</button>
+          <button class="cat-pill" data-cat="navegadores">🌐 Navegadores (10)</button>
+          <button class="cat-pill" data-cat="imagem">🎨 Imagem (12)</button>
+          <button class="cat-pill" data-cat="discos">💾 Ficheiros (11)</button>
+          <button class="cat-pill" data-cat="docs">📄 Docs (11)</button>
+          <button class="cat-pill" data-cat="runtimes">⚙️ Runtimes (10)</button>
+          <button class="cat-pill" data-cat="seguranca">🛡️ Segurança (7)</button>
+          <button class="cat-pill" data-cat="compressao">🗜️ Compressão (4)</button>
+          <button class="cat-pill" data-cat="personalizacao">🛠️ Tweaks (10)</button>
+        </div>
+
+        <!-- Grelha de Demonstração Interativa -->
+        <div class="soft-cards-preview" id="soft-cards-container">
+          <!-- O JavaScript popula os cartões interativos aqui -->
+        </div>
+
+        <div class="soft-demo-footer">
+          <div class="soft-demo-stats">
+            <span>● <b>94 Ferramentas</b> no catálogo nativo da app</span>
+            <span>● Instalação e desinstalação silenciosa em segundo plano</span>
+            <span>● Deteção via Registo do Windows em menos de 3ms</span>
+          </div>
+          <a href="#download" class="btn-primary small">
+            <span>Experimentar na App Pulse Optimizer</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECÇÃO 5: TECNOLOGIA & ARQUITETURA -->
+  <section class="section features" id="features">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">TECNOLOGIA ESPORTS</span>
+        <h2 class="section-title">Engenharia Desenvolvida para a Vitória</h2>
+        <p class="section-desc">Sem truques de marketing e sem placebo: cada módulo atua diretamente nas camadas de driver, temporização do kernel e prioridades de hardware.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon cyan">⚡</div>
+          <h3 class="feature-heading">Reator Orbital de Boost</h3>
+          <p class="feature-text">Ativa o Modo Competitivo com 1 clique. Otimiza timers de sistema para 0.500ms, purga memória em standby e fixa fios de processamento.</p>
+          <div class="feature-tag">LATÊNCIA 0.05ms</div>
+        </div>
+
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon purple">🎙️</div>
+          <h3 class="feature-heading">Soundboard &amp; Capas Voicemod</h3>
+          <p class="feature-text">Importação completa de sons da biblioteca do Voicemod com fotografias e capas originais em alta definição. Sem ficheiros corrompidos.</p>
+          <div class="feature-tag">COM CAPAS ORIGINAIS</div>
+        </div>
+
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon gold">📊</div>
+          <h3 class="feature-heading">Telemetria Circular SVG</h3>
+          <p class="feature-text">Monitorização visual com anéis circulares vetoriais para CPU, GPU, RAM e Disco. Desenvolvido para consumir menos de 0.1% de CPU.</p>
+          <div class="feature-tag">ZERO OVERHEAD</div>
+        </div>
+
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon red">🎯</div>
+          <h3 class="feature-heading">Miras &amp; Viewmodels dos Pros</h3>
+          <p class="feature-text">Configurações das lendas do CS2 (s1mple, NiKo, donk, m0NESY, ZywOo) aplicadas instantaneamente através de códigos oficiais de partilha.</p>
+          <div class="feature-tag">PRO PLAYERS</div>
+        </div>
+
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon green">🛡️</div>
+          <h3 class="feature-heading">100% VAC-Safe &amp; Anticheat</h3>
+          <p class="feature-text">Totalmente compatível com VAC, FaceIt AC, Riot Vanguard e EasyAntiCheat. Não injeta DLLs na memória dos jogos.</p>
+          <div class="feature-tag">ANTI-CHEAT APROVADO</div>
+        </div>
+
+        <div class="feature-card glass-panel" data-tilt>
+          <div class="feature-icon blue">🔄</div>
+          <h3 class="feature-heading">Reinício &amp; Arranque Automático</h3>
+          <p class="feature-text">Atualizações suaves sem intervenção manual. Ao atualizar, a aplicação fecha a versão antiga, substitui os binários e reinicia-se sozinha.</p>
+          <div class="feature-tag">ATUALIZAÇÃO ATÓMICA</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECÇÃO 6: PERGUNTAS FREQUENTES (FAQ) -->
   <section class="section faq" id="faq">
     <div class="section-container">
       <div class="section-header">
-        <span class="section-tag">TIRA AS TUAS DÚVIDAS</span>
+        <span class="section-tag">ESCLARECIMENTOS</span>
         <h2 class="section-title">Perguntas Frequentes</h2>
       </div>
 
       <div class="faq-accordion">
         <div class="faq-item glass-panel">
           <button class="faq-question">
-            <span>Posso ser banido no Counter-Strike 2, Valorant ou Warzone?</span>
+            <span>Posso ser banido no Counter-Strike 2, Valorant ou Call of Duty?</span>
             <span class="faq-chevron">+</span>
           </button>
           <div class="faq-answer">
@@ -479,37 +603,37 @@
             <span class="faq-chevron">+</span>
           </button>
           <div class="faq-answer">
-            <p>O Pulse Optimizer possui um motor avançado que comunica com a tua biblioteca do Voicemod. Ele extrai os ficheiros de áudio, desencripta-os automaticamente e descarrega as fotografias e capas originais de cada meme, exibindo-os com alta definição no teu Soundboard.</p>
+            <p>O Pulse Optimizer possui um motor avançado que comunica com a biblioteca do teu Voicemod. Ele extrai os ficheiros de áudio, desencripta-os automaticamente e copia as fotografias e capas originais de cada meme, exibindo-os com alta definição no teu Soundboard.</p>
           </div>
         </div>
 
         <div class="faq-item glass-panel">
           <button class="faq-question">
-            <span>A aplicação é gratuita?</span>
+            <span>Como funciona o novo Instalador de Softwares com 10 categorias?</span>
+            <span class="faq-chevron">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Na barra lateral da aplicação encontras a secção <b>Instalador de Apps</b>. Ele verifica instantaneamente o registo do teu Windows para saber o que já tens instalado, permite selecionar dezenas de ferramentas ao mesmo tempo e instala-as ou desinstala-as silenciosamente em lote através do Microsoft Winget.</p>
+          </div>
+        </div>
+
+        <div class="faq-item glass-panel">
+          <button class="faq-question">
+            <span>A aplicação é gratuita e de código aberto?</span>
             <span class="faq-chevron">+</span>
           </button>
           <div class="faq-answer">
             <p>Sim, o Pulse Gaming Optimizer é um projeto de código aberto sob licença MIT. Podes inspecionar o código-fonte, contribuir e descarregar todas as versões gratuitamente através do repositório no GitHub.</p>
           </div>
         </div>
-
-        <div class="faq-item glass-panel">
-          <button class="faq-question">
-            <span>Como funciona o reinício e arranque 100% automático?</span>
-            <span class="faq-chevron">+</span>
-          </button>
-          <div class="faq-answer">
-            <p>Quando é detetada uma nova versão, o Pulse Optimizer faz o download transparente dos ficheiros. Ao concluir, fecha a versão anterior de forma limpa, substitui o executável atomicamente sem erros de arquivo bloqueado e relança a nova versão automaticamente preservando privilégios de Administrador.</p>
-          </div>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- Secção de Download Final (CTA) -->
+  <!-- SECÇÃO DE DOWNLOAD FINAL -->
   <section class="section download-section" id="download">
     <div class="section-container">
-      <div class="download-card glass-panel">
+      <div class="download-card glass-panel" data-tilt>
         <div class="download-badge">VERSÃO OFICIAL v4.3.0 ESTÁVEL</div>
         <h2 class="download-title">Pronto para Dominar os Teus Jogos?</h2>
         <p class="download-subtitle">Descarrega já o Pulse Gaming Optimizer e sente a diferença na primeira partida.</p>
@@ -538,44 +662,27 @@
     </div>
   </section>
 
-  <!-- Rodapé -->
+  <!-- RODAPÉ -->
   <footer class="footer">
     <div class="footer-container">
-      <div class="footer-brand">
-        <img src="assets/logo.png" alt="Pulse Gaming Logo" class="footer-logo">
-        <span class="footer-title">Pulse Gaming Optimizer</span>
-        <p class="footer-desc">A suite open-source concebida para elevar a tua experiência nos jogos competitivos.</p>
+      <div class="footer-left">
+        <div class="brand">
+          <img src="assets/logo.png" alt="Pulse Gaming Logo" class="brand-img" style="width:28px;height:28px">
+          <span class="brand-title">PULSE<span class="brand-dot">.</span></span>
+        </div>
+        <p class="footer-copy">© 2026 Pulse Gaming Optimizer. Desenvolvido para a vitória e performance absoluta.</p>
       </div>
 
       <div class="footer-links">
-        <div class="footer-col">
-          <h4>Navegação</h4>
-          <a href="#hero">Início</a>
-          <a href="#features">Funcionalidades</a>
-          <a href="#soundboard">Soundboard</a>
-          <a href="#benchmarks">Desempenho</a>
-        </div>
-
-        <div class="footer-col">
-          <h4>Downloads</h4>
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/tag/v4.2.1">Releases no GitHub</a>
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.2.1/PulseOptimizer.exe">Executável .exe</a>
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.2.1/PulseOptimizer-Windows-x64.zip">Pacote .zip</a>
-        </div>
-
-        <div class="footer-col">
-          <h4>Comunidade</h4>
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos" target="_blank" rel="noopener">Repositório GitHub</a>
-          <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/issues" target="_blank" rel="noopener">Reportar Problema</a>
-        </div>
+        <a href="https://github.com/chibangar/Otimiza-ao-de-jogos" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/issues" target="_blank" rel="noopener">Reportar Bug</a>
+        <a href="#hero">Voltar ao Topo ↑</a>
       </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>© 2026 Pulse Gaming Optimizer. Desenvolvido com paixão para a comunidade gamer. Licença MIT.</p>
     </div>
   </footer>
 
+  <!-- SCRIPT PRINCIPAL INTERATIVO 3D -->
   <script src="script.js"></script>
 </body>
 </html>
