@@ -675,9 +675,49 @@ async function initLogin(){
     try{
       const w=await window.midnightAPI.whoami?.();
       const img=document.getElementById('user-avatar');
-      img.onerror=()=>{ img.removeAttribute('src'); img.style.display='none'; };
-      if(w && w.avatar){ img.src=w.avatar; img.style.display=''; }
-      else { img.removeAttribute('src'); img.style.display='none'; }
+      const sysImg=document.getElementById('sys-user-avatar');
+      const sysName=document.getElementById('sys-user-name');
+      const sysStatus=document.getElementById('sys-user-status');
+      const sysBtn=document.getElementById('btn-sys-discord');
+      const sysBtnText=document.getElementById('btn-sys-discord-text');
+      const topBtn=document.getElementById('btn-topbar-discord');
+      const topBtnText=document.getElementById('btn-topbar-discord-text');
+
+      const isDiscord = !!(w && w.provider === 'discord');
+
+      if(w && w.avatar){
+        if(img){ img.src=w.avatar; img.style.display=''; }
+        if(sysImg){ sysImg.src=w.avatar; sysImg.style.display=''; }
+      } else {
+        if(img){ img.removeAttribute('src'); img.style.display='none'; }
+        if(sysImg){ sysImg.removeAttribute('src'); sysImg.style.display='none'; }
+      }
+
+      if(sysName && w && w.user) sysName.textContent = w.user;
+
+      if(isDiscord){
+        if(topBtn){
+          topBtn.classList.add('connected');
+          topBtn.title = `Conectado como ${w.user} via Discord`;
+          if(topBtnText) topBtnText.textContent = 'Discord Ligado ✔';
+        }
+        if(sysStatus) sysStatus.textContent = `Conta associada ao Discord (${w.user}).`;
+        if(sysBtn){
+          sysBtn.classList.add('connected');
+          if(sysBtnText) sysBtnText.textContent = 'Discord Conectado ✔';
+        }
+      } else {
+        if(topBtn){
+          topBtn.classList.remove('connected');
+          topBtn.title = 'Entrar ou associar conta com Discord';
+          if(topBtnText) topBtnText.textContent = 'Entrar com Discord';
+        }
+        if(sysStatus) sysStatus.textContent = 'Conta local (não associada ao Discord).';
+        if(sysBtn){
+          sysBtn.classList.remove('connected');
+          if(sysBtnText) sysBtnText.textContent = 'Entrar com Discord';
+        }
+      }
     }catch{}
   }
   window._setAvatar=setAvatar;
@@ -712,14 +752,79 @@ async function initLogin(){
   $('btn-guest').addEventListener('click', async ()=>{
     await window.midnightAPI.accountLogin('convidado',''); enter('convidado');
   });
+
   async function doOauth(kind){
-    const e=$('login-err'); e.style.color=''; e.textContent='A abrir o browser… confirma lá e volta aqui.';
-    const r = kind==='google' ? await window.midnightAPI.oauthGoogle() : await window.midnightAPI.oauthDiscord();
-    if(r.success){ e.textContent=''; enter(r.user); refreshUsers(); }
-    else e.textContent=r.output;
+    const e=$('login-err');
+    const mainBtn=$('btn-discord');
+    const mainText=$('btn-discord-text');
+    const topBtn=$('btn-topbar-discord');
+    const topText=$('btn-topbar-discord-text');
+    const sysBtn=$('btn-sys-discord');
+    const sysText=$('btn-sys-discord-text');
+
+    const origMain = mainText ? mainText.textContent : 'Entrar com Discord';
+    const origTop = topText ? topText.textContent : 'Entrar com Discord';
+    const origSys = sysText ? sysText.textContent : 'Entrar com Discord';
+
+    if(e){
+      e.style.color='#7ef0c1';
+      e.textContent='A abrir o navegador para autorizar com o Discord… confirma lá e volta aqui.';
+    }
+    toast('A abrir o navegador… autoriza o acesso no Discord.');
+
+    if(mainBtn){ mainBtn.disabled=true; mainBtn.classList.add('loading'); }
+    if(mainText) mainText.textContent='A aguardar Discord…';
+    if(topBtn) topBtn.disabled=true;
+    if(topText) topText.textContent='A aguardar…';
+    if(sysBtn) sysBtn.disabled=true;
+    if(sysText) sysText.textContent='A aguardar…';
+
+    try{
+      const r = kind==='google' ? await window.midnightAPI.oauthGoogle() : await window.midnightAPI.oauthDiscord();
+      if(r && r.success){
+        if(e){ e.textContent=''; }
+        toast(`✔ Bem-vindo(a), ${r.user}! Autenticado com Discord.`);
+        await enter(r.user);
+        await refreshUsers();
+      } else {
+        const msg = (r && r.output) || 'Falha na autenticação Discord.';
+        if(e){ e.style.color=''; e.textContent=msg; }
+        toast(`⚠ ${msg}`);
+      }
+    }catch(err){
+      const msg = 'Erro: ' + (err && err.message || err);
+      if(e){ e.style.color=''; e.textContent=msg; }
+      toast(`⚠ ${msg}`);
+    }finally{
+      if(mainBtn){ mainBtn.disabled=false; mainBtn.classList.remove('loading'); }
+      if(mainText) mainText.textContent=origMain;
+      if(topBtn) topBtn.disabled=false;
+      if(topText) topText.textContent=origTop;
+      if(sysBtn) sysBtn.disabled=false;
+      if(sysText) sysText.textContent=origSys;
+      await setAvatar();
+    }
   }
-  $('btn-google').addEventListener('click', ()=>doOauth('google'));
-  $('btn-discord').addEventListener('click', ()=>doOauth('discord'));
+
+  $('btn-google')?.addEventListener('click', ()=>doOauth('google'));
+  $('btn-discord')?.addEventListener('click', ()=>doOauth('discord'));
+  $('btn-topbar-discord')?.addEventListener('click', async ()=>{
+    const w = await window.midnightAPI.whoami?.();
+    if(w && w.provider === 'discord'){
+      toast(`✔ Já tens sessão iniciada com o Discord (${w.user})!`);
+      return;
+    }
+    await doOauth('discord');
+  });
+  $('btn-sys-discord')?.addEventListener('click', async ()=>{
+    const w = await window.midnightAPI.whoami?.();
+    if(w && w.provider === 'discord'){
+      toast(`✔ Já tens sessão iniciada com o Discord (${w.user})!`);
+      return;
+    }
+    await doOauth('discord');
+  });
+
   $('link-discord-portal')?.addEventListener('click', async (e)=>{
     e.preventDefault();
     try{ await window.midnightAPI.openUrl('https://discord.com/developers/applications'); }
@@ -744,18 +849,16 @@ async function initLogin(){
     document.getElementById('vm-power')?.classList.remove('on');
     document.getElementById('vm-micbtn')?.classList.remove('on');
     $('login-name').value=''; $('login-pass').value=''; $('login-err').textContent='';
+    await setAvatar();
     $('login-overlay').style.display='flex';
     refreshUsers();
   });
   function paintOAuth(st){
     st = st || {};
-    if(st.google || st.discord){
-      $('login-social').style.display='flex';
-      if(!st.google) $('btn-google').style.display='none'; else $('btn-google').style.display='';
-      if(!st.discord) $('btn-discord').style.display='none'; else $('btn-discord').style.display='';
-    }
-    // Se o Discord já está configurado, esconde o formulário de chaves.
-    // (Os campos aparecem sempre vazios por segurança — vazio NÃO é erro.)
+    if($('btn-google')) $('btn-google').style.display = st.google ? '' : 'none';
+    if($('btn-discord')) $('btn-discord').style.display = (st.discord !== false) ? '' : 'none';
+
+    // Se o Discord já está configurado, esconde o formulário de chaves
     const dc=$('discord-cfg');
     let note=document.getElementById('discord-active-note');
     if(st.discord && dc){
@@ -764,10 +867,12 @@ async function initLogin(){
         note=document.createElement('p');
         note.id='discord-active-note';
         note.className='muted small';
-        note.innerHTML='℈ Login com Discord ativo ✔ (<a href="#" id="link-discord-reconfig">mudar chaves</a>)';
+        note.innerHTML='℈ Login com Discord ativo ✔ (<a href="#" id="link-discord-reconfig">chaves personalizadas</a>)';
         const a=note.querySelector('#link-discord-reconfig');
-        a.style.color='var(--accent)';
-        a.addEventListener('click',(ev)=>{ ev.preventDefault(); dc.style.display=''; dc.open=true; note.style.display='none'; });
+        if(a){
+          a.style.color='var(--accent)';
+          a.addEventListener('click',(ev)=>{ ev.preventDefault(); dc.style.display=''; dc.open=true; note.style.display='none'; });
+        }
         dc.parentNode.insertBefore(note, dc.nextSibling);
       }
       note.style.display='';

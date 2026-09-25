@@ -1,11 +1,11 @@
-🌟 Midnight Optimizer v4.0.0 — Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism)
+⚡ Pulse Gaming Optimizer v4.4.0 — Login com Discord em 1 Clique & Loopback Blindado
 
-## ✨ Principais Novidades da Versão 4.0.0
-- Redesign Completo 4.0: Interface construída em Glassmorphism 2.0 com painéis de vidro translúcido, gradientes táticos e bordas com iluminação em neon.
-- Reator Orbital de Boost: Componente central no Dashboard com anéis de energia interativos em rotação contínua e ativação instantânea do Modo Competitivo.
-- Telemetria Circular SVG de Alta Precisão: Monitorização visual em tempo real para CPU, GPU, RAM e Disco.
-- Sistema Nativo de Ícones SVG: Remoção completa de emojis de texto em favor de ícones vetoriais modernos e nítidos.
-- 4 Atmosferas/Temas Dinâmicos: WoW Midnight, CS2 Blaze, COD SpecOps e Titanium Frost com partículas reativas.
-- Miras dos Pros & Viewmodels CS2: Galeria completa dos melhores pro players, códigos de partilha e renders autênticos in-game.
-- Resolução de Registo de Tiros (Sub-Tick Hitreg Fix) e In-Game Notification Overlay.
-- Empacotamento determinístico com inclusão total dos novos componentes de interface no executável (.exe).
+## ✨ Principais Novidades da Versão 4.4.0
+- Login oficial com Discord em 1 clique: entra com a tua conta Discord sem configurações manuais (chaves oficiais embutidas).
+- Botão oficial do Discord disponível no ecrã de login e na barra de topo da aplicação.
+- Servidor loopback local robusto (captura de código de autorização rápida, tolerante a pedidos paralelos e com fecho automático do separador).
+- Sincronização automática do avatar oficial do Discord e nome de utilizador.
+- Gestão de perfil e estado de ligação na Ficha Técnica de Sistema.
+- Instalador & Gestor de Softwares com 10 categorias e 94 ferramentas essenciais via Winget.
+- Importador de sons do Voicemod com fotos e capas originais preservadas.
+- Motor nativo de auto-update em PowerShell com reinício automático e verificação manual.

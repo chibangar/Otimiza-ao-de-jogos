@@ -1,5 +1,15 @@
 # Changelog
 
+## [v4.4.0] - 2026-09-25
+
+### 🎮 Autenticação e Login com Discord em 1 Clique (Oficial & Sem Configurações)
+- **Login com Discord Imediato e Destacado**: Adicionado botão proeminente "Entrar com Discord" no ecrã inicial de login e na barra superior de perfil, permitindo iniciar sessão com a conta Discord a qualquer momento mesmo em modo convidado.
+- **Credenciais Oficiais Embutidas**: Chaves de aplicação Discord integradas no executável (`BUILTIN_DISCORD_CLIENT_ID` e `BUILTIN_DISCORD_CLIENT_SECRET`), sem necessidade de criar apps no portal de desenvolvedores nem colar chaves manuais.
+- **Servidor Loopback Local Blindado**: O servidor local OAuth2 em `http://127.0.0.1:8742/callback` foi remodelado para gerir múltiplos pedidos de navegadores modernos (ignorando requisições secundárias como favicon e pre-flights), com suporte a `SO_REUSEADDR`, prevenção de concorrência e encerramento limpo.
+- **Sincronização Completa de Perfil & Avatar**: Download automático do avatar oficial do Discord em qualquer formato (PNG, JPEG, WEBP, GIF) com renderização imediata na barra de topo e no perfil do sistema.
+- **Vinculação Inteligente de Contas**: Associa automaticamente o perfil Discord ao utilizador ativo sem perder atalhos, configurações personalizadas de jogos ou biblioteca de sons.
+- **Cartão de Gestão na Ficha de Sistema**: Visualização detalhada do estado da ligação Discord com indicação visual de conta conectada e opção de troca de conta.
+
 ## [v4.0.0] - 2026-09-25
 
 ### 🌟 Redesign Completo da Interface (Dark Gaming HUD & Glassmorphism 4.0)

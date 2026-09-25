@@ -90,12 +90,13 @@ _VS = {"stream": None, "state": None, "effect": "", "gain": 1.5,
        "rec": None, "recording": False, "last_wav": "",
        "mon": None, "mon_state": None}
 
-APP_VERSION = "4.3.0"
+APP_VERSION = "4.4.0"
 REPO = "chibangar/Otimiza-ao-de-jogos"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Novidades mostradas no popup ao ligar a app (uma linha por novidade).
 APP_NEWS = [
+    "🎮 Login com Discord em 1 Clique: Entra instantaneamente com a tua conta Discord sem configurações manuais — chaves oficiais embutidas e sincronização automática de avatar e perfil!",
     "📦 Instalador & Gestor de Softwares: Catálogo com 10 categorias e 94 ferramentas essenciais (Dev, Jogos, Navegadores, Runtimes, Utilitários) com instalação silenciosa em lote via Winget!",
     "🖼️ Sons do Voicemod com Imagens Originais: Ao importar a tua aba do Voicemod, as fotos e capas originais de cada meme são transferidas automaticamente para o Soundboard!",
     "🔄 Reinício & Arranque 100% Automático: Atualizações sem atritos que encerram, substituem o executável e relançam a app automaticamente com privilégios preservados.",
@@ -1094,11 +1095,14 @@ class Api:
     def whoami(self):
         u = _SESSION.get("user")
         av = ""
+        provider = ""
         try:
-            av = self._avatar_url(accounts._load_users().get(u, {}).get("avatar", ""))
+            udata = accounts._load_users().get(u, {})
+            av = self._avatar_url(udata.get("avatar", ""))
+            provider = udata.get("provider", "")
         except Exception:
             pass
-        return {"user": u, "avatar": av}
+        return {"user": u, "avatar": av, "provider": provider}
 
     def oauth_status(self):
         try:
