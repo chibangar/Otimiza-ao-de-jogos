@@ -116,19 +116,6 @@ async function getBackend(){
   }
   return null;
 }
-// Estrelas / void particles
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-let stars = [];
-function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-addEventListener('resize', resize); resize();
-for(let i=0;i<140;i++) stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.6+.3,s:Math.random()*.4+.05,tw:Math.random()*Math.PI*2});
-(function anim(){ ctx.clearRect(0,0,canvas.width,canvas.height);
-  for(const st of stars){ st.tw+=.02; const a=.3+Math.abs(Math.sin(st.tw))*.7;
-    ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,7); ctx.fillStyle=`rgba(${150+Math.random()*20|0},${140},255,${a*.8})`; ctx.fill();
-    st.y+=st.s; if(st.y>innerHeight) st.y=0; }
-  requestAnimationFrame(anim); })();
-
 // Navegação
 const navBtns = document.querySelectorAll('.nav-btn');
 const pages = document.querySelectorAll('.page');
@@ -142,6 +129,7 @@ function go(page){ navBtns.forEach(b=>b.classList.toggle('active',b.dataset.page
     const h=document.getElementById('page-title'), d=document.getElementById('page-desc');
     if(h) h.textContent=t[0];
     if(d) d.textContent=t[1];
+    document.dispatchEvent(new CustomEvent('midnight:navigate', { detail: { page } }));
   }catch{}
 }
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
@@ -544,20 +532,26 @@ function vmSelectFromHotkey(id){ selectVoice(id); }
 
 // ---------- TEMAS ----------
 function applyTheme(t){
-  t = (t==='cs2') ? 'cs2' : (t==='cod') ? 'cod' : 'wow';
-  if(t==='cs2') document.body.dataset.theme='cs2';
-  else if(t==='cod') document.body.dataset.theme='cod';
-  else document.body.removeAttribute('data-theme');
+  if (!['cs2', 'cod', 'frost', 'wow'].includes(t)) t = 'wow';
+  document.body.dataset.theme = t;
   try{ localStorage.setItem(LS('theme'), t); }catch{}
   document.querySelectorAll('.theme-switch button').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
   document.querySelectorAll('.theme-opt').forEach(b=>b.classList.toggle('sel', b.dataset.theme===t));
+  document.dispatchEvent(new CustomEvent('midnight:theme', { detail: { theme: t } }));
 }
 function themeSaved(){ try{ return localStorage.getItem(LS('theme'))||''; }catch{ return ''; } }
-document.querySelectorAll('.theme-switch button').forEach(b=>b.addEventListener('click',()=>{ applyTheme(b.dataset.theme); toast(b.dataset.theme==='cs2'?'Interface CS2 Tático ativa.':(b.dataset.theme==='cod'?'Interface Call of Duty ativa. Soldado!':'Interface WoW Midnight ativa.')); }));
+document.querySelectorAll('.theme-switch button').forEach(b=>b.addEventListener('click',()=>{
+  applyTheme(b.dataset.theme);
+  const labels = { cs2: 'Atmosfera CS2 Blaze ativa.', cod: 'Atmosfera COD SpecOps ativa.', frost: 'Atmosfera Titanium Frost ativa.', wow: 'Atmosfera WoW Midnight ativa.' };
+  toast(labels[b.dataset.theme] || 'Tema atualizado.');
+}));
 document.querySelectorAll('.theme-opt').forEach(b=>b.addEventListener('click',()=>{
   applyTheme(b.dataset.theme);
   document.getElementById('theme-overlay').style.display='none';
 }));
+document.getElementById('reactor-trigger')?.addEventListener('click', () => {
+  if (typeof setCompetitive === 'function') setCompetitive(!competitive);
+});
 
 // ---------- NOVIDADES DA APP (popup ao iniciar) ----------
 const NEWS_FALLBACK = [

@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const port = Number(process.env.MIDNIGHT_PREVIEW_PORT || 4173);
 const types = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon','.mp3':'audio/mpeg'};
-const publicFiles = new Set(['index.html', 'styles.css', 'interface.css', 'renderer.js', 'interface.js']);
+const publicFiles = new Set(['index.html', 'styles.css', 'styles-modern.css', 'interface.css', 'renderer.js', 'interface.js']);
 http.createServer((request, response) => {
   let pathname;
   try { pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname); }

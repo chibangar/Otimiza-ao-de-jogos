@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "preview": "node scripts/preview.cjs",
     "dist": "electron-builder --win portable nsis",
     "build-exe": "electron-builder --win nsis"
   },
