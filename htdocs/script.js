@@ -5,12 +5,17 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initAudioSynthesizer();
+  initCustomCursor();
+  initBackgroundParticles();
   initThreeJsHeroCore();
+  initHeroBoostTriggers();
   initHeroViewTabs();
+  initProCrosshairsLab();
   initFrametimeBenchmarkSimulator();
   initRealSoundboardPlayer();
   initSoftwareManagerShowcase();
   init3DMatrixTiltPhysics();
+  initThemeDock();
   initFaqAccordion();
   initNavbarScroll();
 });
@@ -309,11 +314,11 @@ function initThreeJsHeroCore() {
     isPointerOver = false;
   });
 
-  // Clique para libertar onda de choque quântica
-  container.addEventListener('click', () => {
+  // Disparo de Sobrecarga Quântica e Boost
+  function triggerBoost() {
     playShockwaveSound();
-    overchargeSpeed = 3.8;
-    shockwaveScale = 1.6;
+    overchargeSpeed = 4.2;
+    shockwaveScale = 1.7;
 
     const st = document.getElementById('hud-core-status');
     if (st) {
@@ -321,12 +326,64 @@ function initThreeJsHeroCore() {
       st.style.color = 'var(--cyan)';
       setTimeout(() => {
         if (st) {
-          st.textContent = 'ESTADO: PRONTO • CLICA PARA CARREGAR';
+          st.textContent = 'ESTADO: PRONTO • CLICA NO NÚCLEO 3D';
           st.style.color = '#fff';
         }
-      }, 1600);
+      }, 1800);
     }
-  });
+
+    const rStatus = document.getElementById('reactor-status-text');
+    if (rStatus) {
+      rStatus.textContent = '⚡ BOOST INJETADO! TIMERS A 0.500ms • LATÊNCIA 0.05ms';
+      rStatus.style.color = 'var(--cyan)';
+      setTimeout(() => {
+        if (rStatus) {
+          rStatus.textContent = 'Clica no núcleo para injetar boost e disparar o framerate';
+          rStatus.style.color = '';
+        }
+      }, 2500);
+    }
+  }
+
+  container.addEventListener('click', triggerBoost);
+  window._triggerHeroBoost = triggerBoost;
+
+  // Atualização dinâmica de cores 3D ao alternar de atmosfera
+  window._updateThreeTheme = function(theme) {
+    let c1, c2, c3;
+    if (theme === 'blaze') {
+      c1 = 0xff7700;
+      c2 = 0xff3b00;
+      c3 = 0xffaa00;
+    } else if (theme === 'specops') {
+      c1 = 0x00ff66;
+      c2 = 0x10b981;
+      c3 = 0x84cc16;
+    } else if (theme === 'frost') {
+      c1 = 0x38bdf8;
+      c2 = 0x818cf8;
+      c3 = 0x67e8f9;
+    } else { // midnight
+      c1 = 0x00f0ff;
+      c2 = 0xa855f7;
+      c3 = 0xffb703;
+    }
+
+    if (lightCyan) lightCyan.color.setHex(c1);
+    if (lightPurple) lightPurple.color.setHex(c2);
+    if (ring1Mat) { ring1Mat.color.setHex(c1); ring1Mat.emissive.setHex(c1); }
+    if (ring2Mat) { ring2Mat.color.setHex(c2); ring2Mat.emissive.setHex(c2); }
+    if (ring3Mat) { ring3Mat.color.setHex(c3); ring3Mat.emissive.setHex(c3); }
+    if (crystalMat) { crystalMat.color.setHex(c1); crystalMat.emissive.setHex(c1); }
+    if (cageMat) cageMat.color.setHex(c1);
+    if (particleMat) particleMat.color.setHex(c1);
+    if (gridFloor && gridFloor.material) gridFloor.material.color.setHex(c1);
+  };
+
+  const initialTheme = localStorage.getItem('pulse_theme') || 'midnight';
+  if (initialTheme !== 'midnight') {
+    window._updateThreeTheme(initialTheme);
+  }
 
   // Redimensionamento
   window.addEventListener('resize', () => {
@@ -868,4 +925,329 @@ function initNavbarScroll() {
       menu.style.borderBottom = '1px solid var(--border)';
     });
   }
+}
+
+/* ==========================================================================
+   10. CURSOR CYBERPUNK INTERATIVO DE ALTA PRECISÃO
+   ========================================================================== */
+function initCustomCursor() {
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  let mouseX = -100, mouseY = -100;
+  let ringX = -100, ringY = -100;
+  let isMoving = false;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+    if (!isMoving) {
+      ringX = mouseX;
+      ringY = mouseY;
+      isMoving = true;
+    }
+  });
+
+  function renderCursor() {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
+    requestAnimationFrame(renderCursor);
+  }
+  requestAnimationFrame(renderCursor);
+
+  const interactables = 'a, button, [data-tilt], .real-sound-card, .pro-card, .cat-pill, .soft-preview-item, .view-tab, .bench-tab, .mode-btn, .faq-question';
+  document.querySelectorAll(interactables).forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('active'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('active'));
+  });
+}
+
+/* ==========================================================================
+   11. ENXAME DE PARTÍCULAS CYBERPUNK DE FUNDO (CANVAS 2D ULTRA-LEVE)
+   ========================================================================== */
+function initBackgroundParticles() {
+  const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let w = (canvas.width = window.innerWidth);
+  let h = (canvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+
+  const count = 45;
+  const particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.32,
+      vy: (Math.random() - 0.5) * 0.32,
+      size: Math.random() * 1.8 + 0.6,
+      alpha: Math.random() * 0.35 + 0.12
+    });
+  }
+
+  function loop() {
+    requestAnimationFrame(loop);
+    ctx.clearRect(0, 0, w, h);
+
+    for (let i = 0; i < count; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0) p.x = w;
+      else if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      else if (p.y > h) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
+      ctx.fill();
+
+      // Linhas finas de rede quântica entre partículas próximas
+      for (let j = i + 1; j < count; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.strokeStyle = `rgba(0, 240, 255, ${0.08 * (1 - dist / 100)})`;
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ==========================================================================
+   12. ESTÚDIO INTERATIVO DE MIRAS CS2 DOS PROS
+   ========================================================================== */
+const PRO_CROSSHAIRS = {
+  s1mple: {
+    name: 's1mple',
+    fullname: 'Oleksandr Kostyliev',
+    team: 'NAVI // AWPer & GOAT',
+    flag: '🇺🇦',
+    code: 'CSGO-456qB-c67rZ-38kGj-Xy9Nm-2Ab5Q',
+    color: '#00ff66',
+    dot: true,
+    size: 1,
+    thickness: 1,
+    gap: -2,
+    outline: false
+  },
+  niko: {
+    name: 'NiKo',
+    fullname: 'Nikola Kovač',
+    team: 'G2 Esports // Rifler',
+    flag: '🇧🇦',
+    code: 'CSGO-UaP3V-kE2pZ-8LhR8-iX9bB-4YpQ2',
+    color: '#00ff00',
+    dot: false,
+    size: 2,
+    thickness: 1,
+    gap: -3,
+    outline: false
+  },
+  donk: {
+    name: 'donk',
+    fullname: 'Danil Kryshkovets',
+    team: 'Team Spirit // Entry Fragger',
+    flag: '🇷🇺',
+    code: 'CSGO-HRTdn-OjXhn-tNspm-b5MfZ-kCjQN',
+    color: '#00f0ff',
+    dot: false,
+    size: 1.2,
+    thickness: 1,
+    gap: -4,
+    outline: true
+  },
+  m0nesy: {
+    name: 'm0NESY',
+    fullname: 'Ilya Osipov',
+    team: 'G2 Esports // AWPer',
+    flag: '🇷🇺',
+    code: 'CSGO-9vS6f-o8OqN-2bWkK-6e7J8-3kGjA',
+    color: '#00e5ff',
+    dot: false,
+    size: 2,
+    thickness: 1.5,
+    gap: -3,
+    outline: false
+  },
+  zywoo: {
+    name: 'ZywOo',
+    fullname: 'Mathieu Herbaut',
+    team: 'Team Vitality // Sniper',
+    flag: '🇫🇷',
+    code: 'CSGO-7jFq9-6wGk4-o58yZ-32hT6-9jKk2',
+    color: '#ffea00',
+    dot: false,
+    size: 2,
+    thickness: 1,
+    gap: -3,
+    outline: false
+  },
+  b1t: {
+    name: 'b1t',
+    fullname: 'Valerij Vakhovsjkyj',
+    team: 'NAVI // Headshot Machine',
+    flag: '🇺🇦',
+    code: 'CSGO-9ZzTq-hJk4p-8Nmq2-6mNkJ-3wP4Z',
+    color: '#00ff66',
+    dot: false,
+    size: 2,
+    thickness: 1,
+    gap: -3,
+    outline: true
+  }
+};
+
+function initProCrosshairsLab() {
+  const renderBox = document.getElementById('crosshair-renderer');
+  const nameEl = document.getElementById('ch-active-name');
+  const teamEl = document.getElementById('ch-active-team');
+  const flagEl = document.getElementById('ch-active-flag');
+  const codeEl = document.getElementById('ch-code-text');
+  const copyBtn = document.getElementById('btn-copy-crosshair');
+  const cards = document.querySelectorAll('.pro-card');
+
+  if (!renderBox) return;
+
+  function render(key) {
+    const data = PRO_CROSSHAIRS[key] || PRO_CROSSHAIRS.s1mple;
+
+    if (nameEl) nameEl.textContent = data.name;
+    if (teamEl) teamEl.textContent = data.team;
+    if (flagEl) flagEl.textContent = data.flag;
+    if (codeEl) codeEl.textContent = data.code;
+
+    // Renderiza graficamente a mira com precisão de pixel
+    renderBox.innerHTML = '';
+    const th = Math.max(2, Math.round(data.thickness * 2));
+    const len = Math.round(data.size * 10);
+    const gap = Math.max(3, Math.round(10 + data.gap * 2.2));
+    const borderStyle = data.outline ? '1px solid rgba(0,0,0,0.95)' : 'none';
+    const bg = data.color;
+
+    // Top
+    const topBar = document.createElement('div');
+    topBar.className = 'ch-line';
+    topBar.style.cssText = `width:${th}px; height:${len}px; left:calc(50% - ${th/2}px); bottom:calc(50% + ${gap}px); background:${bg}; border:${borderStyle};`;
+    renderBox.appendChild(topBar);
+
+    // Bottom
+    const botBar = document.createElement('div');
+    botBar.className = 'ch-line';
+    botBar.style.cssText = `width:${th}px; height:${len}px; left:calc(50% - ${th/2}px); top:calc(50% + ${gap}px); background:${bg}; border:${borderStyle};`;
+    renderBox.appendChild(botBar);
+
+    // Left
+    const leftBar = document.createElement('div');
+    leftBar.className = 'ch-line';
+    leftBar.style.cssText = `width:${len}px; height:${th}px; top:calc(50% - ${th/2}px); right:calc(50% + ${gap}px); background:${bg}; border:${borderStyle};`;
+    renderBox.appendChild(leftBar);
+
+    // Right
+    const rightBar = document.createElement('div');
+    rightBar.className = 'ch-line';
+    rightBar.style.cssText = `width:${len}px; height:${th}px; top:calc(50% - ${th/2}px); left:calc(50% + ${gap}px); background:${bg}; border:${borderStyle};`;
+    renderBox.appendChild(rightBar);
+
+    // Dot central se configurado
+    if (data.dot) {
+      const dotEl = document.createElement('div');
+      dotEl.className = 'ch-dot';
+      const dotSize = th + 2;
+      dotEl.style.cssText = `width:${dotSize}px; height:${dotSize}px; left:calc(50% - ${dotSize/2}px); top:calc(50% - ${dotSize/2}px); background:${bg}; border:${borderStyle};`;
+      renderBox.appendChild(dotEl);
+    }
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      playClickSound();
+      cards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      render(card.dataset.pro);
+    });
+  });
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const code = codeEl ? codeEl.textContent.trim() : '';
+      if (!code) return;
+      navigator.clipboard.writeText(code).then(() => {
+        playClickSound();
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = '<span>✔ Copiado!</span>';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = '<span>📋 Copiar</span>';
+        }, 2000);
+      });
+    });
+  }
+
+  // Renderização inicial
+  render('s1mple');
+}
+
+/* ==========================================================================
+   13. DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS & 3D LIGHTS)
+   ========================================================================== */
+function initThemeDock() {
+  const dockBtns = document.querySelectorAll('.theme-dock-btn');
+  const savedTheme = localStorage.getItem('pulse_theme') || 'midnight';
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('pulse_theme', theme);
+    dockBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+    if (window._updateThreeTheme) {
+      window._updateThreeTheme(theme);
+    }
+  }
+
+  dockBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      playClickSound();
+      applyTheme(btn.dataset.theme);
+    });
+  });
+
+  applyTheme(savedTheme);
+}
+
+/* ==========================================================================
+   14. GATILHOS DO REATOR TURBO COMPETITIVO (HERO BANNER)
+   ========================================================================== */
+function initHeroBoostTriggers() {
+  const btnTrigger = document.getElementById('btn-boost-trigger');
+  const miniReactor = document.getElementById('mini-reactor-btn');
+
+  const trigger = () => {
+    if (window._triggerHeroBoost) {
+      window._triggerHeroBoost();
+    }
+  };
+
+  btnTrigger?.addEventListener('click', trigger);
+  miniReactor?.addEventListener('click', trigger);
 }

@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-PT" data-theme="midnight">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pulse Gaming Optimizer — Suite 3D de Alta Performance &amp; Baixa Latência</title>
   
-  <meta name="description" content="Pulse Gaming Optimizer é a suite definitiva para jogos competitivos: Otimização DPC de baixa latência, Soundboard integrado com importador Voicemod com fotos originais, novo Instalador de Softwares com 10 categorias e telemetria 3D. 100% VAC-Safe.">
-  <meta name="keywords" content="pulse gaming optimizer, otimizador de jogos, cs2 boost, valorant fps, soundboard voicemod, software installer winget, dpc latency">
+  <meta name="description" content="Pulse Gaming Optimizer: Suite desportiva para jogos competitivos. Otimização DPC 0.05ms, Soundboard integrado com fotos originais do Voicemod, novo Instalador de Softwares com 10 categorias e estúdio de miras dos pros. 100% VAC-Safe.">
+  <meta name="keywords" content="pulse gaming optimizer, otimizador de jogos, cs2 boost, valorant fps, soundboard voicemod, software installer winget, miras cs2 pros, dpc latency">
   <meta name="author" content="Pulse Gaming Team">
   <meta name="theme-color" content="#040509">
   
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Pulse Gaming Optimizer — Suite 3D de Alta Performance">
-  <meta property="og:description" content="Ganha mais FPS, reduz o input lag e desfruta da suite definitiva com Soundboard Voicemod e Instalador de 94 Softwares. 100% VAC-Safe e Grátis.">
+  <meta property="og:description" content="Ganha mais FPS, reduz o input lag e desfruta da suite definitiva com Soundboard Voicemod, Instalador de 94 Softwares e Miras dos Pros. 100% VAC-Safe e Grátis.">
   <meta property="og:image" content="assets/logo.png">
   <meta property="og:url" content="https://github.com/chibangar/Otimiza-ao-de-jogos">
   
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
   
@@ -28,13 +28,17 @@
   <script src="assets/three.min.js"></script>
 </head>
 <body>
-  <!-- Fundo Cyberpunk com Grelha 3D e Brilhos -->
+  <!-- Cursor Cyberpunk Interativo -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+
+  <!-- Fundo Cyberpunk com Grelha 3D e Nebulosas -->
   <div class="cyber-grid-bg"></div>
   <canvas id="particle-canvas"></canvas>
 
-  <div class="ambient-glow cyan"></div>
-  <div class="ambient-glow purple"></div>
-  <div class="ambient-glow gold"></div>
+  <div class="ambient-glow cyan" id="glow-cyan"></div>
+  <div class="ambient-glow purple" id="glow-purple"></div>
+  <div class="ambient-glow gold" id="glow-gold"></div>
 
   <!-- HUD Top Bar & Navegação -->
   <header class="navbar" id="navbar">
@@ -52,16 +56,17 @@
 
       <nav class="nav-menu" id="nav-menu">
         <a href="#hero" class="nav-link"><span class="nav-idx">[01]</span> Visão Geral</a>
-        <a href="#benchmarks" class="nav-link"><span class="nav-idx">[02]</span> Benchmarks 3D</a>
-        <a href="#soundboard" class="nav-link"><span class="nav-idx">[03]</span> Soundboard Voicemod</a>
-        <a href="#softwares" class="nav-link"><span class="nav-idx">[04]</span> Instalador de Apps</a>
-        <a href="#features" class="nav-link"><span class="nav-idx">[05]</span> Tecnologia</a>
-        <a href="#faq" class="nav-link"><span class="nav-idx">[06]</span> FAQ</a>
+        <a href="#crosshairs" class="nav-link"><span class="nav-idx">[02]</span> Miras dos Pros</a>
+        <a href="#benchmarks" class="nav-link"><span class="nav-idx">[03]</span> Benchmarks 3D</a>
+        <a href="#soundboard" class="nav-link"><span class="nav-idx">[04]</span> Soundboard Voicemod</a>
+        <a href="#softwares" class="nav-link"><span class="nav-idx">[05]</span> Instalador de Apps</a>
+        <a href="#features" class="nav-link"><span class="nav-idx">[06]</span> Tecnologia</a>
+        <a href="#faq" class="nav-link"><span class="nav-idx">[07]</span> FAQ</a>
       </nav>
 
       <div class="nav-actions">
         <!-- Botão de Efeitos Sonoros Web Audio -->
-        <button class="btn-sfx-toggle" id="btn-sfx-toggle" title="Ativar / Desativar Efeitos Sonoros Sintetizados">
+        <button class="btn-sfx-toggle" id="btn-sfx-toggle" title="Ativar / Desativar Efeitos Sonoros 3D">
           <span class="sfx-icon">🔊</span>
           <span class="sfx-text">SFX ATIVO</span>
         </button>
@@ -85,31 +90,51 @@
     </div>
   </header>
 
-  <!-- SECÇÃO HERO 3D INTERATIVA -->
+  <!-- ==========================================================================
+       SECÇÃO HERO 3D COM PALCO INTERATIVO
+       ========================================================================== -->
   <section class="hero" id="hero">
     <div class="hero-container">
       <!-- Coluna da Esquerda: Textos & CTAs -->
       <div class="hero-content">
-        <div class="hero-badge">
+        <div class="hero-badge" data-tilt>
           <span class="badge-dot"></span>
-          <span>SYS_TELEMETRY // V4.3.0 DISPONÍVEL</span>
+          <span>SYS_TELEMETRY // V4.3.0 OFICIAL</span>
           <span class="badge-tag">100% VAC-SAFE</span>
         </div>
 
         <h1 class="hero-title">
-          DOMINA A ARENA COM <span class="gradient-text">PERFORMANCE 3D PURA</span>
+          VELOCIDADE PURA.<br>
+          <span class="gradient-text">CONTROLO ABSOLUTO.</span>
         </h1>
 
         <p class="hero-desc">
-          A suite de engenharia desportiva para gaming competitivo: Otimização de baixa latência DPC (0.05ms), <b>novo Instalador de Softwares com 10 categorias e 94 ferramentas</b>, Soundboard com capas e fotos originais do Voicemod e auto-update transparente.
+          A suite desportiva desenhada para competição de alta precisão: Redução de latência DPC para <b>0.05ms</b>, novo <b>Instalador de 94 Softwares em 10 categorias</b>, Soundboard com capas originais do Voicemod e estúdio de miras dos melhores jogadores do mundo.
         </p>
+
+        <!-- Barra de Ativação do Reator Turbo (Interativo) -->
+        <div class="reactor-action-banner glass-panel" id="reactor-banner" data-tilt>
+          <div class="reactor-banner-left">
+            <div class="mini-reactor-core" id="mini-reactor-btn">
+              <span class="mini-core-icon">⚡</span>
+              <div class="mini-core-ring"></div>
+            </div>
+            <div>
+              <b class="reactor-banner-title">MODO COMPETITIVO TURBO</b>
+              <p class="reactor-banner-sub" id="reactor-status-text">Clica no núcleo para injetar boost e disparar o framerate</p>
+            </div>
+          </div>
+          <button class="btn-boost-trigger" id="btn-boost-trigger">
+            <span>ATIVAR BOOST</span>
+          </button>
+        </div>
 
         <div class="hero-cta">
           <a href="https://github.com/chibangar/Otimiza-ao-de-jogos/releases/download/v4.3.0/PulseOptimizer.exe" class="btn-hero-primary" id="btn-download-primary">
             <div class="btn-icon">⚡</div>
             <div class="btn-label-group">
               <span class="btn-label-top">Descarregar PulseOptimizer.exe</span>
-              <span class="btn-label-bottom">Windows 10/11 x64 • Versão Oficial 4.3.0</span>
+              <span class="btn-label-bottom">Windows 10/11 x64 • 46.39 MB • Portátil</span>
             </div>
           </a>
 
@@ -121,14 +146,14 @@
           </a>
         </div>
 
-        <!-- Estatísticas Rápidas do Sistema -->
+        <!-- Estatísticas Rápidas com Efeito 3D Tilt -->
         <div class="hero-stats">
           <div class="stat-pill" data-tilt>
-            <span class="stat-val">+42%</span>
+            <span class="stat-val" id="stat-fps-val">+42%</span>
             <span class="stat-desc">Estabilidade FPS</span>
           </div>
           <div class="stat-pill" data-tilt>
-            <span class="stat-val">0.05ms</span>
+            <span class="stat-val" id="stat-dpc-val">0.05ms</span>
             <span class="stat-desc">Latência DPC</span>
           </div>
           <div class="stat-pill" data-tilt>
@@ -142,7 +167,7 @@
         </div>
       </div>
 
-      <!-- Coluna da Direita: VISUALIZADOR 3D WEBGL INTERATIVO COM MOUSE PARALLAX -->
+      <!-- Coluna da Direita: PALCO 3D WEBGL INTERATIVO COM MOUSE PARALLAX -->
       <div class="hero-preview-wrapper" id="hero-preview">
         <div class="mockup-card glass-panel" id="mockup-tilt">
           <!-- Cabeçalho do HUD 3D -->
@@ -162,7 +187,7 @@
             </div>
           </div>
 
-          <!-- Abas para Alternar entre o Núcleo 3D e o Mockup da Aplicação -->
+          <!-- Abas para Alternar entre o Núcleo 3D, App HUD e Telemetria -->
           <div class="hero-view-tabs">
             <button class="view-tab active" data-view="3d-core">
               <span class="tab-icon">🔮</span>
@@ -193,11 +218,11 @@
                   <div class="hud-coord-text" id="hud-coord-display">PITCH: +0.0° // YAW: +0.0°</div>
                   <div class="hud-energy-status">
                     <span class="energy-dot"></span>
-                    <span id="hud-core-status">ESTADO: PRONTO • CLICA PARA CARREGAR</span>
+                    <span id="hud-core-status">ESTADO: PRONTO • CLICA NO NÚCLEO 3D</span>
                   </div>
                 </div>
               </div>
-              <p class="reactor-hint">⚡ <b>Interação Física 3D:</b> Move o rato para rodar o núcleo. Clica no reator para libertar uma onda de choque de energia!</p>
+              <p class="reactor-hint">⚡ <b>Física 3D Real:</b> Move o rato para rodar o núcleo quântico. Clica para disparar a onda de choque de energia!</p>
             </div>
 
             <!-- VISTA 2: Mockup do Reator Orbital da Aplicação -->
@@ -253,7 +278,7 @@
                   <span class="gauge-label">RAM DISPONÍVEL</span>
                 </div>
               </div>
-              <p class="reactor-hint">📊 Medidores circulares de precisão que não consomem mais de 0.1% de CPU</p>
+              <p class="reactor-hint">📊 Medidores circulares vetoriais de precisão sem consumo de CPU</p>
             </div>
           </div>
         </div>
@@ -261,7 +286,119 @@
     </div>
   </section>
 
-  <!-- SECÇÃO 2: BENCHMARK 3D INTERATIVO & SIMULADOR DE FRAMETIMES -->
+  <!-- ==========================================================================
+       NOVA SECÇÃO: ESTÚDIO INTERATIVO DE MIRAS CS2 DOS PROS
+       ========================================================================== -->
+  <section class="section crosshairs-section" id="crosshairs">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">PRECISÃO CIRÚRGICA ESPORTS</span>
+        <h2 class="section-title">Estúdio Interativo de Miras CS2 dos Pros</h2>
+        <p class="section-desc">Testa e visualiza a mira oficial dos maiores jogadores do mundo. Clica para copiar o código de partilha diretamente para o teu jogo!</p>
+      </div>
+
+      <div class="crosshairs-lab glass-panel" data-tilt>
+        <!-- Coluna da Esquerda: Alvo com a Mira Renderizada em SVG/Canvas -->
+        <div class="crosshair-stage">
+          <div class="crosshair-target-view" id="crosshair-target">
+            <div class="target-backdrop-grid"></div>
+            <!-- Mira Renderizada Dinamicamente -->
+            <div class="crosshair-render-box" id="crosshair-renderer">
+              <!-- O JS desenha as linhas da mira com precisão de pixel -->
+            </div>
+            <div class="crosshair-cross-guides">
+              <span class="guide-h"></span>
+              <span class="guide-v"></span>
+            </div>
+            <div class="crosshair-pro-badge" id="ch-active-player">
+              <span class="pro-flag" id="ch-active-flag">🇺🇦</span>
+              <b id="ch-active-name">s1mple</b>
+              <small id="ch-active-team">NAVI // AWPer</small>
+            </div>
+          </div>
+
+          <div class="crosshair-code-box">
+            <span class="code-lbl">CÓDIGO DE PARTILHA CS2:</span>
+            <code class="code-val" id="ch-code-text">CSGO-456qB-c67rZ-38kGj-Xy9Nm-2Ab5Q</code>
+            <button class="btn-copy-code" id="btn-copy-crosshair" title="Copiar código">
+              <span>📋 Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Coluna da Direita: Seleção dos Jogadores Pros -->
+        <div class="crosshair-players-list">
+          <div class="players-list-title">ESCOLHE O TEU PRO PLAYER:</div>
+
+          <div class="pro-player-cards-grid">
+            <!-- s1mple -->
+            <div class="pro-card active" data-pro="s1mple">
+              <div class="pro-avatar-slot">👑</div>
+              <div class="pro-info">
+                <b>s1mple</b>
+                <span>Oleksandr Kostyliev • NAVI</span>
+              </div>
+              <span class="pro-pill">DOT PEQUENO</span>
+            </div>
+
+            <!-- NiKo -->
+            <div class="pro-card" data-pro="niko">
+              <div class="pro-avatar-slot">🎯</div>
+              <div class="pro-info">
+                <b>NiKo</b>
+                <span>Nikola Kovač • G2 Esports</span>
+              </div>
+              <span class="pro-pill">CLÁSSICA VERDE</span>
+            </div>
+
+            <!-- donk -->
+            <div class="pro-card" data-pro="donk">
+              <div class="pro-avatar-slot">⚡</div>
+              <div class="pro-info">
+                <b>donk</b>
+                <span>Danil Kryshkovets • Spirit</span>
+              </div>
+              <span class="pro-pill">ULTRA COMPACTA</span>
+            </div>
+
+            <!-- m0NESY -->
+            <div class="pro-card" data-pro="m0nesy">
+              <div class="pro-avatar-slot">🚀</div>
+              <div class="pro-info">
+                <b>m0NESY</b>
+                <span>Ilya Osipov • G2 Esports</span>
+              </div>
+              <span class="pro-pill">CYAN PRECISION</span>
+            </div>
+
+            <!-- ZywOo -->
+            <div class="pro-card" data-pro="zywoo">
+              <div class="pro-avatar-slot">🌟</div>
+              <div class="pro-info">
+                <b>ZywOo</b>
+                <span>Mathieu Herbaut • Vitality</span>
+              </div>
+              <span class="pro-pill">CROSS CLEAN</span>
+            </div>
+
+            <!-- b1t -->
+            <div class="pro-card" data-pro="b1t">
+              <div class="pro-avatar-slot">🔥</div>
+              <div class="pro-info">
+                <b>b1t</b>
+                <span>Valerij Vakhovsjkyj • NAVI</span>
+              </div>
+              <span class="pro-pill">HEADSHOT KING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECÇÃO BENCHMARK 3D & COMPARADOR DE FRAMETIMES
+       ========================================================================== -->
   <section class="section benchmarks" id="benchmarks">
     <div class="section-container">
       <div class="section-header">
@@ -341,7 +478,9 @@
     </div>
   </section>
 
-  <!-- SECÇÃO 3: SOUNDBOARD INTERATIVO COM SONS & FOTOS ORIGINAIS DO VOICEMOD -->
+  <!-- ==========================================================================
+       SECÇÃO SOUNDBOARD REAL COM SONS & FOTOS ORIGINAIS DO VOICEMOD
+       ========================================================================== -->
   <section class="section soundboard-section" id="soundboard">
     <div class="section-container">
       <div class="section-header">
@@ -480,13 +619,15 @@
     </div>
   </section>
 
-  <!-- SECÇÃO 4: INSTALADOR DE SOFTWARES (10 CATEGORIAS & 94 APPS) -->
+  <!-- ==========================================================================
+       SECÇÃO INSTALADOR DE SOFTWARES (10 CATEGORIAS & 94 APPS)
+       ========================================================================== -->
   <section class="section softwares-section" id="softwares">
     <div class="section-container">
       <div class="section-header">
         <span class="section-tag">NOVIDADE DA VERSÃO 4.3.0</span>
         <h2 class="section-title">Instalador &amp; Gestor de Softwares (Winget)</h2>
-        <p class="section-desc">Inspirado na grelha WinUtil de Chris Titus: 10 categorias organizadas com 94 ferramentas essenciais para gaming, programação, multimédia e otimização.</p>
+        <p class="section-desc">Grelha completa inspirada no WinUtil de Chris Titus: 10 categorias organizadas com 94 ferramentas essenciais para gaming, programação, multimédia e otimização.</p>
       </div>
 
       <div class="software-demo-wrapper glass-panel" data-tilt>
@@ -512,7 +653,7 @@
         <div class="soft-demo-footer">
           <div class="soft-demo-stats">
             <span>● <b>94 Ferramentas</b> no catálogo nativo da app</span>
-            <span>● Instalação e desinstalação silenciosa em segundo plano</span>
+            <span>● Instalação e desinstalação silenciosa em lote via Winget</span>
             <span>● Deteção via Registo do Windows em menos de 3ms</span>
           </div>
           <a href="#download" class="btn-primary small">
@@ -523,7 +664,9 @@
     </div>
   </section>
 
-  <!-- SECÇÃO 5: TECNOLOGIA & ARQUITETURA -->
+  <!-- ==========================================================================
+       SECÇÃO TECNOLOGIA & ARQUITETURA
+       ========================================================================== -->
   <section class="section features" id="features">
     <div class="section-container">
       <div class="section-header">
@@ -578,7 +721,9 @@
     </div>
   </section>
 
-  <!-- SECÇÃO 6: PERGUNTAS FREQUENTES (FAQ) -->
+  <!-- ==========================================================================
+       SECÇÃO PERGUNTAS FREQUENTES (FAQ)
+       ========================================================================== -->
   <section class="section faq" id="faq">
     <div class="section-container">
       <div class="section-header">
@@ -630,7 +775,9 @@
     </div>
   </section>
 
-  <!-- SECÇÃO DE DOWNLOAD FINAL -->
+  <!-- ==========================================================================
+       SECÇÃO DE DOWNLOAD FINAL
+       ========================================================================== -->
   <section class="section download-section" id="download">
     <div class="section-container">
       <div class="download-card glass-panel" data-tilt>
@@ -662,7 +809,34 @@
     </div>
   </section>
 
-  <!-- RODAPÉ -->
+  <!-- ==========================================================================
+       DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS INTERATIVO)
+       ========================================================================== -->
+  <div class="theme-dock-floating">
+    <div class="theme-dock-inner glass-panel">
+      <span class="theme-dock-lbl">ATMOSFERA:</span>
+      <button class="theme-dock-btn active" data-theme="midnight" title="☾ WoW Midnight (Roxo/Ouro)">
+        <span class="dock-dot purple"></span>
+        <span class="dock-name">WoW Midnight</span>
+      </button>
+      <button class="theme-dock-btn" data-theme="blaze" title="◉ CS2 Blaze (Laranja/Âmbar)">
+        <span class="dock-dot orange"></span>
+        <span class="dock-name">CS2 Blaze</span>
+      </button>
+      <button class="theme-dock-btn" data-theme="specops" title="★ COD SpecOps (Verde Militar)">
+        <span class="dock-dot green"></span>
+        <span class="dock-name">COD SpecOps</span>
+      </button>
+      <button class="theme-dock-btn" data-theme="frost" title="❄ Titanium Frost (Azul Glacial)">
+        <span class="dock-dot blue"></span>
+        <span class="dock-name">Titanium Frost</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       RODAPÉ
+       ========================================================================== -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-left">

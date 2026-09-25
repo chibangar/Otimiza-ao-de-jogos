@@ -46,6 +46,99 @@
   --shadow-glow: 0 0 30px rgba(0, 240, 255, 0.25);
 }
 
+/* ==========================================================================
+   TEMAS DINÂMICOS (SELETOR DE ATMOSFERAS)
+   ========================================================================== */
+[data-theme="blaze"] {
+  --cyan: #ff7700;
+  --cyan-rgb: 255, 119, 0;
+  --cyan-glow: rgba(255, 119, 0, 0.45);
+  --purple: #ff3b00;
+  --purple-rgb: 255, 59, 0;
+  --purple-glow: rgba(255, 59, 0, 0.4);
+  --gold: #ffaa00;
+  --gold-glow: rgba(255, 170, 0, 0.4);
+  --border-glass: rgba(255, 119, 0, 0.25);
+  --border-glass-hover: rgba(255, 119, 0, 0.6);
+  --shadow-glow: 0 0 30px rgba(255, 119, 0, 0.25);
+}
+
+[data-theme="specops"] {
+  --cyan: #00ff66;
+  --cyan-rgb: 0, 255, 102;
+  --cyan-glow: rgba(0, 255, 102, 0.45);
+  --purple: #10b981;
+  --purple-rgb: 16, 185, 129;
+  --purple-glow: rgba(16, 185, 129, 0.4);
+  --gold: #84cc16;
+  --gold-glow: rgba(132, 204, 22, 0.4);
+  --border-glass: rgba(0, 255, 102, 0.25);
+  --border-glass-hover: rgba(0, 255, 102, 0.6);
+  --shadow-glow: 0 0 30px rgba(0, 255, 102, 0.25);
+}
+
+[data-theme="frost"] {
+  --cyan: #38bdf8;
+  --cyan-rgb: 56, 189, 248;
+  --cyan-glow: rgba(56, 189, 248, 0.45);
+  --purple: #818cf8;
+  --purple-rgb: 129, 140, 248;
+  --purple-glow: rgba(129, 140, 248, 0.4);
+  --gold: #67e8f9;
+  --gold-glow: rgba(103, 232, 249, 0.4);
+  --border-glass: rgba(56, 189, 248, 0.25);
+  --border-glass-hover: rgba(56, 189, 248, 0.6);
+  --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.25);
+}
+
+/* ==========================================================================
+   CURSOR CYBERPUNK DE ALTA PRECISÃO
+   ========================================================================== */
+@media (pointer: fine) {
+  .cursor-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--cyan);
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+    transform: translate(-50%, -50%);
+    transition: width 0.15s, height 0.15s, background-color 0.2s;
+  }
+
+  .cursor-ring {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid rgba(var(--cyan-rgb), 0.55);
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, border-color 0.2s, transform 0.08s ease-out;
+    box-shadow: 0 0 12px rgba(var(--cyan-rgb), 0.2);
+  }
+
+  .cursor-ring.active {
+    width: 48px;
+    height: 48px;
+    border-color: var(--gold);
+    background: rgba(var(--cyan-rgb), 0.08);
+  }
+}
+
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-ring {
+    display: none !important;
+  }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -510,6 +603,102 @@ body {
 
 .hero-desc b {
   color: #fff;
+}
+
+/* Banner Interativo do Reator Turbo */
+.reactor-action-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, rgba(var(--cyan-rgb), 0.08), rgba(var(--purple-rgb), 0.05));
+  border: 1px solid rgba(var(--cyan-rgb), 0.25);
+  border-radius: var(--r);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(var(--cyan-rgb), 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.reactor-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mini-reactor-core {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cyan) 0%, #032030 70%);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--cyan-glow);
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mini-reactor-core:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px var(--cyan-glow);
+}
+
+.mini-core-icon {
+  font-size: 20px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 6px #fff);
+}
+
+.mini-core-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px dashed var(--cyan);
+  animation: spinSlow 12s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.reactor-banner-title {
+  font-family: var(--font-hud);
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: #fff;
+  display: block;
+}
+
+.reactor-banner-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.btn-boost-trigger {
+  padding: 10px 18px;
+  background: var(--cyan);
+  color: #040509;
+  font-family: var(--font-hud);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  box-shadow: 0 0 18px var(--cyan-glow);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-boost-trigger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 28px var(--cyan-glow);
 }
 
 .hero-cta {
@@ -1051,6 +1240,317 @@ body {
   font-size: 15px;
   color: var(--text-muted);
   line-height: 1.6;
+}
+
+/* ==========================================================================
+   ESTÚDIO INTERATIVO DE MIRAS CS2 DOS PROS
+   ========================================================================== */
+.crosshairs-section {
+  position: relative;
+  z-index: 10;
+  padding: 80px 24px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.crosshairs-lab {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 36px;
+  padding: 36px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow), 0 0 40px rgba(var(--cyan-rgb), 0.1);
+}
+
+.crosshair-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.crosshair-target-view {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 290px;
+  background: radial-gradient(circle at center, #101626 0%, #060912 85%, #030408 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85);
+}
+
+.target-backdrop-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle, rgba(var(--cyan-rgb), 0.08) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px, 15px 15px;
+  background-position: center;
+  pointer-events: none;
+}
+
+/* Anéis concêntricos do alvo */
+.crosshair-target-view::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.09);
+  pointer-events: none;
+}
+
+.crosshair-target-view::after {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--cyan-rgb), 0.16);
+  pointer-events: none;
+}
+
+.crosshair-cross-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.guide-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.08) 30%, transparent 48%, transparent 52%, rgba(255, 255, 255, 0.08) 70%, transparent 95%);
+}
+
+.guide-v {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent 5%, rgba(255, 255, 255, 0.08) 30%, transparent 48%, transparent 52%, rgba(255, 255, 255, 0.08) 70%, transparent 95%);
+}
+
+.crosshair-render-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.95));
+}
+
+.ch-line {
+  position: absolute;
+  box-shadow: 0 0 1px #000, 0 0 4px rgba(0, 0, 0, 0.85);
+  transition: all 0.22s var(--ease);
+}
+
+.ch-dot {
+  position: absolute;
+  box-shadow: 0 0 1px #000, 0 0 4px rgba(0, 0, 0, 0.85);
+  transition: all 0.22s var(--ease);
+}
+
+.crosshair-pro-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(4, 5, 9, 0.88);
+  backdrop-filter: blur(10px);
+  padding: 6px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  font-family: var(--font-hud);
+  z-index: 12;
+}
+
+.pro-flag {
+  font-size: 18px;
+}
+
+#ch-active-name {
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+#ch-active-team {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+.crosshair-code-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+}
+
+.code-lbl {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.code-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.08);
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--cyan-rgb), 0.2);
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-copy-code {
+  padding: 7px 16px;
+  background: var(--cyan);
+  color: #040509;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-hud);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  white-space: nowrap;
+}
+
+.btn-copy-code:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px var(--cyan-glow);
+}
+
+.btn-copy-code.copied {
+  background: var(--green);
+  color: #040509;
+}
+
+.crosshair-players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.players-list-title {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--cyan);
+}
+
+.pro-player-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.pro-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all 0.22s var(--ease);
+  position: relative;
+}
+
+.pro-card:hover {
+  border-color: var(--border-glass-hover);
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-2px);
+}
+
+.pro-card.active {
+  border-color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.08);
+  box-shadow: 0 0 20px rgba(var(--cyan-rgb), 0.25);
+}
+
+.pro-avatar-slot {
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.pro-card.active .pro-avatar-slot {
+  border-color: var(--cyan);
+  background: rgba(var(--cyan-rgb), 0.15);
+}
+
+.pro-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.pro-info b {
+  font-family: var(--font-hud);
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.pro-info span {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pro-pill {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-faint);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.pro-card.active .pro-pill {
+  background: var(--cyan);
+  color: #040509;
 }
 
 .benchmark-interactive-box {
@@ -1919,12 +2419,108 @@ body {
 }
 
 /* ==========================================================================
+   DOCK FLUTUANTE DE ATMOSFERAS (SELETOR DE TEMAS)
+   ========================================================================== */
+.theme-dock-floating {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.theme-dock-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(7, 10, 19, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--r-pill);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(var(--cyan-rgb), 0.2);
+}
+
+.theme-dock-lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--text-faint);
+  margin-right: 4px;
+}
+
+.theme-dock-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  color: var(--text-muted);
+  font-family: var(--font-hud);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.22s var(--ease);
+}
+
+.theme-dock-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.theme-dock-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(var(--cyan-rgb), 0.35);
+}
+
+.dock-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.dock-dot.purple {
+  background: #a855f7;
+  color: #a855f7;
+}
+
+.dock-dot.orange {
+  background: #ff7700;
+  color: #ff7700;
+}
+
+.dock-dot.green {
+  background: #00ff66;
+  color: #00ff66;
+}
+
+.dock-dot.blue {
+  background: #38bdf8;
+  color: #38bdf8;
+}
+
+/* ==========================================================================
    RESPONSIVIDADE
    ========================================================================== */
 @media (max-width: 1024px) {
   .hero-container {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+  .crosshairs-lab {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 24px;
   }
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1944,8 +2540,37 @@ body {
   .hero-title {
     font-size: 36px;
   }
+  .reactor-action-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .btn-boost-trigger {
+    width: 100%;
+    text-align: center;
+  }
   .hero-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .pro-player-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .theme-dock-floating {
+    bottom: 12px;
+    width: 94%;
+    max-width: 440px;
+  }
+  .theme-dock-inner {
+    padding: 6px 8px;
+    justify-content: space-around;
+    overflow-x: auto;
+  }
+  .theme-dock-lbl {
+    display: none;
+  }
+  .theme-dock-btn {
+    padding: 5px 8px;
+    font-size: 11px;
   }
   .features-grid {
     grid-template-columns: 1fr;

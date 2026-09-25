@@ -39,10 +39,13 @@ def main():
     ftp.login(FTP_USER, password)
     print("Connected and logged in successfully!")
     
-    # Destination is /htdocs
+    # Destination is /htdocs and /chibangagaming.ct.ws/htdocs
+    print("Uploading to /htdocs...")
     upload_dir(ftp, local_htdocs, "/htdocs")
+    print("Uploading to /chibangagaming.ct.ws/htdocs...")
+    upload_dir(ftp, local_htdocs, "/chibangagaming.ct.ws/htdocs")
     ftp.quit()
-    print("ALL FILES UPLOADED SUCCESSFULLY!")
+    print("ALL FILES UPLOADED SUCCESSFULLY TO BOTH DOMAIN LOCATIONS!")
 
 if __name__ == "__main__":
     main()
