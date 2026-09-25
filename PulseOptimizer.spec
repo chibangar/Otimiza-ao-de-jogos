@@ -20,6 +20,7 @@ a = Analysis(
         ('oauth_login.py', '.'),
         ('servers.py', '.'),
         ('online.py', '.'),
+        ('voicemod_importer.py', '.'),
     ],
     hiddenimports=[
         'pros',
@@ -30,6 +31,7 @@ a = Analysis(
         'oauth_login',
         'servers',
         'online',
+        'voicemod_importer',
         'tkinter',
         'webview',
         'webview.platforms.winforms',

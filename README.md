@@ -47,6 +47,7 @@ Aplica num clique o conjunto de regras essenciais para menor latência de entrad
 ### 4. Estúdio de Áudio & Soundboard
 - Módulo de modulação de voz com microfone virtual dedicado **Pulse Mic**.
 - Soundboard com suporte para atalhos globais de teclado (F1–F12, combinações).
+- **Importador Integrado do Voicemod**: Importa toda a tua coleção de sons do Voicemod com 1 clique (deteção automática de pastas `%LocalAppData%\Voicemod\memes`, descodificação de `.dat` e suporte a backups `.zip`).
 - Integração direta com Discord, Steam e jogos multijogador.
 
 ---

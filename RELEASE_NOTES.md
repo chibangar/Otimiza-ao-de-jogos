@@ -29,6 +29,7 @@
 - **Áudio Virtual Pulse Mic & Soundboard**:
   - Microfone virtual rebatizado para `Pulse Mic` e `Pulse Speakers`.
   - Soundboard integrado para partidas e chamadas Discord.
+  - **Importador Exclusivo do Voicemod**: Importa toda a biblioteca de sons do Voicemod com deteção automática de pastas `%LocalAppData%\Voicemod\memes`, descodificação de ficheiros `.dat` de áudio, metadados SQLite (`memeSearch.db`), pastas personalizadas e arquivos `.zip` / `.v2s`.
 
 - **Compilação e Releases**:
   - Binários autónomos distribuídos como `PulseOptimizer.exe` e arquivo ZIP no GitHub Releases.

@@ -1640,6 +1640,37 @@ class Api:
         except Exception as e:
             return {"success": False, "output": str(e)}
 
+    # ---------- IMPORTADOR VOICEMOD ----------
+    def voicemod_import_auto(self):
+        """Deteção automática de pastas do Voicemod (V2/V3) e importação."""
+        try:
+            import voicemod_importer
+            r = voicemod_importer.auto_import_voicemod(self._me())
+            _SB_CACHE.clear()
+            return r
+        except Exception as e:
+            return {"success": False, "output": f"Erro na importação automática: {e}"}
+
+    def voicemod_import_folder(self):
+        """Abre seletor de pasta para importar ficheiros de áudio ou .dat do Voicemod."""
+        try:
+            import voicemod_importer
+            r = voicemod_importer.pick_and_import_folder(self._me())
+            _SB_CACHE.clear()
+            return r
+        except Exception as e:
+            return {"success": False, "output": f"Erro ao importar pasta: {e}"}
+
+    def voicemod_import_file(self):
+        """Abre seletor de ficheiro/backup (.zip, .v2s, .vmsoundboard) do Voicemod."""
+        try:
+            import voicemod_importer
+            r = voicemod_importer.pick_and_import_file(self._me())
+            _SB_CACHE.clear()
+            return r
+        except Exception as e:
+            return {"success": False, "output": f"Erro ao importar ficheiro: {e}"}
+
     def _sb_samples(self, sound_id):
         import numpy as np
         if sound_id in _SB_CACHE:

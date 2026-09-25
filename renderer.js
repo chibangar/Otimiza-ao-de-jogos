@@ -117,6 +117,9 @@ async function getBackend(){
       bugsList: ()=>a.bugs_list(),
       bugsAdd: (t)=>a.bugs_add(t),
       bugsClear: ()=>a.bugs_clear(),
+      voicemodImportAuto: ()=>a.voicemod_import_auto(),
+      voicemodImportFolder: ()=>a.voicemod_import_folder(),
+      voicemodImportFile: ()=>a.voicemod_import_file(),
     };
     window.pulseAPI = window.midnightAPI;
     return window.midnightAPI;
@@ -1202,6 +1205,58 @@ document.getElementById('btn-add-sound')?.addEventListener('click', async ()=>{
   slog(r.output); toast(r.output);
   if(r.success){ try{ soundAll=await window.midnightAPI.soundboardList(); }catch{} renderSoundGrid(); }
 });
+
+// Importador de sons do Voicemod
+const vmModal = document.getElementById('voicemod-modal');
+const vmStatus = document.getElementById('vm-import-status');
+
+document.getElementById('btn-import-voicemod')?.addEventListener('click', ()=>{
+  if(vmStatus) vmStatus.textContent = '';
+  if(vmModal) vmModal.style.display = 'flex';
+});
+
+document.getElementById('btn-vm-close')?.addEventListener('click', ()=>{
+  if(vmModal) vmModal.style.display = 'none';
+});
+
+vmModal?.addEventListener('click', (e)=>{
+  if(e.target === vmModal) vmModal.style.display = 'none';
+});
+
+async function handleVmImport(promise, label){
+  if(vmStatus) vmStatus.textContent = `⏳ ${label}…`;
+  toast(`A processar importação do Voicemod…`);
+  try {
+    const r = await promise;
+    slog(r.output || 'Importação terminada.');
+    if(r.success){
+      toast(r.output || 'Sons do Voicemod importados!');
+      if(vmStatus) vmStatus.textContent = `✔ ${r.output}`;
+      try { soundAll = await window.midnightAPI.soundboardList(); } catch {}
+      renderSoundGrid();
+      setTimeout(()=>{ if(vmModal) vmModal.style.display = 'none'; }, 2200);
+    } else {
+      toast(r.output || 'Nenhum som importado.');
+      if(vmStatus) vmStatus.textContent = `⚠ ${r.output}`;
+    }
+  } catch(e) {
+    toast(`Erro: ${e}`);
+    if(vmStatus) vmStatus.textContent = `✘ Falha: ${e}`;
+  }
+}
+
+document.getElementById('btn-vm-auto')?.addEventListener('click', async ()=>{
+  await handleVmImport(window.midnightAPI.voicemodImportAuto(), 'A detetar pastas padrão do Voicemod');
+});
+
+document.getElementById('btn-vm-folder')?.addEventListener('click', async ()=>{
+  await handleVmImport(window.midnightAPI.voicemodImportFolder(), 'A aguardar seleção da pasta');
+});
+
+document.getElementById('btn-vm-file')?.addEventListener('click', async ()=>{
+  await handleVmImport(window.midnightAPI.voicemodImportFile(), 'A aguardar seleção do ficheiro/backup');
+});
+
 document.getElementById('btn-sound-stop')?.addEventListener('click', async ()=>{
   const r=await window.midnightAPI.soundboardStop(); slog(r.output);
 });

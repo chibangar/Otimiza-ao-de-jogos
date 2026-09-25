@@ -761,6 +761,7 @@
           <button class="btn gold" id="btn-cable-out">🎯 Usar Pulse Mic</button>
           <button class="btn ghost" id="btn-brand-audio">✨ Rebatizar</button>
           <button class="btn ghost" id="btn-audio-restart" title="Reinicia o serviço de áudio">↻ Reiniciar Áudio</button>
+          <button class="btn ghost" id="btn-import-voicemod" title="Importar sons do Voicemod">🎙️ Importar Voicemod</button>
           <button class="btn gold" id="btn-add-sound">＋ Adicionar Som</button>
         </div>
       </div>
@@ -933,6 +934,55 @@
         <b>❄ Titanium Frost</b>
         <small>Azul Ártico Glacial</small>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR VOICEMOD -->
+<div class="theme-overlay" id="voicemod-modal" style="display:none">
+  <div class="theme-card" style="max-width:540px;text-align:left">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:24px;flex-shrink:0;box-shadow:0 0 25px var(--accent-glow)">🎙️</div>
+      <div>
+        <h3 style="margin:0;font-size:18px;color:#fff">Importar Sons do Voicemod</h3>
+        <p class="muted small" style="margin:2px 0 0 0">Transfere toda a tua coleção de memes e áudios para o Pulse Soundboard.</p>
+      </div>
+    </div>
+    
+    <div style="background:var(--card-sub);padding:14px;border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:16px;font-size:12.5px;color:var(--text-dim);line-height:1.55">
+      💡 Suporta deteção automática do Voicemod V2/V3 (pasta <code>memes</code>, ficheiros <code>.dat</code> descodificados, nomes de <code>memeSearch.db</code>), pastas locais e backups <code>.zip</code>.
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn gold" id="btn-vm-auto" style="justify-content:flex-start;padding:13px 16px;text-align:left;height:auto">
+        <span style="font-size:20px;margin-right:12px">⚡</span>
+        <div>
+          <b style="display:block;font-size:13.5px">Deteção Automática do Voicemod</b>
+          <span style="font-size:11.5px;opacity:0.85;display:block">Procurar pastas padrão (%LocalAppData%\Voicemod\memes) e importar tudo</span>
+        </div>
+      </button>
+
+      <button class="btn ghost" id="btn-vm-folder" style="justify-content:flex-start;padding:13px 16px;text-align:left;height:auto">
+        <span style="font-size:20px;margin-right:12px">📁</span>
+        <div>
+          <b style="display:block;font-size:13.5px">Escolher Pasta com Sons</b>
+          <span style="font-size:11.5px;opacity:0.85;display:block">Seleciona uma pasta no teu computador com ficheiros .dat, .mp3, .wav ou .ogg</span>
+        </div>
+      </button>
+
+      <button class="btn ghost" id="btn-vm-file" style="justify-content:flex-start;padding:13px 16px;text-align:left;height:auto">
+        <span style="font-size:20px;margin-right:12px">🗜️</span>
+        <div>
+          <b style="display:block;font-size:13.5px">Escolher Ficheiro de Backup / ZIP</b>
+          <span style="font-size:11.5px;opacity:0.85;display:block">Importar ficheiro comprimido (.zip, .v2s, .vmsoundboard)</span>
+        </div>
+      </button>
+    </div>
+
+    <div id="vm-import-status" style="margin-top:14px;font-size:12px;min-height:18px;color:var(--accent);font-weight:600"></div>
+
+    <div style="margin-top:16px;display:flex;justify-content:flex-end">
+      <button class="btn outline small" id="btn-vm-close">Fechar</button>
     </div>
   </div>
 </div>
